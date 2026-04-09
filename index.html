@@ -360,6 +360,11 @@
     .mail-copy-btn:hover{background:var(--az-bg)}
     .mail-open-btn{padding:8px 18px;border:none;border-radius:6px;background:var(--az);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
     .mail-open-btn:hover{background:var(--az2)}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .syncing #sync-icon{animation:spin .8s linear infinite}
+    #sync-btn:hover{color:white!important}
+    .sync-error{color:rgba(255,120,120,.9)!important}
   </style>
 </head>
 <body>
@@ -379,6 +384,14 @@
   </div>
   <div class="header-sep"></div>
   <div class="header-badge">Total <span id="header-count">43</span> asignaturas</div>
+  <div class="header-sep"></div>
+  <div id="sync-status" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.75)">
+    <svg id="sync-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+    <span id="sync-label">Cargando...</span>
+    <button id="sync-btn" title="Recargar datos" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,.7);padding:0;display:flex;align-items:center">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+    </button>
+  </div>
   <div class="header-sep"></div>
   <a href="mailto:pverab@santotomas.cl" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92)" title="Directora E-Learning UST">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
@@ -536,51 +549,6 @@
 <script>
 
 // ─── AVANCE (datos reales Google Sheets) ───
-const AVANCE = {
-  "Ingeniería Térmica": {avance:0, obs:"Profesor no responde correos", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Gestión Incertidumbre y Simulación": {avance:0, obs:"Planificación validada por el profesor", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Finanzas Corporativas": {avance:0, obs:"STEC, Planificación validada", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Inteligencia de Negocios": {avance:0, obs:"Revisando enlaces de videos en la planificación", hitos:{s0:"Enviada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Electivo I: Energías Renovables": {avance:0, obs:"Planificación esperando por revisión de bibliografía", hitos:{s0:"Enviada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Electivo I: Op. Humanitarias": {avance:0, obs:"Trabajando en la planificación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Regresión y Pronóstico de Datos": {avance:0, obs:"", hitos:{s0:"En construcción",s1s2:"En construcción",s3s4:"En construcción",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Proyecto de Título": {avance:0, obs:"Se envia planificación a Leonardo", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Pronóstico de Datos e IA": {avance:0, obs:"", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Electivo III: Op. Humanitarias": {avance:9, obs:"", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Electivo III: Modelo Neg. Residuos": {avance:9, obs:"Planificación casi lista para enviar a validar. Problema A+S", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Electivo I: Tecnologías Excavación": {avance:0, obs:"El docente avisa que los contenidos del programa no corresponden, se escaló a la DDC", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Electivo III: IA y Tecnologías 4.0": {avance:0, obs:"Planificación en validación de DI", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Gestión de Operaciones Mineras": {avance:0, obs:"En espera de entrega de validación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Taller Emprendimiento en Minería": {avance:0, obs:"En espera de entrega de validación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Plan de Negocios": {avance:0, obs:"Ajustando comentarios docentes en la planificación.", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Simulación de Negocios": {avance:0, obs:"Lab. virtual sincrónico", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Mercado de Capitales": {avance:0, obs:"AJUSTE DE AULA", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Análisis de Datos": {avance:0, obs:"AJUSTE DE AULA", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Inglés Avanzado I": {avance:0, obs:"Ajustando comentarios docentes", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Políticas Públicas e Innovación": {avance:0, obs:"Agendar reunión con el profesor", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Contabilidad Financiera": {avance:0, obs:"Planificación validada por el profesor", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Microeconomía": {avance:0, obs:"Ajuste de horas", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Derecho Comercial y Laboral": {avance:0, obs:"Trabajando en la planificación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Evaluación de Proyectos": {avance:9, obs:"Planificación enviada a DEL", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
-  "Sist. Prod. Cultivos Sostenibles": {avance:0, obs:"Planificación validada por el profesor", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
-  "Sist. Prod. Frutales Sostenibles": {avance:9, obs:"Inicia 15 junio", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
-  "Trabajo de Título": {avance:0, obs:"Inicia 1 septiembre", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
-  "Calidad e Inocuidad Alimentaria": {avance:0, obs:"Inicia 1 septiembre", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
-  "Análisis de Datos Cualitativos": {avance:0, obs:"Ajuste de aula", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "Análisis de Datos Cuantitativos": {avance:0, obs:"Lab. virtual sincrónico", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Neuroadaptación y Ambliopía": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Bases Gestión en Imagenología": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Herramientas y Atributos Calidad I": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Bioinformática": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Componentes Bioactivos en Alimentos": {avance:0, obs:"Reunión 8/4", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Bases Comportamiento Alimentario": {avance:0, obs:"Reunión 8/4", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Mercado I+D+i I": {avance:0, obs:"Reunión 8/4", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Optometría Clínica IV": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Procesos Ind. Alimentos III": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Tecnología de Embalajes": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Gestión Talento Humano": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
-  "FP: Gestión de Procesos": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}}
-};
 
 const HITO_META = [
   {key:'s0',    label:'S0 Videos B y C', fecha:'31/3'},
@@ -651,51 +619,131 @@ const PROD = {
   "Narrativa Digital":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
 };
 
-const DATA = [
-  {facultad:"Ingeniería",asignatura:"Ingeniería Térmica",docente:"Rojo Camacho Jorge H.",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Gestión Incertidumbre y Simulación",docente:"Nicolas Rodriguez",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Finanzas Corporativas",docente:"Mauricio Torres",jp:"José Luis",di:"Cristián",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Inteligencia de Negocios",docente:"Claudio Henriquez",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Electivo I: Energías Renovables",docente:"Leonardo Rodriguez",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Electivo I: Op. Humanitarias",docente:"Leonardo Rodriguez",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No inicia",fmt:"Pendiente",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Regresión y Pronóstico de Datos",docente:"Francisco Labbe",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Proyecto de Título",docente:"Monserrat Martinez",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Pronóstico de Datos e IA",docente:"Claudio Henriquez",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Electivo III: Op. Humanitarias",docente:"Rodrigo Barraza",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"No inicia",fmt:"Pendiente",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Electivo III: Modelo Neg. Residuos",docente:"Ana Jimenez",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Electivo I: Tecnologías Excavación",docente:"Cristian Rivera",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Electivo III: IA y Tecnologías 4.0",docente:"Luis Alvarez",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Sin respuesta",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"Sin respuesta hace más de 3 días. Requiere seguimiento.",correo:"",fechaSR:"2026-04-01"},
-  {facultad:"Ingeniería",asignatura:"Gestión de Operaciones Mineras",docente:"Juan Orellana",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ingeniería",asignatura:"Taller Emprendimiento en Minería",docente:"Juan Orellana",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Plan de Negocios",docente:"Paola Salas",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Simulación de Negocios",docente:"Rodrigo Ramirez",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Mercado de Capitales",docente:"Ajuste DEL",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"No aplica",planif:"No aplica",fmt:"Antiguo",obs:"Ajuste DEL — no requiere reunión.",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Análisis de Datos",docente:"Ajuste DEL",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"No aplica",planif:"No aplica",fmt:"Antiguo",obs:"Ajuste DEL — no requiere reunión.",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Inglés Avanzado I",docente:"Claudia Jeria",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Finanzas Corporativas",docente:"Sergio Álvarez",jp:"Noelia",di:"José Luis",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"—",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Políticas Públicas e Innovación",docente:"Jorge Miranda",jp:"Noelia",di:"José Luis",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Agendada",planif:"En construcción",fmt:"—",obs:"Reunión agendada. Pendiente confirmación de planificación.",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Contabilidad Financiera",docente:"Luis Lagos",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Microeconomía",docente:"Felipe Riffo",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
-  {facultad:"Economía y Negocios",asignatura:"Derecho Comercial y Laboral",docente:"Felipe Lagos",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
-  {facultad:"Recursos Naturales",asignatura:"Evaluación de Proyectos",docente:"Raúl González",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Recursos Naturales",asignatura:"Sist. Prod. Cultivos Sostenibles",docente:"Claudio Koplow",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Recursos Naturales",asignatura:"Sist. Prod. Frutales Sostenibles",docente:"Katherine Garcia",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Recursos Naturales",asignatura:"Trabajo de Título",docente:"Alexis Ortiz",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No inicia",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Recursos Naturales",asignatura:"Calidad e Inocuidad Alimentaria",docente:"Alexis Ortiz",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No inicia",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ciencias Sociales",asignatura:"Análisis de Datos Cualitativos",docente:"Verónica Villagra",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Ciencias Sociales",asignatura:"Análisis de Datos Cuantitativos",docente:"Daniel Valenzuela",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Salud",asignatura:"FP: Neuroadaptación y Ambliopía",docente:"Carol Retamal",jp:"Noelia",di:"Natalia",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Sin DG asignado.",correo:""},
-  {facultad:"Salud",asignatura:"FP: Bases Gestión en Imagenología",docente:"Sin asignar",jp:"Noelia",di:"Natalia",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
-  {facultad:"Salud",asignatura:"FP: Herramientas y Atributos Calidad I",docente:"Sin asignar",jp:"Noelia",di:"Brenda",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
-  {facultad:"Salud",asignatura:"FP: Bioinformática",docente:"Sin asignar",jp:"Noelia",di:"Brenda",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
-  {facultad:"Salud",asignatura:"FP: Componentes Bioactivos en Alimentos",docente:"Vilma Robles",jp:"José Luis",di:"Magdalena",dg:"—",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Salud",asignatura:"FP: Bases Comportamiento Alimentario",docente:"Víctor Sepúlveda",jp:"José Luis",di:"Magdalena",dg:"—",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Salud",asignatura:"FP: Mercado I+D+i I",docente:"Rodrigo Alarcón",jp:"José Luis",di:"Magdalena",dg:"—",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Salud",asignatura:"FP: Factores Fisiológicos y Psicológicos del Ejercicio",docente:"Sin asignar",jp:"José Luis",di:"Noelia Escalona",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
-  {facultad:"Formación General",asignatura:"Interculturalidad Pueblos Indígenas",docente:"Javier Huiliñir",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Formación General",asignatura:"Inglés Cultura POP",docente:"Javiera Varela",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
-  {facultad:"Formación General",asignatura:"Narrativa Digital",docente:"Claudia Ruiz",jp:"José Luis",di:"Magdalena",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
-];
+
+// ─── GOOGLE SHEETS EN TIEMPO REAL ───────────────────────────────────────────
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&sheet=Seguimiento";
+
+// Parsear CSV respetando comillas y saltos de línea dentro de celdas
+function parseCSV(text){
+  const rows=[];
+  let row=[], cell='', inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'&&text[i+1]==='"'){cell+='"';i++;}
+      else if(c==='"'){inQ=false;}
+      else{cell+=c;}
+    } else {
+      if(c==='"'){inQ=true;}
+      else if(c===','){row.push(cell.trim());cell='';}
+      else if(c==='\n'||(c==='\r'&&text[i+1]==='\n')){
+        if(c==='\r')i++;
+        row.push(cell.trim());rows.push(row);row=[];cell='';
+      } else {cell+=c;}
+    }
+  }
+  if(cell||row.length)rows.push([...row,cell.trim()]);
+  return rows;
+}
+
+// Mapear estado de hito
+function mapHito(v){
+  if(!v||v==='—'||v==='')return '—';
+  if(v.includes('Validada'))return 'Validada';
+  if(v.includes('Enviada'))return 'Enviada';
+  if(v.includes('En construcción'))return 'En construcción';
+  if(v.includes('No inicia'))return 'No inicia';
+  if(v.includes('No aplica'))return 'No aplica';
+  return v;
+}
+
+// Construir DATA y AVANCE desde filas CSV (fila 0 = headers fusionados, filas 1-43 = datos)
+function buildData(rows){
+  const data=[], avance={};
+  // Filas 1 en adelante son asignaturas
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i];
+    if(!r[1]||r[1].trim()==='')continue; // saltar filas vacías
+    const asig   = r[1]||'';
+    const pctRaw = (r[20]||'0%').replace('%','').trim();
+    const pct    = parseInt(pctRaw)||0;
+    data.push({
+      facultad:      r[0]||'',
+      asignatura:    asig,
+      docente:       r[2]||'',
+      fmt:           r[3]||'',
+      jp:            r[4]||'',
+      di:            r[5]||'',
+      dg:            r[6]||'—',
+      implementador: r[7]||'',
+      reunion:       r[8]||'',
+      planif:        r[9]||'',
+      obs:           r[22]||'',
+      correo:        r[24]||'',
+      fechaSR:       r[25]||'',
+    });
+    avance[asig]={
+      avance: pct,
+      obs:    r[22]||'',
+      hitos:{
+        s0:    mapHito(r[10]),
+        s1s2:  mapHito(r[11]),
+        s3s4:  mapHito(r[12]),
+        s5s6:  mapHito(r[13]),
+        s7s8:  mapHito(r[14]),
+        s9s10: mapHito(r[15]),
+        s11s12:mapHito(r[16]),
+        s13s14:mapHito(r[17]),
+        s15s16:mapHito(r[18]),
+        s17s18:mapHito(r[19]),
+      }
+    };
+  }
+  return {data, avance};
+}
+
+let DATA=[], AVANCE={};
+
+function setSyncLabel(txt, isError=false){
+  const lbl=document.getElementById('sync-label');
+  if(lbl){lbl.textContent=txt;lbl.className=isError?'sync-error':'';}
+}
+
+async function loadSheetData(silent=false){
+  const statusEl=document.getElementById('sync-status');
+  if(statusEl)statusEl.closest('header')?.classList?.add('syncing')||statusEl.classList.add('syncing');
+  if(!silent)setSyncLabel('Actualizando...');
+  try{
+    const res = await fetch(SHEET_CSV+'&nocache='+Date.now());
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    const built= buildData(rows);
+    DATA   = built.data;
+    AVANCE = built.avance;
+    // Guardar caché en memoria
+    window._ust_cache = {DATA:[...DATA], AVANCE:{...AVANCE}, ts:Date.now()};
+    const now=new Date();
+    const hm=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+    const dm=now.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+    setSyncLabel(`Actualizado ${hm} · ${dm}`);
+    return true;
+  }catch(err){
+    console.warn('Fetch sheet error:',err);
+    // Intentar caché en memoria
+    if(window._ust_cache&&window._ust_cache.DATA){
+      DATA=window._ust_cache.DATA; AVANCE=window._ust_cache.AVANCE;
+      const ago=Math.round((Date.now()-window._ust_cache.ts)/60000);
+      setSyncLabel(`Sin conexión · caché hace ${ago}min`,true);
+      return true;
+    }
+    setSyncLabel('Error al cargar datos',true);
+    return false;
+  }finally{
+    if(statusEl)statusEl.classList.remove('syncing');
+  }
+}
+
 
 // ─── STATE ───
 let filters={jp:null,di:null,dg:null,implementador:null,facultad:null,planif:null};
@@ -1038,8 +1086,35 @@ document.querySelectorAll('th[data-col]').forEach(th=>{
 // ─── SEARCH ───
 document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.value.trim();renderTable();renderKPIs();renderFacBar()});
 
-// ─── INIT ───
-renderSidebar();renderKPIs();renderFacBar();renderTable();
+// ─── INIT ASÍNCRONO (datos desde Google Sheets) ───
+(async()=>{
+  const ok = await loadSheetData();
+  if(ok){
+    renderSidebar();
+    renderKPIs();
+    renderFacBar();
+    renderTable();
+    document.getElementById('header-count').textContent = DATA.length;
+  }
+  // Botón recarga manual
+  document.getElementById('sync-btn')?.addEventListener('click', async()=>{
+    await loadSheetData();
+    renderSidebar();
+    renderKPIs();
+    renderFacBar();
+    renderTable();
+    document.getElementById('header-count').textContent = DATA.length;
+    if(selectedIdx>=0) openPanel(selectedIdx);
+  });
+  // Auto-refresh cada 5 minutos
+  setInterval(async()=>{
+    await loadSheetData(true);
+    renderTable();
+    renderKPIs();
+    renderFacBar();
+    document.getElementById('header-count').textContent = DATA.length;
+  }, 5*60*1000);
+})();
 
 // ─── ESCALAMIENTO ───────────────────────────────────────────────
 const ESCAL_NIVELES = [
