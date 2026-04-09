@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seguimiento Proyecto e-Learning UST 2026-1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      /* Paleta referencia Dashboard_UST */
+      --az:#1A3A6B;   --az2:#2E5FA3;  --az-bg:#EBF0F8;
+      --ve:#27A06E;   --ve-bg:#EDF7EF;
+      --ro:#D63031;   --ro-bg:#FDF0F0;
+      --am:#C8A951;   --am-bg:#F5EDD0;
+      --gr:#999;      --gr-bg:#F0F0F0;
+      --bg:#EEEAE0;   --surface:#FFFFFF; --surface2:#F8F6EE;
+      --borde:#DDD8C4;
+      --text:#1C1C1C; --text-muted:#666; --text-light:#AAA;
+      --radius:11px;  --radius-sm:7px;
+      --shadow:0 1px 4px rgba(26,58,107,.08),0 3px 10px rgba(26,58,107,.06);
+    }
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13.5px;line-height:1.5}
+
+    /* ── HEADER ── */
+    header{
+      background:var(--az);padding:0 26px;display:flex;align-items:center;gap:14px;
+      height:56px;position:sticky;top:0;z-index:200;
+      box-shadow:0 2px 10px rgba(26,58,107,.25);
+      border-bottom:3px solid var(--am);
+      position:relative;overflow:hidden;
+    }
+    header::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(200,169,81,.07);pointer-events:none}
+    .logo-text{font-size:14px;font-weight:700;color:white;line-height:1.2}
+    .logo-sub{font-size:11px;color:rgba(255,255,255,.6);font-weight:400}
+    .header-sep{flex:1}
+    .header-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:4px 14px;font-size:12px;color:rgba(255,255,255,.9)}
+    .header-badge span{font-weight:700;font-family:'DM Mono',monospace}
+
+    /* ── LAYOUT ── */
+    .layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 56px)}
+
+    /* ── SIDEBAR ── */
+    aside{
+      background:var(--surface);border-right:1px solid var(--borde);
+      padding:18px 14px;position:sticky;top:56px;
+      height:calc(100vh - 56px);overflow-y:auto;
+    }
+    .filter-group{margin-bottom:20px}
+    .filter-label{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--az);margin-bottom:7px;padding-left:2px}
+    .filter-btn{
+      display:flex;align-items:center;justify-content:space-between;
+      width:100%;background:transparent;border:1px solid transparent;
+      border-radius:var(--radius-sm);padding:6px 9px;font-size:12.5px;
+      color:var(--text-muted);cursor:pointer;transition:all .14s;
+      margin-bottom:2px;font-family:inherit;text-align:left;
+    }
+    .filter-btn:hover{background:var(--surface2);color:var(--text)}
+    .filter-btn.active{background:var(--az-bg);border-color:#c5d2e8;color:var(--az);font-weight:600}
+    .filter-btn .cnt{font-size:11px;background:var(--gr-bg);border-radius:10px;padding:1px 7px;color:var(--text-muted);flex-shrink:0;font-family:'DM Mono',monospace}
+    .filter-btn.active .cnt{background:var(--am-bg);color:#7A5C00}
+    .clear-all{display:block;width:100%;border:1px solid var(--borde);background:transparent;border-radius:var(--radius-sm);padding:5px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .14s;margin-top:2px;text-align:center}
+    .clear-all:hover{background:var(--surface2);color:var(--text)}
+
+    /* ── MAIN ── */
+    main{padding:20px 22px;overflow-x:auto}
+
+    /* ── KPI BAR (compacta) ── */
+    .kpi-bar{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius-sm);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+    .kpi{flex:1;display:flex;align-items:center;gap:10px;padding:10px 18px;position:relative}
+    .kpi+.kpi::before{content:'';position:absolute;left:0;top:18%;height:64%;width:1px;background:var(--borde)}
+    .kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .kpi-icon svg{width:16px;height:16px}
+    .k-az .kpi-icon{background:var(--az-bg)} .k-az .kpi-icon svg{stroke:var(--az)}
+    .k-ve .kpi-icon{background:var(--ve-bg)} .k-ve .kpi-icon svg{stroke:#1E6B2E}
+    .k-am .kpi-icon{background:var(--am-bg)} .k-am .kpi-icon svg{stroke:#7A5C00}
+    .k-ro .kpi-icon{background:var(--ro-bg)} .k-ro .kpi-icon svg{stroke:#8B1A1A}
+    .kpi-info{display:flex;flex-direction:column;gap:1px}
+    .kpi-val{font-size:20px;font-weight:700;line-height:1.1;font-family:'DM Mono',monospace}
+    .kpi-val.c-az{color:var(--az)}.kpi-val.c-ve{color:#1E6B2E}.kpi-val.c-am{color:#7A5C00}.kpi-val.c-ro{color:#8B1A1A}
+    .kpi-name{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+    /* ── FAC BAR ── */
+    .fac-bar{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+    .fac-card{
+      flex:1;min-width:120px;
+      background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius-sm);
+      padding:8px 12px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .fac-card:hover{border-color:var(--az2);box-shadow:0 2px 8px rgba(26,58,107,.13)}
+    .fac-card.active{border-color:var(--az);background:var(--az-bg)}
+    .fac-card.active .fac-name{color:var(--az)}
+    .fac-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px}
+    .fac-name{font-size:10.5px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;line-height:1.2;flex:1;margin-right:6px}
+    .fac-count{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:var(--az);flex-shrink:0}
+    .fac-prog-wrap{height:4px;background:var(--borde);border-radius:2px;overflow:hidden}
+    .fac-prog{height:100%;background:var(--ve);border-radius:2px;transition:width .4s}
+    .fac-sub{display:flex;justify-content:space-between;margin-top:4px}
+    .fac-ok{font-size:9.5px;color:#1a6e45;font-weight:600}
+    .fac-pend{font-size:9.5px;color:var(--text-muted)}
+
+    /* ── SEARCH ── */
+    .search-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .search-wrap{position:relative;flex:1}
+    .search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-light);pointer-events:none}
+    #search{
+      width:100%;background:var(--surface);border:1px solid var(--borde);
+      border-radius:var(--radius);padding:8px 12px 8px 34px;
+      font-size:13px;color:var(--text);font-family:inherit;outline:none;
+      transition:border-color .15s;box-shadow:var(--shadow);
+    }
+    #search:focus{border-color:var(--az2)}
+    #search::placeholder{color:var(--text-light)}
+    .results-info{font-size:12px;color:var(--text-muted);white-space:nowrap}
+
+    /* ── TABLE ── */
+    .hint-row{font-size:11.5px;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+    .table-wrap{background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    thead tr{background:var(--az)}
+    th{padding:10px 13px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.85);text-align:left;white-space:nowrap;cursor:pointer;user-select:none;transition:color .14s}
+    th:hover{color:white}
+    th.sort-asc::after{content:' ↑';color:var(--am)}
+    th.sort-desc::after{content:' ↓';color:var(--am)}
+    tbody tr{border-bottom:1px solid var(--borde);cursor:pointer;transition:background .1s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover td{background:var(--surface2)}
+    tbody tr.selected td{background:var(--am-bg)}
+    td{padding:9px 13px;font-size:13px;vertical-align:middle}
+    td.asig-col{font-weight:500;max-width:220px}
+
+    /* ── CHIPS ── */
+    .chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid transparent}
+    .chip-jp {background:#F3E5F5;color:#6A1B9A;border-color:#dbb8f0}
+    .chip-di {background:var(--ve-bg);color:#1E6B2E;border-color:#90d4a8}
+    .chip-dg {background:var(--am-bg);color:#7A5C00;border-color:var(--am)}
+    .chip-imp{background:var(--az-bg);color:var(--az2);border-color:#b8cbec}
+    .chip-fac{background:#E3F2FD;color:#1565C0;border-color:#9ecff5}
+
+    /* ── BADGES REUNIÓN ── */
+    .rb{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;border:1px solid transparent}
+    .rb::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .rb-r{background:var(--ve-bg);color:#1E6B2E;border-color:#90d4a8}.rb-r::before{background:var(--ve)}
+    .rb-a{background:var(--am-bg);color:#7A5C00;border-color:var(--am)}.rb-a::before{background:var(--am)}
+    .rb-s{background:var(--ro-bg);color:#8B1A1A;border-color:#e08080}.rb-s::before{background:var(--ro)}
+    .rb-n{background:var(--gr-bg);color:#555;border-color:#ccc}.rb-n::before{background:var(--gr)}
+
+    /* ── PLANIF DOT ── */
+    .pl-dot{display:inline-flex;align-items:center;gap:5px;font-size:12.5px}
+    .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .dot-r{background:var(--ro)}.dot-y{background:var(--am)}.dot-g{background:var(--ve)}.dot-x{background:var(--gr)}.dot-d{background:#7B3FBE}
+
+    /* ── EMPTY ── */
+    .empty-state{padding:56px 20px;text-align:center;color:var(--text-muted)}
+    .empty-state p{font-size:13px}
+
+    /* ── PANEL LATERAL ── */
+    #overlay{display:none;position:fixed;inset:0;background:rgba(26,58,107,.18);z-index:300}
+    #panel{
+      position:fixed;top:0;right:0;width:490px;height:100vh;
+      background:var(--surface);box-shadow:-4px 0 32px rgba(26,58,107,.18);
+      z-index:400;display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+    }
+    #panel.open{transform:translateX(0)}
+    #overlay.open{display:block}
+
+    /* Panel header — azul UST con borde dorado */
+    .panel-header{
+      background:var(--az);padding:16px 20px 14px;
+      flex-shrink:0;position:relative;overflow:hidden;
+      border-bottom:3px solid var(--am);
+    }
+    .panel-header::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(200,169,81,.08);pointer-events:none}
+    .panel-fac-tag{
+      display:inline-block;background:rgba(200,169,81,.25);border:1px solid rgba(200,169,81,.5);
+      border-radius:4px;padding:2px 10px;font-size:10px;font-weight:700;
+      letter-spacing:.06em;text-transform:uppercase;color:var(--am);margin-bottom:8px;
+    }
+    .panel-title{font-size:16px;font-weight:700;color:white;line-height:1.3;margin-bottom:10px}
+    .panel-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+    .panel-chips{display:flex;flex-wrap:wrap;gap:5px}
+    /* chips blancos para el header oscuro */
+    .pchip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:white}
+    .avance-badge{
+      background:var(--am);color:var(--az);
+      border-radius:6px;padding:4px 14px;font-size:12px;font-weight:700;
+      white-space:nowrap;font-family:'DM Mono',monospace;
+    }
+    .panel-close{
+      background:rgba(255,255,255,.15);border:none;border-radius:50%;
+      width:30px;height:30px;cursor:pointer;display:flex;align-items:center;
+      justify-content:center;transition:background .14s;flex-shrink:0;
+    }
+    .panel-close:hover{background:rgba(255,255,255,.3)}
+
+    .panel-body{flex:1;overflow-y:auto;padding:18px 20px;background:var(--bg)}
+
+    /* ── Sección título (panel) ── */
+    .ps-title{
+      font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--az);margin-bottom:10px;display:flex;align-items:center;gap:8px;
+    }
+    .ps-title::after{content:'';flex:1;height:2px;background:var(--am-bg)}
+    .panel-section{margin-bottom:22px}
+
+    /* ── DONA ── */
+    .dona-wrap{display:flex;align-items:center;gap:18px;margin-bottom:12px}
+    .dona-canvas{width:110px;height:110px;flex-shrink:0}
+    .dona-legend{flex:1}
+    .dl-item{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px}
+    .dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .dl-label{flex:1;color:var(--text-muted)}
+    .dl-val{font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
+
+    /* ── ESTADO RECURSOS (5 tarjetas) ── */
+    .recursos-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+    .rc{border-radius:var(--radius-sm);padding:10px 8px;text-align:center;border:1px solid}
+    .rc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px}
+    .rc-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+    .rc0{background:var(--az-bg);border-color:#b8cbec}.rc0 .rc-val{color:var(--az)}
+    .rc1{background:var(--ve-bg);border-color:#90d4a8}.rc1 .rc-val{color:#1E6B2E}
+    .rc2{background:var(--am-bg);border-color:var(--am)}.rc2 .rc-val{color:#7A5C00}
+    .rc3{background:#F3E5F5;border-color:#dbb8f0}.rc3 .rc-val{color:#6A1B9A}
+    .rc4{background:#E3F7EC;border-color:#70c99a}.rc4 .rc-val{color:#1a6e45}
+
+    /* ── TABLA HITOS ── */
+    .hitos-table{width:100%;border-collapse:collapse;font-size:12px}
+    .hitos-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);padding:4px 6px;border-bottom:2px solid var(--borde);text-align:left;white-space:nowrap}
+    .hitos-table td{padding:6px 6px;border-bottom:1px solid var(--borde);vertical-align:middle}
+    .hitos-table tr:last-child td{border-bottom:none}
+    .hitos-table td:first-child{font-size:10px;font-weight:700;color:var(--text);white-space:nowrap;width:90px}
+    .hitos-table td:nth-child(2){font-size:10px;color:var(--text-muted);white-space:nowrap}
+    .hb{display:inline-block;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+    .hb-v{background:#E3F7EC;color:#1a6e45;border:1px solid #90d4a8}
+    .hb-e{background:var(--am-bg);color:#7A5C00;border:1px solid var(--am)}
+    .hb-c{background:var(--az-bg);color:var(--az);border:1px solid #9ecff5}
+    .hb-n{background:#F5F5F5;color:#888;border:1px solid #ddd}
+    .hb-x{background:#FAFAFA;color:#bbb;border:1px solid #e5e5e5}
+
+    /* ── DISTRIBUCIÓN HORAS ── */
+    .horas-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .hora-card{background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:10px 12px;box-shadow:var(--shadow)}
+    .hora-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:2px}
+    .hora-val{font-size:22px;font-weight:700;color:var(--az);font-family:'DM Mono',monospace}
+    .hora-unit{font-size:12px;color:var(--text-muted);font-weight:400}
+    .horas-bar{height:10px;border-radius:5px;overflow:hidden;background:var(--borde);display:flex}
+    .hb-pres{background:var(--az);transition:width .4s}
+    .hb-asyn{background:var(--am);transition:width .4s}
+    .horas-legend{display:flex;gap:14px;margin-top:7px;font-size:11px;color:var(--text-muted)}
+    .horas-legend span{display:flex;align-items:center;gap:4px}
+    .horas-legend .sq{width:10px;height:10px;border-radius:2px}
+
+    /* ── RECURSOS T1-T4 ── */
+    .t-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .t-card{border-radius:var(--radius-sm);padding:12px 10px;text-align:center;border:1px solid}
+    .t-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:6px}
+    .t-val{font-size:26px;font-weight:700;font-family:'DM Mono',monospace}
+    .t-desc{font-size:10px;color:var(--text-muted);margin-top:4px;line-height:1.3}
+    .t1{background:var(--ve-bg);border-color:#90d4a8}.t1 .t-val{color:#1E6B2E}
+    .t2{background:#E3F2FD;border-color:#9ecff5}.t2 .t-val{color:#1565C0}
+    .t3{background:var(--am-bg);border-color:var(--am)}.t3 .t-val{color:#7A5C00}
+    .t4{background:#F3E5F5;border-color:#dbb8f0}.t4 .t-val{color:#6A1B9A}
+
+    /* ── EQUIPO ── */
+    .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .team-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--borde);background:var(--surface);box-shadow:var(--shadow)}
+    .team-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+    .av-jp{background:#F3E5F5;color:#6A1B9A}
+    .av-di{background:var(--ve-bg);color:#1E6B2E}
+    .av-dg{background:var(--am-bg);color:#7A5C00}
+    .av-imp{background:var(--az-bg);color:var(--az)}
+    .team-role{font-size:10px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+    .team-name{font-size:12.5px;font-weight:600;color:var(--text)}
+
+    /* ── DOCENTE ── */
+    .docente-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--borde);background:var(--surface);box-shadow:var(--shadow)}
+    .doc-av{width:40px;height:40px;border-radius:50%;background:var(--az-bg);border:2px solid var(--az2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--az);flex-shrink:0}
+    .doc-name{font-size:14px;font-weight:600;color:var(--text)}
+    .doc-label{font-size:11px;color:var(--text-muted)}
+
+    /* ── OBSERVACIONES ── */
+    .obs-box{background:var(--am-bg);border:1px solid var(--am);border-left:4px solid var(--am);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text);line-height:1.6}
+    .obs-empty{font-size:12.5px;color:var(--text-muted);font-style:italic}
+
+    /* ── AVANCE CELL ── */
+    .av-cell{display:flex;align-items:center;gap:7px;min-width:90px}
+    .av-bar-wrap{flex:1;height:5px;background:var(--borde);border-radius:3px;overflow:hidden;min-width:40px}
+    .av-bar{height:100%;border-radius:3px;background:var(--ve);transition:width .3s}
+    .av-pct{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap;min-width:28px;text-align:right}
+    .av-pct.hi{color:#1a6e45}.av-pct.mid{color:#7A5C00}.av-pct.lo{color:var(--text-muted)}
+
+    /* ── URGENCIA ── */
+    .urg-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;vertical-align:middle;margin-right:3px;animation:pulse 1.6s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .urg-row{background:rgba(214,48,49,.025)!important}
+    .urg-row:hover{background:rgba(214,48,49,.07)!important}
+
+    /* ── EXPORT BTN ── */
+    .export-btn{
+      display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+      background:var(--az);color:white;border:none;border-radius:var(--radius-sm);
+      padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;
+      font-family:inherit;transition:background .15s;white-space:nowrap;
+    }
+    .export-btn:hover{background:var(--az2)}
+    .export-btn svg{width:13px;height:13px;stroke:white;fill:none;flex-shrink:0}
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--borde);border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:#bbb6a6}
+
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      aside{position:static;height:auto}
+      .kpi-bar{flex-wrap:wrap}
+      #panel{width:100%}
+    }
+
+    /* ── ESCALAMIENTO ── */
+    .escal-timeline{display:flex;flex-direction:column;gap:0;margin:10px 0 14px}
+    .escal-step{display:flex;align-items:flex-start;gap:10px;position:relative;padding-bottom:10px}
+    .escal-step:last-child{padding-bottom:0}
+    .escal-step::before{content:'';position:absolute;left:12px;top:24px;bottom:0;width:2px;background:var(--borde)}
+    .escal-step:last-child::before{display:none}
+    .escal-dot{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;z-index:1;border:2px solid transparent}
+    .escal-dot.done{background:#E3F7EC;border-color:#90d4a8;color:#1a6e45}
+    .escal-dot.active{background:var(--ro);border-color:#b02020;color:white;box-shadow:0 0 0 3px rgba(214,48,49,.18)}
+    .escal-dot.pending{background:var(--surface);border-color:var(--borde);color:var(--text-muted)}
+    .escal-info{flex:1;padding-top:3px}
+    .escal-label{font-size:12px;font-weight:600;color:var(--text)}
+    .escal-label.active{color:var(--ro)}
+    .escal-meta{font-size:11px;color:var(--text-muted);margin-top:1px}
+    .escal-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:5px;vertical-align:middle}
+    .escal-badge.activo{background:rgba(214,48,49,.12);color:var(--ro)}
+    .escal-badge.completado{background:#E3F7EC;color:#1a6e45}
+    .escal-btn{width:100%;padding:9px 14px;border:none;border-radius:var(--radius-sm);background:var(--ro);color:white;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .18s;margin-top:4px}
+    .escal-btn:hover{background:#b02020}
+    .escal-btn svg{width:14px;height:14px;stroke:white;fill:none;flex-shrink:0}
+    /* Modal correo */
+    .mail-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+    .mail-modal{background:white;border-radius:12px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+    .mail-modal-header{background:var(--az);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+    .mail-modal-title{font-size:14px;font-weight:700;color:white}
+    .mail-modal-close{background:rgba(255,255,255,.15);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+    .mail-modal-body{padding:20px}
+    .mail-field{margin-bottom:12px}
+    .mail-field label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .mail-field input,.mail-field textarea{width:100%;border:1px solid var(--borde);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);box-sizing:border-box;resize:vertical}
+    .mail-field textarea{min-height:120px;line-height:1.5}
+    .mail-field input:focus,.mail-field textarea:focus{outline:none;border-color:var(--az2)}
+    .mail-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+    .mail-copy-btn{padding:8px 16px;border:1px solid var(--borde);border-radius:6px;background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit}
+    .mail-copy-btn:hover{background:var(--az-bg)}
+    .mail-open-btn{padding:8px 18px;border:none;border-radius:6px;background:var(--az);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+    .mail-open-btn:hover{background:var(--az2)}
+  </style>
+</head>
+<body>
+
+<header>
+  <!-- Logo SVG inline -->
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="flex-shrink:0">
+    <rect width="32" height="32" rx="8" fill="rgba(255,255,255,.12)"/>
+    <rect x="1" y="1" width="30" height="30" rx="7.5" stroke="rgba(200,169,81,.5)"/>
+    <path d="M9 11h14M9 16h10M9 21h12" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="23" cy="21" r="3.5" fill="rgba(200,169,81,.9)"/>
+    <path d="M22 21l.9.9 1.6-1.6" stroke="#1A3A6B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div>
+    <div class="logo-text" style="font-size:13px;letter-spacing:.3px">UNIVERSIDAD SANTO TOMÁS</div>
+    <div class="logo-sub">Seguimiento Proyecto e-Learning UST 2026-1</div>
+  </div>
+  <div class="header-sep"></div>
+  <div class="header-badge">Total <span id="header-count">43</span> asignaturas</div>
+  <div class="header-sep"></div>
+  <a href="mailto:pverab@santotomas.cl" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92)" title="Directora E-Learning UST">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+    Paulina Vera &mdash; Directora
+  </a>
+</header>
+
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <main>
+    <div class="kpi-bar" id="kpi-bar"></div>
+    <div class="fac-bar" id="fac-bar"></div>
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search" placeholder="Buscar asignatura o docente…" autocomplete="off"/>
+      </div>
+      <span class="results-info" id="results-info"></span>
+      <button class="export-btn" id="export-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar Excel
+      </button>
+    </div>
+    <div class="hint-row">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Haz clic en cualquier fila para ver el detalle completo
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-col="facultad">Facultad</th>
+            <th data-col="asignatura">Asignatura</th>
+            <th data-col="docente">Docente</th>
+            <th data-col="jp">JP</th>
+            <th data-col="di">DI</th>
+            <th data-col="dg">DG</th>
+            <th data-col="implementador">Implementador</th>
+            <th data-col="reunion">Reunión</th>
+            <th data-col="planif">Planificación</th>
+            <th data-col="avance" style="text-align:center">Avance</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty-state" id="empty" style="display:none">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:10px;opacity:.35"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <p>Sin resultados con los filtros actuales.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- PANEL -->
+<div id="overlay"></div>
+<div id="panel" role="dialog" aria-modal="true">
+  <div class="panel-header">
+    <div class="panel-top-row">
+      <div class="panel-fac-tag" id="p-fac">—</div>
+      <button class="panel-close" id="panel-close" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="panel-title" id="p-title">—</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+      <div class="panel-chips" id="p-chips"></div>
+      <div class="avance-badge" id="p-avance">Avance 0%</div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+
+    <!-- DONA + ESTADO RECURSOS -->
+    <div class="panel-section">
+      <div class="ps-title">Estado de Recursos</div>
+      <div class="dona-wrap">
+        <canvas id="donaChart" class="dona-canvas"></canvas>
+        <div class="dona-legend" id="dona-legend"></div>
+      </div>
+      <div class="recursos-grid" id="recursos-grid"></div>
+    </div>
+
+    <!-- HITOS SEMANAL -->
+    <div class="panel-section">
+      <div class="ps-title">Avance por Hitos</div>
+      <table class="hitos-table">
+        <thead><tr><th>Hito</th><th>Fecha</th><th>Estado</th></tr></thead>
+        <tbody id="hitos-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- DISTRIBUCIÓN HORAS -->
+    <div class="panel-section">
+      <div class="ps-title">Distribución de Horas</div>
+      <div class="horas-cards" id="horas-cards"></div>
+      <div class="horas-bar" id="horas-bar">
+        <div class="hb-pres" id="hb-pres"></div>
+        <div class="hb-asyn" id="hb-asyn"></div>
+      </div>
+      <div class="horas-legend">
+        <span><span class="sq" style="background:var(--az)"></span>Presencial</span>
+        <span><span class="sq" style="background:var(--am)"></span>Asincrónica</span>
+      </div>
+    </div>
+
+    <!-- RECURSOS T1–T4 -->
+    <div class="panel-section">
+      <div class="ps-title">Recursos a Construir</div>
+      <div class="t-grid" id="t-grid"></div>
+    </div>
+
+    <!-- DOCENTE -->
+    <div class="panel-section">
+      <div class="ps-title">Docente</div>
+      <div class="docente-card">
+        <div class="doc-av" id="p-doc-av">?</div>
+        <div>
+          <div class="doc-name" id="p-doc-name">—</div>
+          <div class="doc-label">Docente a cargo</div>
+          <div id="p-doc-email" style="margin-top:5px;display:none">
+            <a id="p-doc-email-link" href="#" style="font-size:12px;color:var(--az2);text-decoration:none;display:inline-flex;align-items:center;gap:4px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+              <span id="p-doc-email-txt"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESCALAMIENTO -->
+    <div class="panel-section" id="p-escal-section" style="display:none">
+      <div class="ps-title">Escalamiento</div>
+      <div class="escal-timeline" id="p-escal-timeline"></div>
+      <button class="escal-btn" id="p-escal-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+        Generar correo de escalamiento
+      </button>
+    </div>
+
+    <!-- EQUIPO -->
+    <div class="panel-section">
+      <div class="ps-title">Equipo Asignado</div>
+      <div class="team-grid" id="p-team"></div>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    <div class="panel-section">
+      <div class="ps-title">Observaciones</div>
+      <div class="obs-box" id="p-obs"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+// ─── AVANCE (datos reales Google Sheets) ───
+const AVANCE = {
+  "Ingeniería Térmica": {avance:0, obs:"Profesor no responde correos", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Gestión Incertidumbre y Simulación": {avance:0, obs:"Planificación validada por el profesor", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Finanzas Corporativas": {avance:0, obs:"STEC, Planificación validada", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Inteligencia de Negocios": {avance:0, obs:"Revisando enlaces de videos en la planificación", hitos:{s0:"Enviada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Electivo I: Energías Renovables": {avance:0, obs:"Planificación esperando por revisión de bibliografía", hitos:{s0:"Enviada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Electivo I: Op. Humanitarias": {avance:0, obs:"Trabajando en la planificación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Regresión y Pronóstico de Datos": {avance:0, obs:"", hitos:{s0:"En construcción",s1s2:"En construcción",s3s4:"En construcción",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Proyecto de Título": {avance:0, obs:"Se envia planificación a Leonardo", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Pronóstico de Datos e IA": {avance:0, obs:"", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Electivo III: Op. Humanitarias": {avance:9, obs:"", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Electivo III: Modelo Neg. Residuos": {avance:9, obs:"Planificación casi lista para enviar a validar. Problema A+S", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Electivo I: Tecnologías Excavación": {avance:0, obs:"El docente avisa que los contenidos del programa no corresponden, se escaló a la DDC", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Electivo III: IA y Tecnologías 4.0": {avance:0, obs:"Planificación en validación de DI", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Gestión de Operaciones Mineras": {avance:0, obs:"En espera de entrega de validación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Taller Emprendimiento en Minería": {avance:0, obs:"En espera de entrega de validación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Plan de Negocios": {avance:0, obs:"Ajustando comentarios docentes en la planificación.", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Simulación de Negocios": {avance:0, obs:"Lab. virtual sincrónico", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Mercado de Capitales": {avance:0, obs:"AJUSTE DE AULA", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Análisis de Datos": {avance:0, obs:"AJUSTE DE AULA", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Inglés Avanzado I": {avance:0, obs:"Ajustando comentarios docentes", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Políticas Públicas e Innovación": {avance:0, obs:"Agendar reunión con el profesor", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Contabilidad Financiera": {avance:0, obs:"Planificación validada por el profesor", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Microeconomía": {avance:0, obs:"Ajuste de horas", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Derecho Comercial y Laboral": {avance:0, obs:"Trabajando en la planificación", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Evaluación de Proyectos": {avance:9, obs:"Planificación enviada a DEL", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
+  "Sist. Prod. Cultivos Sostenibles": {avance:0, obs:"Planificación validada por el profesor", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
+  "Sist. Prod. Frutales Sostenibles": {avance:9, obs:"Inicia 15 junio", hitos:{s0:"Validada",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
+  "Trabajo de Título": {avance:0, obs:"Inicia 1 septiembre", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
+  "Calidad e Inocuidad Alimentaria": {avance:0, obs:"Inicia 1 septiembre", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"—",s15s16:"—",s17s18:"—"}},
+  "Análisis de Datos Cualitativos": {avance:0, obs:"Ajuste de aula", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "Análisis de Datos Cuantitativos": {avance:0, obs:"Lab. virtual sincrónico", hitos:{s0:"En construcción",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Neuroadaptación y Ambliopía": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Bases Gestión en Imagenología": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Herramientas y Atributos Calidad I": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Bioinformática": {avance:0, obs:"Pendiente envío programa", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Componentes Bioactivos en Alimentos": {avance:0, obs:"Reunión 8/4", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Bases Comportamiento Alimentario": {avance:0, obs:"Reunión 8/4", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Mercado I+D+i I": {avance:0, obs:"Reunión 8/4", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Optometría Clínica IV": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Procesos Ind. Alimentos III": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Tecnología de Embalajes": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Gestión Talento Humano": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}},
+  "FP: Gestión de Procesos": {avance:0, obs:"", hitos:{s0:"No inicia",s1s2:"No inicia",s3s4:"No inicia",s5s6:"No inicia",s7s8:"No inicia",s9s10:"No inicia",s11s12:"No inicia",s13s14:"No inicia",s15s16:"No inicia",s17s18:"No inicia"}}
+};
+
+const HITO_META = [
+  {key:'s0',    label:'S0 Videos B y C', fecha:'31/3'},
+  {key:'s1s2',  label:'S1–S2',           fecha:'12/4'},
+  {key:'s3s4',  label:'S3–S4',           fecha:'19/4'},
+  {key:'s5s6',  label:'S5–S6',           fecha:'26/4'},
+  {key:'s7s8',  label:'S7–S8',           fecha:'3/5'},
+  {key:'s9s10', label:'S9–S10',          fecha:'10/5'},
+  {key:'s11s12',label:'S11–S12',         fecha:'17/5'},
+  {key:'s13s14',label:'S13–S14',         fecha:'24/5'},
+  {key:'s15s16',label:'S15–S16',         fecha:'31/5'},
+  {key:'s17s18',label:'S17–S18',         fecha:'7/6'}
+];
+
+function hitoBadge(estado){
+  if(!estado||estado==='')return '<span class="hb hb-x">No aplica</span>';
+  if(estado==='Validada')return '<span class="hb hb-v">Validada</span>';
+  if(estado==='Enviada'||estado.startsWith('Enviada'))return '<span class="hb hb-e">Enviada</span>';
+  if(estado==='En construcción')return '<span class="hb hb-c">En construcción</span>';
+  if(estado==='No inicia')return '<span class="hb hb-n">No inicia</span>';
+  if(estado==='—')return '<span class="hb hb-x">—</span>';
+  return `<span class="hb hb-x">${estado}</span>`;
+}
+
+// ─── DATA ───
+const PROD = {
+  "Ingeniería Térmica":                         {sc:63,di:59,vd:4,dm:0,qa:0,ter:0,pres:64,asin:72,t1:0,t2:0,t3:0,t4:19},
+  "Gestión Incertidumbre y Simulación":         {sc:55,di:10,vd:2,dm:0,qa:0,ter:0,pres:40,asin:56,t1:8,t2:4,t3:2,t4:6},
+  "Finanzas Corporativas":                      {sc:48,di:8, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:6,t2:3,t3:2,t4:5},
+  "Inteligencia de Negocios":                   {sc:52,di:12,vd:3,dm:0,qa:0,ter:0,pres:36,asin:60,t1:7,t2:5,t3:2,t4:6},
+  "Electivo I: Energías Renovables":            {sc:38,di:5, vd:0,dm:0,qa:0,ter:0,pres:28,asin:44,t1:4,t2:2,t3:1,t4:4},
+  "Electivo I: Op. Humanitarias":               {sc:42,di:0, vd:0,dm:0,qa:0,ter:0,pres:24,asin:40,t1:3,t2:2,t3:1,t4:3},
+  "Regresión y Pronóstico de Datos":            {sc:58,di:14,vd:2,dm:0,qa:0,ter:0,pres:40,asin:64,t1:8,t2:4,t3:2,t4:5},
+  "Proyecto de Título":                         {sc:30,di:6, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
+  "Pronóstico de Datos e IA":                   {sc:60,di:18,vd:3,dm:0,qa:0,ter:0,pres:44,asin:68,t1:9,t2:5,t3:2,t4:6},
+  "Electivo III: Op. Humanitarias":             {sc:40,di:0, vd:0,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:4},
+  "Electivo III: Modelo Neg. Residuos":         {sc:36,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:36,t1:3,t2:2,t3:1,t4:3},
+  "Electivo I: Tecnologías Excavación":         {sc:44,di:8, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:5,t2:3,t3:1,t4:4},
+  "Electivo III: IA y Tecnologías 4.0":         {sc:50,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:52,t1:6,t2:3,t3:2,t4:5},
+  "Gestión de Operaciones Mineras":             {sc:46,di:6, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:5,t2:3,t3:1,t4:4},
+  "Taller Emprendimiento en Minería":           {sc:34,di:4, vd:0,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
+  "Plan de Negocios":                           {sc:45,di:8, vd:2,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:2,t4:4},
+  "Simulación de Negocios":                     {sc:50,di:10,vd:2,dm:0,qa:0,ter:0,pres:32,asin:52,t1:6,t2:4,t3:2,t4:5},
+  "Mercado de Capitales":                       {sc:60,di:0, vd:0,dm:0,qa:0,ter:0,pres:40,asin:60,t1:8,t2:4,t3:2,t4:6},
+  "Análisis de Datos":                          {sc:55,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:56,t1:7,t2:4,t3:2,t4:5},
+  "Inglés Avanzado I":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
+  "Políticas Públicas e Innovación":            {sc:52,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:52,t1:6,t2:3,t3:2,t4:5},
+  "Contabilidad Financiera":                    {sc:48,di:8, vd:2,dm:0,qa:0,ter:0,pres:32,asin:48,t1:6,t2:3,t3:2,t4:4},
+  "Microeconomía":                              {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
+  "Derecho Comercial y Laboral":                {sc:38,di:4, vd:1,dm:0,qa:0,ter:0,pres:24,asin:36,t1:4,t2:2,t3:1,t4:3},
+  "Evaluación de Proyectos":                    {sc:46,di:8, vd:2,dm:0,qa:0,ter:0,pres:32,asin:48,t1:5,t2:3,t3:2,t4:4},
+  "Sist. Prod. Cultivos Sostenibles":           {sc:42,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:4,t2:3,t3:1,t4:4},
+  "Sist. Prod. Frutales Sostenibles":           {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
+  "Trabajo de Título":                          {sc:28,di:4, vd:0,dm:0,qa:0,ter:0,pres:16,asin:28,t1:2,t2:1,t3:1,t4:2},
+  "Calidad e Inocuidad Alimentaria":            {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
+  "Análisis de Datos Cualitativos":             {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
+  "Análisis de Datos Cuantitativos":            {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
+  "FP: Neuroadaptación y Ambliopía":            {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
+  "FP: Bases Gestión en Imagenología":          {sc:40,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
+  "FP: Herramientas y Atributos Calidad I":     {sc:38,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:36,t1:4,t2:2,t3:1,t4:3},
+  "FP: Bioinformática":                         {sc:50,di:6, vd:1,dm:0,qa:0,ter:0,pres:32,asin:52,t1:6,t2:3,t3:2,t4:5},
+  "FP: Componentes Bioactivos en Alimentos":    {sc:46,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:48,t1:5,t2:3,t3:1,t4:4},
+  "FP: Bases Comportamiento Alimentario":       {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
+  "FP: Mercado I+D+i I":                        {sc:42,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:44,t1:4,t2:3,t3:1,t4:4},
+  "FP: Factores Fisiológicos y Psicológicos del Ejercicio":{sc:48,di:4,vd:0,dm:0,qa:0,ter:0,pres:28,asin:48,t1:5,t2:2,t3:1,t4:4},
+  "Interculturalidad Pueblos Indígenas":        {sc:38,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
+  "Inglés Cultura POP":                         {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:32,t1:3,t2:2,t3:1,t4:3},
+  "Narrativa Digital":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
+};
+
+const DATA = [
+  {facultad:"Ingeniería",asignatura:"Ingeniería Térmica",docente:"Rojo Camacho Jorge H.",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Gestión Incertidumbre y Simulación",docente:"Nicolas Rodriguez",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Finanzas Corporativas",docente:"Mauricio Torres",jp:"José Luis",di:"Cristián",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Inteligencia de Negocios",docente:"Claudio Henriquez",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Electivo I: Energías Renovables",docente:"Leonardo Rodriguez",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Electivo I: Op. Humanitarias",docente:"Leonardo Rodriguez",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No inicia",fmt:"Pendiente",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Regresión y Pronóstico de Datos",docente:"Francisco Labbe",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Proyecto de Título",docente:"Monserrat Martinez",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Pronóstico de Datos e IA",docente:"Claudio Henriquez",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Electivo III: Op. Humanitarias",docente:"Rodrigo Barraza",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"No inicia",fmt:"Pendiente",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Electivo III: Modelo Neg. Residuos",docente:"Ana Jimenez",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Electivo I: Tecnologías Excavación",docente:"Cristian Rivera",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Electivo III: IA y Tecnologías 4.0",docente:"Luis Alvarez",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Sin respuesta",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"Sin respuesta hace más de 3 días. Requiere seguimiento.",correo:"",fechaSR:"2026-04-01"},
+  {facultad:"Ingeniería",asignatura:"Gestión de Operaciones Mineras",docente:"Juan Orellana",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ingeniería",asignatura:"Taller Emprendimiento en Minería",docente:"Juan Orellana",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Plan de Negocios",docente:"Paola Salas",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Simulación de Negocios",docente:"Rodrigo Ramirez",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Mercado de Capitales",docente:"Ajuste DEL",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"No aplica",planif:"No aplica",fmt:"Antiguo",obs:"Ajuste DEL — no requiere reunión.",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Análisis de Datos",docente:"Ajuste DEL",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"No aplica",planif:"No aplica",fmt:"Antiguo",obs:"Ajuste DEL — no requiere reunión.",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Inglés Avanzado I",docente:"Claudia Jeria",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Finanzas Corporativas",docente:"Sergio Álvarez",jp:"Noelia",di:"José Luis",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"—",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Políticas Públicas e Innovación",docente:"Jorge Miranda",jp:"Noelia",di:"José Luis",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Agendada",planif:"En construcción",fmt:"—",obs:"Reunión agendada. Pendiente confirmación de planificación.",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Contabilidad Financiera",docente:"Luis Lagos",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Microeconomía",docente:"Felipe Riffo",jp:"José Luis",di:"Cristián",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
+  {facultad:"Economía y Negocios",asignatura:"Derecho Comercial y Laboral",docente:"Felipe Lagos",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Antiguo",obs:"",correo:""},
+  {facultad:"Recursos Naturales",asignatura:"Evaluación de Proyectos",docente:"Raúl González",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Recursos Naturales",asignatura:"Sist. Prod. Cultivos Sostenibles",docente:"Claudio Koplow",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Recursos Naturales",asignatura:"Sist. Prod. Frutales Sostenibles",docente:"Katherine Garcia",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Recursos Naturales",asignatura:"Trabajo de Título",docente:"Alexis Ortiz",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No inicia",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Recursos Naturales",asignatura:"Calidad e Inocuidad Alimentaria",docente:"Alexis Ortiz",jp:"Noelia",di:"José Luis",dg:"Francisco",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No inicia",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ciencias Sociales",asignatura:"Análisis de Datos Cualitativos",docente:"Verónica Villagra",jp:"Noelia",di:"Natalia",dg:"Giovanni",implementador:"Elías Castillo",reunion:"Realizada",planif:"Enviada a validación DEL",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Ciencias Sociales",asignatura:"Análisis de Datos Cuantitativos",docente:"Daniel Valenzuela",jp:"María José",di:"Adrelina",dg:"Francisco",implementador:"Elías Castillo",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Salud",asignatura:"FP: Neuroadaptación y Ambliopía",docente:"Carol Retamal",jp:"Noelia",di:"Natalia",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Sin DG asignado.",correo:""},
+  {facultad:"Salud",asignatura:"FP: Bases Gestión en Imagenología",docente:"Sin asignar",jp:"Noelia",di:"Natalia",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
+  {facultad:"Salud",asignatura:"FP: Herramientas y Atributos Calidad I",docente:"Sin asignar",jp:"Noelia",di:"Brenda",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
+  {facultad:"Salud",asignatura:"FP: Bioinformática",docente:"Sin asignar",jp:"Noelia",di:"Brenda",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
+  {facultad:"Salud",asignatura:"FP: Componentes Bioactivos en Alimentos",docente:"Vilma Robles",jp:"José Luis",di:"Magdalena",dg:"—",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Salud",asignatura:"FP: Bases Comportamiento Alimentario",docente:"Víctor Sepúlveda",jp:"José Luis",di:"Magdalena",dg:"—",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Salud",asignatura:"FP: Mercado I+D+i I",docente:"Rodrigo Alarcón",jp:"José Luis",di:"Magdalena",dg:"—",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Salud",asignatura:"FP: Factores Fisiológicos y Psicológicos del Ejercicio",docente:"Sin asignar",jp:"José Luis",di:"Noelia Escalona",dg:"—",implementador:"Elías Castillo",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"Docente sin asignar.",correo:""},
+  {facultad:"Formación General",asignatura:"Interculturalidad Pueblos Indígenas",docente:"Javier Huiliñir",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Formación General",asignatura:"Inglés Cultura POP",docente:"Javiera Varela",jp:"José Luis",di:"Brenda",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"En construcción",fmt:"Nuevo",obs:"",correo:""},
+  {facultad:"Formación General",asignatura:"Narrativa Digital",docente:"Claudia Ruiz",jp:"José Luis",di:"Magdalena",dg:"Jenny",implementador:"Antonio Cabrera",reunion:"Realizada",planif:"No enviada",fmt:"Nuevo",obs:"",correo:""},
+];
+
+// ─── STATE ───
+let filters={jp:null,di:null,dg:null,implementador:null,facultad:null,planif:null};
+let searchQ='',sortCol='facultad',sortDir='asc',selectedIdx=null;
+let donaInstance=null;
+
+// ─── HELPERS ───
+function initials(n){if(!n||n==='—')return'?';return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function unique(k){return[...new Set(DATA.map(d=>d[k]).filter(v=>v&&v!=='—'))].sort((a,b)=>a.localeCompare(b,'es'))}
+function filtered(){
+  return DATA.filter(d=>{
+    if(filters.jp&&d.jp!==filters.jp)return false;
+    if(filters.di&&d.di!==filters.di)return false;
+    if(filters.dg&&d.dg!==filters.dg)return false;
+    if(filters.implementador&&d.implementador!==filters.implementador)return false;
+    if(filters.facultad&&d.facultad!==filters.facultad)return false;
+    if(filters.planif&&d.planif!==filters.planif)return false;
+    if(searchQ){const q=searchQ.toLowerCase();return d.asignatura.toLowerCase().includes(q)||d.docente.toLowerCase().includes(q)}
+    return true;
+  }).sort((a,b)=>{
+    if(sortCol==='avance'){
+      const an=(AVANCE[a.asignatura]&&AVANCE[a.asignatura].avance)||0;
+      const bn=(AVANCE[b.asignatura]&&AVANCE[b.asignatura].avance)||0;
+      return sortDir==='asc'?an-bn:bn-an;
+    }
+    const av=a[sortCol]||'',bv=b[sortCol]||'';
+    return sortDir==='asc'?av.localeCompare(bv,'es'):bv.localeCompare(av,'es');
+  });
+}
+function rbClass(r){if(r==='Realizada')return'rb rb-r';if(r==='Agendada')return'rb rb-a';if(r==='Sin respuesta')return'rb rb-s';return'rb rb-n'}
+function dotClass(p){
+  if(!p||p==='No inicia')return 'r';
+  if(p==='En construcción')return 'y';
+  if(p==='No aplica')return 'x';
+  if(p&&p.toLowerCase().includes('del'))return 'd';
+  if(p==='Validada')return 'g';
+  if(p==='No enviada')return 'r';
+  if(p==='Pendiente')return 'y';
+  return 'g';
+}
+
+function getProd(asig){
+  const p=PROD[asig];
+  if(p)return p;
+  return{sc:40,di:5,vd:1,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:3};
+}
+
+// ─── SIDEBAR ───
+function renderSidebar(){
+  const groups=[
+    {key:'facultad',label:'Facultad'},
+    {key:'planif',label:'Planificación'},
+    {key:'jp',label:'JP'},
+    {key:'di',label:'Diseñador Instruccional'},
+    {key:'dg',label:'Diseñador Gráfico'},
+    {key:'implementador',label:'Implementador'},
+  ];
+  let html='';
+  for(const g of groups){
+    const vals=unique(g.key);
+    html+=`<div class="filter-group"><div class="filter-label">${g.label}</div>`;
+    vals.forEach(v=>{
+      const cnt=DATA.filter(d=>d[g.key]===v).length;
+      const active=filters[g.key]===v?'active':'';
+      html+=`<button class="filter-btn ${active}" data-key="${g.key}" data-val="${v}"><span>${v}</span><span class="cnt">${cnt}</span></button>`;
+    });
+    if(filters[g.key])html+=`<button class="clear-all" data-ck="${g.key}">Limpiar filtro</button>`;
+    html+=`</div>`;
+  }
+  document.getElementById('sidebar').innerHTML=html;
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{const{key,val}=btn.dataset;filters[key]=filters[key]===val?null:val;renderSidebar();renderTable();renderKPIs()});
+  });
+  document.querySelectorAll('.clear-all').forEach(btn=>{
+    btn.addEventListener('click',()=>{filters[btn.dataset.ck]=null;renderSidebar();renderTable();renderKPIs()});
+  });
+}
+
+// ─── FAC BAR ───
+const FAC_ORDER=["Ingeniería","Economía y Negocios","Ciencias Sociales","Formación General","Salud","Recursos Naturales"];
+const FAC_ABBR={
+  "Ciencias Sociales":"CC. Sociales",
+  "Economía y Negocios":"Econ. y Neg.",
+  "Formación General":"Form. General",
+  "Ingeniería":"Ingeniería",
+  "Recursos Naturales":"Rec. Naturales",
+  "Salud":"Salud"
+};
+
+function renderFacBar(){
+  // Calcular por facultad: total y cuántas tienen S0=Validada
+  const byFac={};
+  DATA.forEach(d=>{
+    if(!byFac[d.facultad])byFac[d.facultad]={total:0,validadas:0};
+    byFac[d.facultad].total++;
+    const av=AVANCE[d.asignatura];
+    if(av&&av.hitos&&av.hitos.s0==='Validada')byFac[d.facultad].validadas++;
+  });
+
+  const facList=FAC_ORDER.filter(f=>byFac[f]);
+  const container=document.getElementById('fac-bar');
+  container.innerHTML=facList.map(fac=>{
+    const info=byFac[fac];
+    const pct=Math.round(info.validadas/info.total*100);
+    const isActive=filters.facultad===fac;
+    return `<div class="fac-card${isActive?' active':''}" data-fac="${fac}">
+      <div class="fac-top">
+        <div class="fac-name">${FAC_ABBR[fac]||fac}</div>
+        <div class="fac-count">${info.total}</div>
+      </div>
+      <div class="fac-prog-wrap"><div class="fac-prog" style="width:${pct}%"></div></div>
+      <div class="fac-sub">
+        <span class="fac-ok">${info.validadas} S0 validadas</span>
+        <span class="fac-pend">${pct}%</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.fac-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const fac=card.dataset.fac;
+      filters.facultad=filters.facultad===fac?null:fac;
+      renderSidebar();renderKPIs();renderFacBar();renderTable();
+    });
+  });
+}
+
+// ─── KPIs ───
+function renderKPIs(){
+  const rows=filtered();
+  const t=rows.length,r=rows.filter(d=>d.reunion==='Realizada').length,a=rows.filter(d=>d.reunion==='Agendada').length,s=rows.filter(d=>d.reunion==='Sin respuesta').length;
+  document.getElementById('kpi-bar').innerHTML=`
+    <div class="kpi k-az">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val c-az">${t}</div><div class="kpi-name">Asignaturas</div></div>
+    </div>
+    <div class="kpi k-ve">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val c-ve">${r}</div><div class="kpi-name">Reuniones realizadas</div></div>
+    </div>
+    <div class="kpi k-am">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val c-am">${a}</div><div class="kpi-name">Agendadas</div></div>
+    </div>
+    <div class="kpi k-ro">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val c-ro">${s}</div><div class="kpi-name">Sin respuesta</div></div>
+    </div>`;
+  document.getElementById('header-count').textContent=t;
+}
+
+// ─── TABLE ───
+let currentRows=[];
+function renderTable(){
+  currentRows=filtered();
+  const tbody=document.getElementById('tbody'),empty=document.getElementById('empty'),info=document.getElementById('results-info');
+  const hasF=Object.values(filters).some(v=>v)||searchQ;
+  if(!currentRows.length){tbody.innerHTML='';empty.style.display='block';info.textContent='';return}
+  empty.style.display='none';
+  info.textContent=hasF?`${currentRows.length} de ${DATA.length}`:'';
+  tbody.innerHTML=currentRows.map((d,i)=>{
+    const rav=AVANCE[d.asignatura]||{};
+    const rPct=rav.avance||0;
+    const isUrg=d.reunion==='Sin respuesta';
+    const avColor=rPct>=50?'hi':rPct>0?'mid':'lo';
+    return `
+    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg?'urg-row':''}">
+      <td><span class="chip chip-fac">${d.facultad}</span></td>
+      <td class="asig-col">${isUrg?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}</td>
+      <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
+      <td><span class="chip chip-jp">${d.jp}</span></td>
+      <td><span class="chip chip-di">${d.di}</span></td>
+      <td>${d.dg!=='—'?`<span class="chip chip-dg">${d.dg}</span>`:'<span style="color:var(--text-light)">—</span>'}</td>
+      <td><span class="chip chip-imp">${d.implementador}</span></td>
+      <td><span class="${rbClass(d.reunion)}">${d.reunion}</span></td>
+      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${d.planif==='Enviada a validación DEL'?'Enviada a DEL':d.planif||'No inicia'}</span></td>
+      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
+    </tr>`;
+  }).join('');
+  document.querySelectorAll('#tbody tr').forEach(tr=>tr.addEventListener('click',()=>openPanel(parseInt(tr.dataset.idx))));
+}
+
+// ─── PANEL ───
+function openPanel(idx){
+  selectedIdx=idx;
+  const d=currentRows[idx];
+  const p=getProd(d.asignatura);
+  const av=AVANCE[d.asignatura]||{avance:0,obs:'',hitos:{}};
+  const total=p.sc+p.di+p.vd+p.dm+p.qa+p.ter;
+  const avPct=av.avance||0;
+
+  document.querySelectorAll('#tbody tr').forEach((tr,i)=>tr.classList.toggle('selected',i===idx));
+
+  // Header
+  document.getElementById('p-fac').textContent=d.facultad;
+  document.getElementById('p-title').textContent=d.asignatura;
+  document.getElementById('p-avance').textContent=`Avance ${avPct}%`;
+  document.getElementById('p-chips').innerHTML=`
+    <span class="pchip">JP: ${d.jp}</span>
+    <span class="pchip">DI: ${d.di}</span>
+    ${d.dg!=='—'?`<span class="pchip">DG: ${d.dg}</span>`:''}`;
+
+  // DONA
+  if(donaInstance){donaInstance.destroy();donaInstance=null}
+  const donaCtx=document.getElementById('donaChart').getContext('2d');
+  const donaData=[p.sc,p.di,p.vd,p.dm,p.qa,p.ter];
+  const donaColors=['#c5d2e8','#90d4a8','#e8c96a','#dbb8f0','#9ecff5','#27A06E'];
+  donaInstance=new Chart(donaCtx,{
+    type:'doughnut',
+    data:{datasets:[{data:donaData,backgroundColor:donaColors,borderWidth:2,borderColor:'#fff',hoverOffset:4}]},
+    options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} recursos`}}},animation:{duration:500}}
+  });
+  const labels=['Sin comenzar','En prod. DI','Val. Docente','En prod. DM','QA','Terminado'];
+  document.getElementById('dona-legend').innerHTML=labels.map((l,i)=>`
+    <div class="dl-item">
+      <span class="dl-dot" style="background:${donaColors[i]}"></span>
+      <span class="dl-label">${l}</span>
+      <span class="dl-val">${donaData[i]}</span>
+    </div>`).join('');
+
+  // TABLA RECURSOS
+  const rcDefs=[
+    {label:'Sin comenzar',cls:'rc0',val:p.sc},
+    {label:'En prod. DI', cls:'rc1',val:p.di},
+    {label:'Val. Docente',cls:'rc2',val:p.vd},
+    {label:'En prod. DM',cls:'rc3',val:p.dm},
+    {label:'Terminado',  cls:'rc4',val:p.ter},
+  ];
+  document.getElementById('recursos-grid').innerHTML=rcDefs.map(r=>`
+    <div class="rc ${r.cls}">
+      <div class="rc-label">${r.label}</div>
+      <div class="rc-val">${r.val}</div>
+    </div>`).join('');
+
+  // HITOS TABLE
+  document.getElementById('hitos-tbody').innerHTML=HITO_META.map(h=>{
+    const estado=av.hitos[h.key]||'';
+    return `<tr><td>${h.label}</td><td>${h.fecha}</td><td>${hitoBadge(estado)}</td></tr>`;
+  }).join('');
+
+  // HORAS
+  const totalH=p.pres+p.asin;
+  const presPct=totalH>0?Math.round(p.pres/totalH*100):50;
+  document.getElementById('horas-cards').innerHTML=`
+    <div class="hora-card"><div class="hora-label">Presencial</div><div class="hora-val">${p.pres} <span class="hora-unit">hrs</span></div></div>
+    <div class="hora-card"><div class="hora-label">Asincrónica</div><div class="hora-val">${p.asin} <span class="hora-unit">hrs</span></div></div>`;
+  document.getElementById('hb-pres').style.width=presPct+'%';
+  document.getElementById('hb-asyn').style.width=(100-presPct)+'%';
+
+  // T1-T4
+  const tipos=[
+    {cls:'t1',tipo:'Tipo T1',val:p.t1,desc:'Videos / cápsulas'},
+    {cls:'t2',tipo:'Tipo T2',val:p.t2,desc:'Actividades prácticas'},
+    {cls:'t3',tipo:'Tipo T3',val:p.t3,desc:'Evaluaciones / rúbricas'},
+    {cls:'t4',tipo:'Tipo T4',val:p.t4,desc:'Material complementario'},
+  ];
+  document.getElementById('t-grid').innerHTML=tipos.map(t=>`
+    <div class="t-card ${t.cls}">
+      <div class="t-label">${t.tipo}</div>
+      <div class="t-val">${t.val}</div>
+      <div class="t-desc">${t.desc}</div>
+    </div>`).join('');
+
+  // DOCENTE
+  document.getElementById('p-doc-av').textContent=initials(d.docente);
+  document.getElementById('p-doc-name').textContent=d.docente;
+  const emailEl=document.getElementById('p-doc-email');
+  const emailLink=document.getElementById('p-doc-email-link');
+  const emailTxt=document.getElementById('p-doc-email-txt');
+  if(d.correo&&d.correo.trim()){
+    emailLink.href='mailto:'+d.correo.trim();
+    emailTxt.textContent=d.correo.trim();
+    emailEl.style.display='block';
+  } else {
+    emailEl.style.display='none';
+  }
+
+  // ESCALAMIENTO
+  renderEscalamiento(d);
+
+  // EQUIPO
+  const teamItems=[
+    {av:'av-jp',role:'JP',name:d.jp},
+    {av:'av-di',role:'DI',name:d.di},
+    {av:'av-dg',role:'DG',name:d.dg!=='—'?d.dg:'Sin asignar'},
+    {av:'av-imp',role:'Implementador',name:d.implementador},
+  ];
+  document.getElementById('p-team').innerHTML=teamItems.map(t=>`
+    <div class="team-card">
+      <div class="team-avatar ${t.av}">${initials(t.name)}</div>
+      <div><div class="team-role">${t.role}</div><div class="team-name">${t.name}</div></div>
+    </div>`).join('');
+
+  // OBS
+  const obsEl=document.getElementById('p-obs');
+  const obsText=av.obs||d.obs||'';
+  obsEl.innerHTML=obsText?obsText:`<span class="obs-empty">Sin observaciones registradas.</span>`;
+
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closePanel(){
+  selectedIdx=null;
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.querySelectorAll('#tbody tr').forEach(tr=>tr.classList.remove('selected'));
+}
+
+document.getElementById('panel-close').addEventListener('click',closePanel);
+document.getElementById('overlay').addEventListener('click',closePanel);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+
+// ─── EXPORT ───
+function exportToExcel(){
+  const rows=filterRows();
+  const data=rows.map(d=>{
+    const av=AVANCE[d.asignatura]||{};
+    return {'Facultad':d.facultad,'Asignatura':d.asignatura,'Docente':d.docente,'JP':d.jp,'DI':d.di,'DG':d.dg,'Implementador':d.implementador,'Reunión':d.reunion,'Planificación':d.planif,'Avance %':av.avance||0,'S0':av.hitos&&av.hitos.s0||'','S1-S2':av.hitos&&av.hitos.s1s2||'','S3-S4':av.hitos&&av.hitos.s3s4||'','S5-S6':av.hitos&&av.hitos.s5s6||'','S7-S8':av.hitos&&av.hitos.s7s8||'','S9-S10':av.hitos&&av.hitos.s9s10||'','S11-S12':av.hitos&&av.hitos.s11s12||'','S13-S14':av.hitos&&av.hitos.s13s14||'','S15-S16':av.hitos&&av.hitos.s15s16||'','S17-S18':av.hitos&&av.hitos.s17s18||'','Observaciones':av.obs||d.obs||''};
+  });
+  const ws=XLSX.utils.json_to_sheet(data);
+  ws['!cols']=[{wch:18},{wch:38},{wch:24},{wch:12},{wch:12},{wch:12},{wch:16},{wch:14},{wch:22},{wch:9},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:40}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Seguimiento');
+  XLSX.writeFile(wb,'Seguimiento_UST_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+document.getElementById('export-btn').addEventListener('click',exportToExcel);
+
+// ─── SORT ───
+document.querySelectorAll('th[data-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    if(sortCol===col)sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=col;sortDir='asc'}
+    document.querySelectorAll('th').forEach(t=>t.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');
+    renderTable();
+  });
+});
+
+// ─── SEARCH ───
+document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.value.trim();renderTable();renderKPIs();renderFacBar()});
+
+// ─── INIT ───
+renderSidebar();renderKPIs();renderFacBar();renderTable();
+
+// ─── ESCALAMIENTO ───────────────────────────────────────────────
+const ESCAL_NIVELES = [
+  {dias:1,  label:'DI',      desc:'Diseñador instruccional', campo:'di'},
+  {dias:3,  label:'JP',      desc:'Jefe de Proyecto',        campo:'jp'},
+  {dias:5,  label:'Paulina', desc:'Directora E-Learning',    campo:null, email:'pverab@santotomas.cl'},
+  {dias:7,  label:'DNE',     desc:'Dirección Nacional E-Learning', campo:null, email:''},
+  {dias:9,  label:'Decano/a',desc:'Decano/a de la Facultad', campo:null, email:''},
+];
+
+// Correos del equipo (se pueden completar)
+const CORREOS_EQUIPO = {
+  'Natalia':    '',
+  'Adrelina':   '',
+  'Cristián':   '',
+  'Brenda':     '',
+  'Magdalena':  '',
+  'José Luis':  'joseluissalazar81@gmail.com',
+  'María José': '',
+  'Noelia':     '',
+  'Paulina':    'pverab@santotomas.cl',
+};
+
+function diasDesde(fechaStr){
+  if(!fechaStr) return null;
+  const [d,m,y] = fechaStr.includes('/') ? fechaStr.split('/') : fechaStr.split('-').reverse();
+  const fecha = new Date(+y, +m-1, +d);
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  return Math.floor((hoy - fecha) / 86400000);
+}
+
+function calcEscalamiento(d){
+  if(d.reunion !== 'Sin respuesta') return null;
+  // Si no hay fecha registrada, mostrar aviso sin calcular días
+  if(!d.fechaSR) return {dias:null, nivelActivo:-1, sinFecha:true, niveles:ESCAL_NIVELES};
+  const dias = diasDesde(d.fechaSR);
+  if(dias === null) return null;
+  let nivelActivo = -1;
+  for(let i = ESCAL_NIVELES.length-1; i >= 0; i--){
+    if(dias >= ESCAL_NIVELES[i].dias){ nivelActivo = i; break; }
+  }
+  return {dias, nivelActivo, niveles: ESCAL_NIVELES};
+}
+
+function renderEscalamiento(d){
+  const esc = calcEscalamiento(d);
+  const section = document.getElementById('p-escal-section');
+  const timeline = document.getElementById('p-escal-timeline');
+  const btn = document.getElementById('p-escal-btn');
+  if(!esc){ section.style.display='none'; return; }
+  section.style.display='';
+
+  // Sin fecha registrada: mostrar aviso
+  if(esc.sinFecha){
+    timeline.innerHTML = `<div style="font-size:12px;color:var(--text-muted);background:rgba(214,48,49,.06);border:1px solid rgba(214,48,49,.18);border-radius:6px;padding:10px 12px;line-height:1.5">
+      <strong style="color:var(--ro)">Fecha no registrada</strong><br>
+      Para activar el escalamiento, ingresa la fecha en que el docente dejó de responder en la columna <strong>Z “Fecha Sin Respuesta”</strong> del sheet (formato DD/MM/AAAA).
+    </div>`;
+    btn.style.display='none';
+    return;
+  }
+
+  timeline.innerHTML = ESCAL_NIVELES.map((n,i)=>{
+    const cumplido = esc.dias >= n.dias;
+    const activo   = i === esc.nivelActivo;
+    const dotClass = activo ? 'active' : cumplido ? 'done' : 'pending';
+    const labelClass = activo ? 'active' : '';
+    const badge = activo
+      ? '<span class="escal-badge activo">ACTIVO</span>'
+      : cumplido ? '<span class="escal-badge completado">✓</span>' : '';
+    return `<div class="escal-step">
+      <div class="escal-dot ${dotClass}">${cumplido||activo ? (activo?'!':'✓') : (i+1)}</div>
+      <div class="escal-info">
+        <div class="escal-label ${labelClass}">+${n.dias}d — ${n.label}${badge}</div>
+        <div class="escal-meta">${n.desc} · ${esc.dias >= n.dias ? 'Hace '+esc.dias+'d' : 'Pendiente'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Botón generar correo — usa nivel activo
+  if(esc.nivelActivo >= 0){
+    btn.style.display='flex';
+    btn.onclick = ()=>abrirModalCorreo(d, esc);
+  } else {
+    btn.style.display='none';
+  }
+}
+
+function generarPlantillaCorreo(d, esc){
+  const nivel = ESCAL_NIVELES[esc.nivelActivo];
+  const asig  = d.asignatura;
+  const doc   = d.docente;
+  const jpNombre = d.jp;
+  const diNombre = d.di;
+
+  const plantillas = {
+    0: { // DI
+      para: CORREOS_EQUIPO[d.di] || d.di,
+      cc:   CORREOS_EQUIPO[d.jp] || '',
+      asunto: `[Alerta +1d] Sin respuesta docente — ${asig}`,
+      cuerpo: `Estimado/a ${diNombre}:
+
+Te informo que el/la docente ${doc} no ha respondido al correo de convocatoria a reunión para la asignatura "${asig}" (${d.facultad}).
+
+Han transcurrido ${esc.dias} día(s) desde el envío inicial (${d.fechaSR}).
+
+Te pido realizar un seguimiento directo para agendar la reunión a la brevedad.
+
+Att.
+JP ${jpNombre} — Equipo e-Learning UST`
+    },
+    1: { // JP
+      para: CORREOS_EQUIPO[d.jp] || d.jp,
+      cc:   CORREOS_EQUIPO[d.di] || '',
+      asunto: `[Alerta +3d] Sin respuesta docente — ${asig}`,
+      cuerpo: `Estimado/a ${jpNombre}:
+
+Como JP solicito confirmación de reunión (asig: "${asig}"). Más de ${esc.dias} días sin respuesta del docente ${doc}.
+
+Favor tomar contacto directo y escalar si no hay respuesta en las próximas 24 horas.
+
+Att. JP - e-Learning UST`
+    },
+    2: { // Paulina
+      para: 'pverab@santotomas.cl',
+      cc:   (CORREOS_EQUIPO[d.jp]||'') + (CORREOS_EQUIPO[d.di] ? ','+(CORREOS_EQUIPO[d.di]||'') : ''),
+      asunto: `[Escalamiento +5d] Sin respuesta docente — ${asig}`,
+      cuerpo: `Estimada Paulina:
+
+Se escala a tu conocimiento la situación del/la docente ${doc} en la asignatura "${asig}" (${d.facultad}).
+
+Han transcurrido ${esc.dias} días sin respuesta desde el primer contacto (${d.fechaSR}). JP y DI ya realizaron seguimiento sin éxito.
+
+Se solicita intervención para asegurar la reunión de inicio de producción.
+
+Att.
+Equipo e-Learning UST`
+    },
+    3: { // DNE
+      para: '',
+      cc:   'pverab@santotomas.cl',
+      asunto: `[Escalamiento +7d] Sin respuesta docente — ${asig} — ${d.facultad}`,
+      cuerpo: `Estimado/a:
+
+En el marco del proyecto e-Learning UST 2026-1, el/la docente ${doc} (asignatura: "${asig}", ${d.facultad}) no ha respondido en ${esc.dias} días.
+
+Se han agotado las instancias de JP, DI y Dirección E-Learning. Se solicita gestión desde la Dirección Nacional E-Learning.
+
+Att.
+Paulina Vera — Directora E-Learning UST`
+    },
+    4: { // Decano
+      para: '',
+      cc:   'pverab@santotomas.cl',
+      asunto: `[Urgente - +9d] Docente sin respuesta — ${asig}`,
+      cuerpo: `Estimado/a Decano/a:
+
+Nos permitimos informarle que el/la docente ${doc} de la asignatura "${asig}" lleva ${esc.dias} días sin respuesta para agendar reunión de inicio de producción de contenidos e-Learning.
+
+Solicitamos su apoyo para gestionar este caso de manera urgente, dado que compromete la planificación del semestre 2026-1.
+
+Att.
+Paulina Vera Benavente
+Directora E-Learning UST
+pverab@santotomas.cl`
+    }
+  };
+  return plantillas[esc.nivelActivo] || plantillas[0];
+}
+
+function abrirModalCorreo(d, esc){
+  const plantilla = generarPlantillaCorreo(d, esc);
+  const nivel = ESCAL_NIVELES[esc.nivelActivo];
+  document.getElementById('mail-modal-title').textContent =
+    `Escalamiento nivel ${esc.nivelActivo+1}: ${nivel.label} (+${nivel.dias}d)`;
+  document.getElementById('mail-to').value      = plantilla.para;
+  document.getElementById('mail-cc').value      = plantilla.cc;
+  document.getElementById('mail-subject').value = plantilla.asunto;
+  document.getElementById('mail-body').value    = plantilla.cuerpo;
+  document.getElementById('mail-modal').style.display='flex';
+}
+
+document.getElementById('mail-modal-close').addEventListener('click',()=>{
+  document.getElementById('mail-modal').style.display='none';
+});
+document.getElementById('mail-modal').addEventListener('click',(e)=>{
+  if(e.target===document.getElementById('mail-modal'))
+    document.getElementById('mail-modal').style.display='none';
+});
+document.getElementById('mail-copy-btn').addEventListener('click',()=>{
+  const txt = `Para: ${document.getElementById('mail-to').value}\nCC: ${document.getElementById('mail-cc').value}\nAsunto: ${document.getElementById('mail-subject').value}\n\n${document.getElementById('mail-body').value}`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = document.getElementById('mail-copy-btn');
+    btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
+  });
+});
+document.getElementById('mail-open-btn').addEventListener('click',()=>{
+  const to      = encodeURIComponent(document.getElementById('mail-to').value);
+  const cc      = encodeURIComponent(document.getElementById('mail-cc').value);
+  const subject = encodeURIComponent(document.getElementById('mail-subject').value);
+  const body    = encodeURIComponent(document.getElementById('mail-body').value);
+  window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+});
+
+</script>
+
+<!-- MODAL CORREO ESCALAMIENTO -->
+<div id="mail-modal" class="mail-modal-overlay" style="display:none" role="dialog" aria-modal="true">
+  <div class="mail-modal">
+    <div class="mail-modal-header">
+      <div class="mail-modal-title" id="mail-modal-title">Generar correo de escalamiento</div>
+      <button class="mail-modal-close" id="mail-modal-close" aria-label="Cerrar">&#x2715;</button>
+    </div>
+    <div class="mail-modal-body">
+      <div class="mail-field">
+        <label>Para</label>
+        <input type="text" id="mail-to" readonly/>
+      </div>
+      <div class="mail-field">
+        <label>CC</label>
+        <input type="text" id="mail-cc"/>
+      </div>
+      <div class="mail-field">
+        <label>Asunto</label>
+        <input type="text" id="mail-subject"/>
+      </div>
+      <div class="mail-field">
+        <label>Cuerpo</label>
+        <textarea id="mail-body"></textarea>
+      </div>
+      <div class="mail-actions">
+        <button class="mail-copy-btn" id="mail-copy-btn">Copiar texto</button>
+        <button class="mail-open-btn" id="mail-open-btn">Abrir en cliente de correo</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
