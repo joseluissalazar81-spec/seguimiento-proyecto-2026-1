@@ -242,6 +242,19 @@
     .hb-n{background:#F5F5F5;color:#888;border:1px solid #ddd}
     .hb-x{background:#FAFAFA;color:#bbb;border:1px solid #e5e5e5}
 
+    /* ── MINI HITOS EN TABLA PRINCIPAL ── */
+    .hitos-row{display:flex;flex-wrap:nowrap;gap:2px;align-items:center;overflow:hidden}
+    .mh{display:inline-flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0}
+    .mh-key{font-size:7px;font-weight:700;color:var(--text-muted);letter-spacing:.02em;white-space:nowrap;text-transform:uppercase}
+    .mh-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+    .mh-v{background:#27A06E}   /* Validada — verde */
+    .mh-e{background:#C8A951}   /* Enviada — dorado */
+    .mh-c{background:#2E5FA3}   /* En construcción — azul */
+    .mh-n{background:#d1d5db}   /* No inicia — gris claro */
+    .mh-x{background:#f3f4f6}   /* vacío — gris muy claro */
+    th.col-hitos{min-width:130px;text-align:left}
+    td.col-hitos{padding-right:8px}
+
     /* ── DISTRIBUCIÓN HORAS ── */
     .horas-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
     .hora-card{background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:10px 12px;box-shadow:var(--shadow)}
@@ -415,9 +428,18 @@
         Exportar Excel
       </button>
     </div>
-    <div class="hint-row">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      Haz clic en cualquier fila para ver el detalle completo
+    <div class="hint-row" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <span style="display:flex;align-items:center;gap:5px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Haz clic en cualquier fila para ver el detalle completo
+      </span>
+      <span style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Hitos:</span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#27A06E;display:inline-block"></span><span style="font-size:10px;color:var(--text-muted)">Validada</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#C8A951;display:inline-block"></span><span style="font-size:10px;color:var(--text-muted)">Enviada</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#2E5FA3;display:inline-block"></span><span style="font-size:10px;color:var(--text-muted)">En construcción</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#d1d5db;display:inline-block"></span><span style="font-size:10px;color:var(--text-muted)">No inicia</span></span>
+      </span>
     </div>
     <div class="table-wrap">
       <table>
@@ -433,6 +455,7 @@
             <th data-col="reunion">Reunión</th>
             <th data-col="planif">Planificación</th>
             <th data-col="avance" style="text-align:center">Avance</th>
+            <th class="col-hitos">Hitos S0–S18</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -562,6 +585,20 @@ const HITO_META = [
   {key:'s15s16',label:'S15–S16',         fecha:'31/5'},
   {key:'s17s18',label:'S17–S18',         fecha:'7/6'}
 ];
+
+// Mini-dots para columna Hitos en tabla principal
+function miniHitosDot(hitos){
+  const SHORT=['S0','S1','S3','S5','S7','S9','S11','S13','S15','S17'];
+  return '<div class="hitos-row" title="S0 a S17-S18">'+HITO_META.map((h,i)=>{
+    const v=hitos[h.key]||'';
+    let cls='mh-x';
+    if(v==='Validada') cls='mh-v';
+    else if(v.startsWith('Enviada')) cls='mh-e';
+    else if(v==='En construcción') cls='mh-c';
+    else if(v==='No inicia') cls='mh-n';
+    return `<div class="mh" title="${h.label}: ${v||'—'}"><span class="mh-key">${SHORT[i]}</span><div class="mh-dot ${cls}"></div></div>`;
+  }).join('')+'</div>';
+}
 
 function hitoBadge(estado){
   if(!estado||estado==='')return '<span class="hb hb-x">No aplica</span>';
@@ -921,6 +958,7 @@ function renderTable(){
       <td><span class="${rbClass(d.reunion)}">${d.reunion}</span></td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${d.planif==='Enviada a validación DEL'?'Enviada a DEL':d.planif||'No inicia'}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
+      <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
   }).join('');
   document.querySelectorAll('#tbody tr').forEach(tr=>tr.addEventListener('click',()=>openPanel(parseInt(tr.dataset.idx))));
