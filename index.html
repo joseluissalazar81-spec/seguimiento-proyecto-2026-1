@@ -853,7 +853,8 @@ function buildData(rows){
       obs:           r[22]||'',
       correo:        r[24]||'',
       fechaSR:       r[25]||'',
-      del2fecha:     r[26]||'',  // Fecha DEL 2° Instancia (col AB)
+      envDELfecha:   r[26]||'',  // Fecha envío a validación DEL (col AB)
+      del2fecha:     r[27]||'',  // Fecha DEL 2° Instancia (col AC)
     });
     avance[asig]={
       avance: pct,
@@ -1321,7 +1322,7 @@ function exportToExcel(){
       'Facultad':d.facultad,'Asignatura':d.asignatura,'Docente':d.docente,
       'JP':d.jp,'DI':d.di,'DG':d.dg,'Implementador':d.implementador,
       'Reunión':d.reunion,'Planificación':d.planif,
-      'Fecha DEL 2° Inst.':d.del2fecha||'',
+      'Fecha envío DEL':d.envDELfecha||'','Fecha DEL 2° Inst.':d.del2fecha||'',
       'Avance %':av.avance||0,
       'S0':av.hitos&&av.hitos.s0||'','S1-S2':av.hitos&&av.hitos.s1s2||'',
       'S3-S4':av.hitos&&av.hitos.s3s4||'','S5-S6':av.hitos&&av.hitos.s5s6||'',
@@ -1423,7 +1424,7 @@ function renderDelReview(d){
   const stepIdx = planifStepIndex(d.planif);
 
   // Solo mostrar si hay al menos algún avance en planif
-  if(stepIdx === 0 && !d.del2fecha){
+  if(stepIdx === 0 && !d.envDELfecha && !d.del2fecha){
     section.style.display = 'none';
     return;
   }
@@ -1441,9 +1442,11 @@ function renderDelReview(d){
       ? `<span class="del-badge ${step.key==='del2'?'actual2':step.key==='cargada'?'actual-ca':'actual'}">ACTUAL</span>`
       : done ? `<span class="del-badge hecho">✓</span>` : '';
 
-    // Fecha asociada al paso DEL 2°
+    // Fechas por paso
     let dateHtml = '';
-    if(step.key==='del2' && d.del2fecha){
+    if(step.key==='enviada' && d.envDELfecha){
+      dateHtml = `<div class="del-date">Enviado: ${d.envDELfecha}</div>`;
+    } else if(step.key==='del2' && d.del2fecha){
       dateHtml = `<div class="del-date">Enviado: ${d.del2fecha}</div>`;
     } else if(!done && !active){
       dateHtml = `<div class="del-date" style="color:var(--text-light)">Pendiente</div>`;
