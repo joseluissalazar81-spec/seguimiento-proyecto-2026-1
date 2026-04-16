@@ -1275,11 +1275,6 @@
             <th data-col="facultad">Facultad</th>
             <th data-col="asignatura">Asignatura</th>
             <th data-col="docente">Docente</th>
-            <th data-col="jp">JP</th>
-            <th data-col="di">DI</th>
-            <th data-col="dg">DG</th>
-            <th data-col="implementador">Implementador</th>
-            <th data-col="reunion">Reunión</th>
             <th data-col="planif">Planificación</th>
             <th data-col="avance" style="text-align:center">Avance</th>
             <th class="col-hitos">Hitos S0–S18</th>
@@ -1896,11 +1891,6 @@ function renderTable(){
       <td><span class="chip chip-fac">${d.facultad}</span></td>
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
-      <td><span class="chip chip-jp">${d.jp}</span></td>
-      <td><span class="chip chip-di">${d.di}</span></td>
-      <td>${d.dg!=='—'?`<span class="chip chip-dg">${d.dg}</span>`:'<span style="color:var(--text-light)">—</span>'}</td>
-      <td><span class="chip chip-imp">${d.implementador}</span></td>
-      <td><span class="${rbClass(d.reunion)}">${d.reunion}</span></td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${planifLabel(d.planif)}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
