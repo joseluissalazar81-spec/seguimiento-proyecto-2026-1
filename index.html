@@ -683,6 +683,173 @@
     .kpi-bar,.fac-bar,.table-wrap,.ov-metrics,.ov-charts{animation:fadeUp .4s ease both}
     .fac-bar{animation-delay:.05s}
     .table-wrap{animation-delay:.1s}
+
+    /* ── SEMÁFORO GLOBAL HEADER ── */
+    #global-sem{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:700;
+      border:1px solid;transition:all .3s;cursor:default;
+    }
+    #global-sem.sem-verde{background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.35);color:var(--ve)}
+    #global-sem.sem-amarillo{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.35);color:var(--am)}
+    #global-sem.sem-rojo{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.35);color:var(--ro)}
+    .sem-dot{width:8px;height:8px;border-radius:50%;animation:pulse 2s infinite}
+    .sem-verde .sem-dot{background:var(--ve)}
+    .sem-amarillo .sem-dot{background:var(--am)}
+    .sem-rojo .sem-dot{background:var(--ro)}
+
+    /* ── BANNER ALERTAS ── */
+    #alert-banner{
+      display:none;
+      background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(248,113,113,.1));
+      border:1px solid rgba(251,191,36,.35);border-radius:var(--radius);
+      padding:10px 16px;margin-bottom:14px;
+      animation:fadeUp .3s ease both;
+    }
+    .alert-banner-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .alert-icon{font-size:16px;flex-shrink:0}
+    .alert-text{flex:1;font-size:12.5px;color:var(--text)}
+    .alert-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:0;line-height:1;transition:color .2s}
+    .alert-close:hover{color:var(--ro)}
+    .alert-item{display:inline-block;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--ro);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin:2px 3px}
+
+    /* ── VIEW TOGGLE ── */
+    .view-toggle{display:flex;gap:2px;background:rgba(255,255,255,.05);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px}
+    .vt-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:6px 14px;border-radius:6px;border:none;
+      background:transparent;color:var(--text-muted);
+      font-size:12px;font-weight:600;cursor:pointer;
+      font-family:inherit;transition:all .18s;
+    }
+    .vt-btn:hover{color:var(--text);background:rgba(255,255,255,.06)}
+    .vt-btn.active{background:var(--surface3);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+    .vt-btn svg{width:13px;height:13px;stroke:currentColor;fill:none}
+
+    /* ── KANBAN ── */
+    #kanban-view{display:none;overflow-x:auto;padding-bottom:8px}
+    .kanban-board{display:flex;gap:10px;min-width:max-content;padding:2px}
+    .kanban-col{
+      width:200px;flex-shrink:0;
+      background:var(--surface);
+      backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);
+      border:1px solid var(--borde);border-radius:var(--radius);
+      display:flex;flex-direction:column;max-height:calc(100vh - 280px);
+    }
+    .kanban-col-header{
+      padding:10px 12px;border-bottom:1px solid var(--borde);
+      display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+    }
+    .kanban-col-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .kanban-col-count{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;background:rgba(255,255,255,.08);border-radius:10px;padding:1px 7px;color:var(--text-muted)}
+    .kanban-cards{overflow-y:auto;padding:8px;flex:1;display:flex;flex-direction:column;gap:6px}
+    .kanban-card{
+      background:var(--surface2);border:1px solid var(--borde);
+      border-radius:8px;padding:10px 12px;cursor:pointer;
+      transition:all .18s;
+    }
+    .kanban-card:hover{background:var(--surface3);border-color:var(--borde2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .kc-fac{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px}
+    .kc-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:6px}
+    .kc-chips{display:flex;flex-wrap:wrap;gap:3px}
+    .kc-av{font-size:10px;font-weight:700;font-family:'DM Mono',monospace;margin-top:5px}
+
+    /* ── VISTA FACULTAD ── */
+    #fac-view{display:none}
+    .fv-group{margin-bottom:16px;animation:fadeUp .3s ease both}
+    .fv-header{
+      display:flex;align-items:center;gap:10px;padding:10px 14px;
+      background:var(--surface);border:1px solid var(--borde);
+      border-radius:var(--radius) var(--radius) 0 0;
+      cursor:pointer;transition:background .2s;
+    }
+    .fv-header:hover{background:var(--surface2)}
+    .fv-header-collapsed{border-radius:var(--radius)}
+    .fv-fac-name{font-size:12px;font-weight:700;color:var(--az);text-transform:uppercase;letter-spacing:.05em;flex:1}
+    .fv-stats{display:flex;gap:10px;font-size:11px;color:var(--text-muted)}
+    .fv-chevron{transition:transform .2s;color:var(--text-muted)}
+    .fv-chevron.open{transform:rotate(90deg)}
+    .fv-body{background:var(--surface);border:1px solid var(--borde);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+    .fv-body table{width:100%;border-collapse:collapse}
+
+    /* ── HISTORIAL DE CAMBIOS ── */
+    .hist-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)}
+    .hist-item:last-child{border-bottom:none}
+    .hist-dot{width:8px;height:8px;border-radius:50%;background:var(--az);flex-shrink:0;margin-top:4px}
+    .hist-date{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-muted);white-space:nowrap}
+    .hist-text{font-size:11.5px;color:var(--text-muted)}
+    .hist-text strong{color:var(--text)}
+    .hist-empty{font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0}
+
+    /* ── PDF / PRINT ── */
+    .pdf-btn{
+      display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+      background:rgba(45,212,191,.15);color:var(--tl2);
+      border:1px solid rgba(45,212,191,.3);border-radius:var(--radius-sm);
+      padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;
+      font-family:inherit;transition:all .2s;white-space:nowrap;
+    }
+    .pdf-btn:hover{background:rgba(45,212,191,.25);transform:translateY(-1px)}
+    .pdf-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0}
+
+    /* ── PRESENTACIÓN FULLSCREEN ── */
+    .pres-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+      border-radius:20px;padding:4px 12px;font-size:11.5px;
+      color:rgba(255,255,255,.8);cursor:pointer;font-family:inherit;transition:all .2s;
+    }
+    .pres-btn:hover{background:rgba(255,255,255,.15);color:white}
+    .pres-btn svg{width:11px;height:11px;stroke:currentColor;fill:none}
+    body.presentation-mode aside{display:none!important}
+    body.presentation-mode header .header-sep:first-of-type~*:not(.logo-text):not(.header-sep){display:none}
+    body.presentation-mode .layout{grid-template-columns:1fr}
+    body.presentation-mode main{padding:16px}
+
+    /* ── TIMESTAMP ── */
+    #last-update{font-size:10px;color:rgba(255,255,255,.45);white-space:nowrap}
+
+    /* ── DÍAS PRÓXIMA ENTREGA ── */
+    #next-deadline{
+      display:none;align-items:center;gap:5px;
+      background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);
+      border-radius:20px;padding:4px 12px;font-size:11.5px;color:var(--am);
+    }
+    #next-deadline span{font-weight:700;font-family:'DM Mono',monospace}
+
+    /* ── QUICK JP FILTER ── */
+    .jp-quick{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+    .jp-quick-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);white-space:nowrap}
+    .jp-chip{
+      display:inline-flex;align-items:center;padding:3px 10px;
+      border-radius:20px;border:1px solid rgba(167,139,248,.25);
+      background:transparent;color:var(--text-muted);
+      font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;
+      transition:all .18s;
+    }
+    .jp-chip:hover{background:rgba(167,139,248,.1);color:var(--text)}
+    .jp-chip.active{background:rgba(167,139,248,.2);border-color:rgba(167,139,248,.5);color:#c4b5fd}
+
+    /* ── PRINT ── */
+    @media print{
+      body{background:white!important;color:#111!important}
+      body::before{display:none}
+      header,aside,#alert-banner,.view-toggle,.jp-quick,.search-row,.hint-row,
+      .export-btn,.pdf-btn,.pres-btn,#sync-btn,#global-sem,#next-deadline,
+      #overview-toggle,#ov-refresh-btn,.panel-close,#overlay,#panel{display:none!important}
+      .layout{display:block}
+      main{padding:0}
+      .table-wrap{border:1px solid #ccc;border-radius:0;box-shadow:none}
+      thead tr{background:#1A3A6B!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      th{color:white!important}
+      tbody tr{border-bottom:1px solid #eee}
+      td{color:#111!important}
+      .chip,.rb,.hb{border:1px solid #ccc!important;background:#f5f5f5!important;color:#111!important}
+      .av-bar{background:#27A06E!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .fac-bar,.kpi-bar,.fac-card,.kpi{background:white!important;border:1px solid #ddd!important}
+      .kpi-val{color:#111!important}
+      @page{size:A4 landscape;margin:1.5cm}
+    }
   </style>
 </head>
 <body>
@@ -706,6 +873,17 @@
     <span id="overview-toggle-label">Ver resumen</span>
   </button>
   <div class="header-sep"></div>
+  <!-- Semáforo global -->
+  <div id="global-sem" class="sem-azul" title="Estado global del proyecto" style="display:none">
+    <span class="sem-dot"></span>
+    <span id="global-sem-label">—</span>
+  </div>
+  <!-- Próxima entrega -->
+  <div id="next-deadline" style="display:none">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Próxima entrega: <span id="next-deadline-label">—</span>
+  </div>
+  <div class="header-sep"></div>
   <div class="header-badge">Total <span id="header-count">43</span> asignaturas</div>
   <div class="header-sep"></div>
   <div id="sync-status" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.75)">
@@ -714,11 +892,18 @@
     <button id="sync-btn" title="Recargar datos" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,.7);padding:0;display:flex;align-items:center">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
     </button>
+    <span id="last-update"></span>
   </div>
+  <div class="header-sep"></div>
+  <!-- Modo presentación -->
+  <button class="pres-btn" id="pres-btn" title="Modo presentación">
+    <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    Presentación
+  </button>
   <div class="header-sep"></div>
   <a href="mailto:pverab@santotomas.cl" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92)" title="Directora E-Learning UST">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
-    Paulina Vera &mdash; Directora
+    Paulina Vera
   </a>
 </header>
 
@@ -755,8 +940,45 @@
       </div>
     </div>
     <!-- ── FIN PANEL VISUAL ── -->
+
+    <!-- ── BANNER ALERTAS ── -->
+    <div id="alert-banner">
+      <div class="alert-banner-inner">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-text" id="alert-text"></span>
+        <button class="alert-close" id="alert-close" title="Cerrar">✕</button>
+      </div>
+    </div>
+
     <div class="kpi-bar" id="kpi-bar"></div>
     <div class="fac-bar" id="fac-bar"></div>
+
+    <!-- ── TOGGLE DE VISTAS ── -->
+    <div class="view-toggle">
+      <button class="vt-btn active" id="vt-table" onclick="setView('table')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+        Tabla
+      </button>
+      <button class="vt-btn" id="vt-kanban" onclick="setView('kanban')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="13" rx="1"/><rect x="17" y="3" width="5" height="16" rx="1"/></svg>
+        Kanban
+      </button>
+      <button class="vt-btn" id="vt-fac" onclick="setView('fac')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Por Facultad
+      </button>
+      <div style="flex:1"></div>
+      <!-- Botón PDF -->
+      <button class="pdf-btn" id="pdf-btn">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+
+    <!-- ── FILTRO RÁPIDO JP ── -->
+    <div class="jp-quick" id="jp-quick"></div>
+
+    <!-- ── SEARCH ROW ── -->
     <div class="search-row">
       <div class="search-wrap">
         <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -768,7 +990,7 @@
         Exportar Excel
       </button>
     </div>
-    <div class="hint-row" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div id="hint-row-wrap" class="hint-row" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
       <span style="display:flex;align-items:center;gap:5px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
         Haz clic en cualquier fila para ver el detalle completo
@@ -805,6 +1027,15 @@
         <p>Sin resultados con los filtros actuales.</p>
       </div>
     </div>
+
+    <!-- ── KANBAN VIEW ── -->
+    <div id="kanban-view">
+      <div class="kanban-board" id="kanban-board"></div>
+    </div>
+
+    <!-- ── VISTA FACULTAD ── -->
+    <div id="fac-view"></div>
+
   </main>
 </div>
 
@@ -910,6 +1141,12 @@
     <div class="panel-section">
       <div class="ps-title">Observaciones</div>
       <div class="obs-box" id="p-obs"></div>
+    </div>
+
+    <!-- HISTORIAL DE CAMBIOS -->
+    <div class="panel-section" id="p-hist-section">
+      <div class="ps-title">Historial de cambios</div>
+      <div id="p-hist-body"></div>
     </div>
 
   </div>
@@ -1387,11 +1624,12 @@ function renderTable(){
     const rav=AVANCE[d.asignatura]||{};
     const rPct=rav.avance||0;
     const isUrg=d.reunion==='Sin respuesta';
+    const isVenc=isHitoVencido(d);
     const avColor=rPct>=50?'hi':rPct>0?'mid':'lo';
     return `
-    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg?'urg-row':''}">
+    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''}">
       <td><span class="chip chip-fac">${d.facultad}</span></td>
-      <td class="asig-col">${isUrg?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}</td>
+      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="chip chip-jp">${d.jp}</span></td>
       <td><span class="chip chip-di">${d.di}</span></td>
@@ -1594,7 +1832,22 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     renderKPIs();
     renderFacBar();
     renderTable();
+    renderJPQuick();
     document.getElementById('header-count').textContent = DATA.length;
+    renderNextDeadline();
+    renderAlertBanner();
+    updateTimestamp();
+    detectChanges();
+    // Semáforo global (necesita DATA_ALL, cargar si hace falta)
+    if(!DATA_ALL.length) await loadDashboardData();
+    renderGlobalSemaforo();
+    // Guardar snapshot tendencia
+    const src2=DATA_ALL.length?DATA_ALL:DATA; const avS2=DATA_ALL.length?AVANCE_ALL:AVANCE;
+    let val2=0,ep2=0;
+    src2.forEach(d=>{const av=avS2[d.asignatura]||{};const hv=Object.values(av.hitos||{});
+      if(av.avance>=100||hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||!h))val2++;
+      else if(av.avance>0)ep2++;});
+    saveTrendSnapshot(src2.length>0?Math.round((val2+(ep2*.5))/src2.length*100):0);
   }
   // Conectar botón "Actualizar datos" del overview (ya cargado en DOM)
   document.getElementById('ov-refresh-btn')?.addEventListener('click', async ()=>{
@@ -1620,7 +1873,15 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     renderTable();
     renderKPIs();
     renderFacBar();
+    renderJPQuick();
     document.getElementById('header-count').textContent = DATA.length;
+    renderNextDeadline();
+    renderAlertBanner();
+    updateTimestamp();
+    detectChanges();
+    renderGlobalSemaforo();
+    if(currentView==='kanban') renderKanban();
+    if(currentView==='fac')    renderFacView();
   }, 5*60*1000);
 })();
 
@@ -2065,9 +2326,11 @@ document.getElementById('overview-toggle').addEventListener('click', async ()=>{
   panel.style.display = overviewVisible ? '' : 'none';
   document.getElementById('overview-toggle-label').textContent = overviewVisible ? 'Ocultar resumen' : 'Ver resumen';
   if(overviewVisible && DATA.length){
-    // Cargar fuente independiente (DATA_DASHBOARD) si aún no se ha cargado
     if(!DATA_ALL.length) await loadDashboardData();
     renderOverview();
+    injectTrendCard();
+    renderTrendChart();
+    renderGlobalSemaforo();
   }
 });
 
@@ -2077,10 +2340,382 @@ document.getElementById('ov-refresh-btn')?.addEventListener('click', async ()=>{
   if(btn){btn.disabled=true; btn.textContent='Actualizando...';}
   await loadDashboardData();
   renderOverview();
+  injectTrendCard();
+  renderTrendChart();
+  renderGlobalSemaforo();
+  updateTimestamp();
   if(btn){btn.disabled=false; btn.textContent='🔄 Actualizar datos';}
 });
 
 // ─── FIN OVERVIEW ────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FUNCIONALIDADES NUEVAS (1–12)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── 1. SEMÁFORO GLOBAL EN HEADER ──────────────────────────────────────────────
+function renderGlobalSemaforo(){
+  const src = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  if(!src.length) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const totalDias  = Math.round((GANTT_END - GANTT_START) / 86400000);
+  const diasTransc = Math.max(0,Math.round((today - GANTT_START)/86400000));
+  const pctTiempo  = Math.min(100,Math.round(diasTransc/totalDias*100));
+  let validadas=0,enProd=0;
+  src.forEach(d=>{
+    const av=avSrc[d.asignatura]||{};
+    const hv=Object.values(av.hitos||{});
+    if(av.avance>=100||hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||!h)) validadas++;
+    else if(av.avance>0||hv.some(h=>h&&h!=='No aplica'&&h!=='—'&&h!=='No inicia')) enProd++;
+  });
+  const pct = src.length>0?Math.round((validadas+(enProd*.5))/src.length*100):0;
+  const diff = pct - pctTiempo;
+  let sem='verde', label='A tiempo';
+  if(diff < -20){sem='rojo';label='Atrasado';}
+  else if(diff < -5){sem='amarillo';label='En riesgo';}
+  else if(diff >= 5){label='Adelantado';}
+  const el = document.getElementById('global-sem');
+  const lb = document.getElementById('global-sem-label');
+  if(el&&lb){
+    el.className=''; el.classList.add('sem-'+sem);
+    lb.textContent = label;
+    el.style.display='inline-flex';
+  }
+}
+
+// ── 2. CONTADOR DÍAS PRÓXIMA ENTREGA ──────────────────────────────────────────
+function renderNextDeadline(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = GANTT_HITOS.filter(h=>h.fecha >= today).sort((a,b)=>a.fecha-b.fecha);
+  if(!upcoming.length){ document.getElementById('next-deadline').style.display='none'; return; }
+  const next = upcoming[0];
+  const dias = Math.round((next.fecha - today)/86400000);
+  const el   = document.getElementById('next-deadline');
+  const lb   = document.getElementById('next-deadline-label');
+  if(el&&lb){
+    lb.innerHTML = `<span>${next.label}</span> en <span>${dias}</span> día${dias!==1?'s':''}`;
+    el.style.display='inline-flex';
+    el.style.color = dias<=3?'var(--ro)':dias<=7?'var(--am)':'var(--am)';
+  }
+}
+
+// ── 3. TENDENCIA SEMANAL (localStorage) ───────────────────────────────────────
+const TREND_KEY = 'ust_trend_2026';
+function getWeekLabel(d=new Date()){
+  const yr = d.getFullYear();
+  const wk = Math.ceil(((d - new Date(yr,0,1))/86400000 + new Date(yr,0,1).getDay()+1)/7);
+  return `${yr}-W${String(wk).padStart(2,'0')}`;
+}
+function saveTrendSnapshot(pct){
+  try{
+    const raw = JSON.parse(localStorage.getItem(TREND_KEY)||'[]');
+    const wk  = getWeekLabel();
+    const last = raw[raw.length-1];
+    if(last && last.w===wk){ last.pct=pct; }
+    else{ raw.push({w:wk,pct}); if(raw.length>8) raw.shift(); }
+    localStorage.setItem(TREND_KEY, JSON.stringify(raw));
+  }catch(e){}
+}
+function getTrendData(){
+  try{ return JSON.parse(localStorage.getItem(TREND_KEY)||'[]'); }catch(e){ return []; }
+}
+
+let ovTrendInstance = null;
+function renderTrendChart(){
+  const data = getTrendData();
+  const canvas = document.getElementById('ovTrendChart');
+  if(!canvas||data.length<2) return;
+  if(ovTrendInstance) ovTrendInstance.destroy();
+  ovTrendInstance = new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{
+      labels: data.map(d=>d.w.replace(/\d{4}-/,'')),
+      datasets:[{
+        data: data.map(d=>d.pct),
+        borderColor:'#818cf8',
+        backgroundColor:'rgba(129,140,248,.12)',
+        tension:.4, fill:true,
+        pointBackgroundColor:'#818cf8', pointRadius:4,
+        borderWidth:2,
+      }]
+    },
+    options:{
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10},color:'rgba(255,255,255,.4)'},grid:{color:'rgba(255,255,255,.05)'}},
+        x:{ticks:{font:{size:10},color:'rgba(255,255,255,.4)'},grid:{display:false}}
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}% avance`}}},
+      animation:{duration:400}
+    }
+  });
+}
+
+// Inyectar canvas de tendencia en el overview después del donut
+function injectTrendCard(){
+  const charts = document.querySelector('.ov-charts');
+  if(!charts || document.getElementById('ovTrendChart')) return;
+  const card = document.createElement('div');
+  card.className='ov-chart-card';
+  card.innerHTML=`<div class="ov-chart-title">Tendencia semanal de avance</div><canvas id="ovTrendChart" height="150"></canvas>`;
+  charts.appendChild(card);
+}
+
+// ── 7. BANNER ALERTAS (próximas entregas ≤7 días) ─────────────────────────────
+function renderAlertBanner(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const src   = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  const alerts = [];
+  GANTT_HITOS.forEach(h=>{
+    const dias = Math.round((h.fecha - today)/86400000);
+    if(dias<0||dias>7) return;
+    const pendientes = src.filter(d=>{
+      const av=avSrc[d.asignatura]||{};
+      const v=av.hitos&&av.hitos[h.key];
+      return !v||v==='No inicia'||v==='En construcción';
+    }).length;
+    if(pendientes>0) alerts.push({label:h.label, dias, pendientes});
+  });
+  const banner = document.getElementById('alert-banner');
+  const txt    = document.getElementById('alert-text');
+  if(!alerts.length){ banner.style.display='none'; return; }
+  const items  = alerts.map(a=>
+    `<span class="alert-item">${a.label}: ${a.pendientes} pendiente${a.pendientes!==1?'s':''} · ${a.dias===0?'¡HOY!':a.dias+'d'}</span>`
+  ).join('');
+  txt.innerHTML = `<strong>Entregas próximas:</strong> ${items}`;
+  banner.style.display='';
+}
+document.getElementById('alert-close').addEventListener('click',()=>{
+  document.getElementById('alert-banner').style.display='none';
+});
+
+// ── 4. QUICK FILTER JP ────────────────────────────────────────────────────────
+function renderJPQuick(){
+  const jps = [...new Set(DATA.map(d=>d.jp).filter(v=>v&&v!=='—'))].sort();
+  const cont = document.getElementById('jp-quick');
+  if(!cont||!jps.length){ if(cont) cont.style.display='none'; return; }
+  cont.innerHTML = `<span class="jp-quick-label">JP:</span>` +
+    jps.map(jp=>`<button class="jp-chip${filters.jp===jp?' active':''}" data-jp="${jp}">${jp}</button>`).join('') +
+    (filters.jp?`<button class="jp-chip" data-jp="" style="color:var(--ro);border-color:rgba(248,113,113,.3)">✕ Limpiar</button>`:'');
+  cont.querySelectorAll('.jp-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      filters.jp = btn.dataset.jp || null;
+      renderSidebar(); renderTable(); renderKPIs(); renderFacBar(); renderJPQuick();
+      if(currentView==='kanban') renderKanban();
+      if(currentView==='fac') renderFacView();
+    });
+  });
+}
+
+// ── 5. RESALTADO ENTREGAS VENCIDAS ────────────────────────────────────────────
+function isHitoVencido(d){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const av    = AVANCE[d.asignatura]||{};
+  return GANTT_HITOS.some(h=>{
+    if(today <= h.fecha) return false;
+    const v = av.hitos&&av.hitos[h.key];
+    return !v||v==='No inicia'||v==='En construcción'||v==='Enviada a validación DEL';
+  });
+}
+
+// ── 6. HISTORIAL DE CAMBIOS (localStorage) ────────────────────────────────────
+const HIST_KEY = 'ust_historial_2026';
+function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'{}'); }catch(e){ return {}; } }
+function saveHistory(h){ try{ localStorage.setItem(HIST_KEY,JSON.stringify(h)); }catch(e){} }
+
+function detectChanges(){
+  const hist = loadHistory();
+  const snap = {};
+  DATA.forEach(d=>{ snap[d.asignatura]={ planif:d.planif, avance:(AVANCE[d.asignatura]||{}).avance||0 }; });
+  const prev = hist._snapshot||{};
+  const ts   = new Date().toLocaleString('es-CL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  DATA.forEach(d=>{
+    const a  = d.asignatura;
+    const p  = prev[a]||{};
+    if(!hist[a]) hist[a]=[];
+    if(p.planif && p.planif !== d.planif)
+      hist[a].unshift({ts, campo:'Planificación', antes:p.planif, despues:d.planif});
+    const avNow = (AVANCE[d.asignatura]||{}).avance||0;
+    if(p.avance!=null && p.avance!==avNow && avNow>0)
+      hist[a].unshift({ts, campo:'Avance', antes:p.avance+'%', despues:avNow+'%'});
+    if(hist[a].length>10) hist[a]=hist[a].slice(0,10);
+  });
+  hist._snapshot = snap;
+  saveHistory(hist);
+}
+
+function renderHistorial(asignatura){
+  const hist = loadHistory();
+  const items = hist[asignatura]||[];
+  const body  = document.getElementById('p-hist-body');
+  if(!body) return;
+  if(!items.length){
+    body.innerHTML='<div class="hist-empty">Sin cambios registrados en esta sesión.</div>';
+    return;
+  }
+  body.innerHTML = items.map(c=>`
+    <div class="hist-item">
+      <div class="hist-dot"></div>
+      <div style="flex:1">
+        <div class="hist-text"><strong>${c.campo}</strong>: ${c.antes} → <strong>${c.despues}</strong></div>
+        <div class="hist-date">${c.ts}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── 8. EXPORTAR PDF ───────────────────────────────────────────────────────────
+document.getElementById('pdf-btn').addEventListener('click',()=>{ window.print(); });
+
+// ── 9. VISTA KANBAN ───────────────────────────────────────────────────────────
+function renderKanban(){
+  const rows = filtered();
+  const board = document.getElementById('kanban-board');
+  if(!board) return;
+  board.innerHTML = PLANIF_FLOW.map(step=>{
+    const cards = rows.filter(d=>d.planif===step.label||(step.key==='no_inicia'&&(!d.planif||d.planif==='No inicia')));
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <span class="kanban-col-title" style="color:var(--${step.dot==='g'?'ve':step.dot==='r'?'ro':step.dot==='y'?'am':step.dot==='ca'?'ca':step.dot==='d2'?'tl2':'az'})">${step.label}</span>
+        <span class="kanban-col-count">${cards.length}</span>
+      </div>
+      <div class="kanban-cards">
+        ${cards.length===0?'<div style="font-size:11px;color:var(--text-light);text-align:center;padding:12px">Vacío</div>':
+          cards.map(d=>{
+            const av=(AVANCE[d.asignatura]||{}).avance||0;
+            const venc = isHitoVencido(d)?'border-color:rgba(248,113,113,.4);':'';
+            return `<div class="kanban-card" data-asig="${d.asignatura}" style="${venc}">
+              <div class="kc-fac">${d.facultad}</div>
+              <div class="kc-title">${d.asignatura}</div>
+              <div class="kc-chips">
+                <span class="chip chip-jp">${d.jp}</span>
+                <span class="chip chip-di">${d.di}</span>
+              </div>
+              <div class="kc-av" style="color:${av>=70?'var(--ve)':av>0?'var(--am)':'var(--text-muted)'}">${av}% avance</div>
+            </div>`;
+          }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  // Click en tarjeta kanban → abrir panel
+  board.querySelectorAll('.kanban-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const asig = card.dataset.asig;
+      const idx  = DATA.findIndex(d=>d.asignatura===asig);
+      if(idx>=0) openPanel(idx);
+    });
+  });
+}
+
+// ── 10. VISTA POR FACULTAD ────────────────────────────────────────────────────
+function renderFacView(){
+  const rows = filtered();
+  const container = document.getElementById('fac-view');
+  if(!container) return;
+  const byFac = {};
+  FAC_ORDER.forEach(f=>{ if(rows.some(d=>d.facultad===f)) byFac[f]=[]; });
+  rows.forEach(d=>{ if(byFac[d.facultad]) byFac[d.facultad].push(d); });
+  container.innerHTML = Object.entries(byFac).map(([fac,items])=>{
+    const compl = items.filter(d=>(AVANCE[d.asignatura]||{}).avance>=100).length;
+    return `<div class="fv-group">
+      <div class="fv-header" onclick="toggleFvGroup(this)">
+        <svg class="fv-chevron open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="fv-fac-name">${fac}</span>
+        <span class="fv-stats">
+          <span>${items.length} asig.</span>
+          <span style="color:var(--ve)">${compl} completas</span>
+        </span>
+      </div>
+      <div class="fv-body">
+        <table>
+          <thead><tr style="background:linear-gradient(90deg,rgba(99,102,241,.15),rgba(6,182,212,.08));border-bottom:1px solid var(--borde)">
+            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Asignatura</th>
+            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">JP</th>
+            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">DI</th>
+            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Planificación</th>
+            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Avance</th>
+          </tr></thead>
+          <tbody>
+            ${items.map((d,i)=>{
+              const av=(AVANCE[d.asignatura]||{}).avance||0;
+              const venc = isHitoVencido(d)?'background:rgba(248,113,113,.04);':'';
+              return `<tr style="border-bottom:1px solid var(--borde);cursor:pointer;${venc}" onclick="openPanel(DATA.findIndex(x=>x.asignatura==='${d.asignatura.replace(/'/g,"\\'")}'))">
+                <td style="padding:9px 12px;font-size:13px;font-weight:500">${d.asignatura}</td>
+                <td style="padding:9px 12px"><span class="chip chip-jp">${d.jp}</span></td>
+                <td style="padding:9px 12px"><span class="chip chip-di">${d.di}</span></td>
+                <td style="padding:9px 12px"><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${planifLabel(d.planif)}</span></td>
+                <td style="padding:9px 12px"><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${av}%"></div></div><span class="av-pct ${av>=50?'hi':av>0?'mid':'lo'}">${av}%</span></div></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleFvGroup(header){
+  const body = header.nextElementSibling;
+  const chev = header.querySelector('.fv-chevron');
+  const collapsed = body.style.display==='none';
+  body.style.display = collapsed?'':'none';
+  chev.classList.toggle('open', collapsed);
+  header.classList.toggle('fv-header-collapsed',!collapsed);
+}
+
+// ── 11. MODO PRESENTACIÓN FULLSCREEN ─────────────────────────────────────────
+let presMode = false;
+document.getElementById('pres-btn').addEventListener('click',async()=>{
+  presMode = !presMode;
+  document.body.classList.toggle('presentation-mode', presMode);
+  const btn = document.getElementById('pres-btn');
+  if(presMode){
+    btn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0 2-2h3M3 16h3a2 2 0 0 0 2 2v3"/></svg> Salir`;
+    try{ await document.documentElement.requestFullscreen(); }catch(e){}
+  } else {
+    btn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg> Presentación`;
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+  }
+});
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement && presMode){ presMode=false; document.body.classList.remove('presentation-mode'); }
+});
+
+// ── 12. TIMESTAMP ÚLTIMA ACTUALIZACIÓN ────────────────────────────────────────
+function updateTimestamp(){
+  const el = document.getElementById('last-update');
+  if(el) el.textContent = '· '+new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── GESTOR DE VISTAS ──────────────────────────────────────────────────────────
+let currentView = 'table';
+function setView(v){
+  currentView = v;
+  document.querySelector('.table-wrap').style.display   = v==='table' ?'':'none';
+  document.getElementById('kanban-view').style.display  = v==='kanban'?'':'none';
+  document.getElementById('fac-view').style.display     = v==='fac'   ?'':'none';
+  document.getElementById('hint-row-wrap').style.display= v==='table' ?'':'none';
+  ['table','kanban','fac'].forEach(id=>{
+    const btn = document.getElementById('vt-'+id);
+    if(btn) btn.classList.toggle('active', id===v);
+  });
+  if(v==='kanban') renderKanban();
+  if(v==='fac')    renderFacView();
+}
+
+// ── HOOK: integrar en renderTable existente ────────────────────────────────────
+const _origRenderTable = renderTable;
+renderTable = function(){
+  _origRenderTable();
+  if(currentView==='kanban') renderKanban();
+  if(currentView==='fac')    renderFacView();
+};
+
+// ── EXTENDER openPanel para incluir historial ─────────────────────────────────
+const _origOpenPanel = openPanel;
+openPanel = function(idx){
+  _origOpenPanel(idx);
+  if(DATA[idx]) renderHistorial(DATA[idx].asignatura);
+};
 
 document.getElementById('mail-open-btn').addEventListener('click',()=>{
   const to      = encodeURIComponent(document.getElementById('mail-to').value);
