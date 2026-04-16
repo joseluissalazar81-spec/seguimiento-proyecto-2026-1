@@ -17,6 +17,8 @@
       --ro:#D63031;   --ro-bg:#FDF0F0;
       --am:#C8A951;   --am-bg:#F5EDD0;
       --gr:#999;      --gr-bg:#F0F0F0;
+      --tl:#0097A7;   --tl-bg:#E0F7FA;   /* teal — DEL 1° Instancia */
+      --tl2:#00695C;  --tl2-bg:#E8F5E9;  /* teal oscuro — DEL 2° Instancia */
       --bg:#EEEAE0;   --surface:#FFFFFF; --surface2:#F8F6EE;
       --borde:#DDD8C4;
       --text:#1C1C1C; --text-muted:#666; --text-light:#AAA;
@@ -153,6 +155,7 @@
     .pl-dot{display:inline-flex;align-items:center;gap:5px;font-size:12.5px}
     .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
     .dot-r{background:var(--ro)}.dot-y{background:var(--am)}.dot-g{background:var(--ve)}.dot-x{background:var(--gr)}.dot-d{background:#7B3FBE}
+    .dot-d1{background:var(--tl)}.dot-d2{background:var(--tl2)}
 
     /* ── EMPTY ── */
     .empty-state{padding:56px 20px;text-align:center;color:var(--text-muted)}
@@ -374,10 +377,78 @@
     .mail-open-btn{padding:8px 18px;border:none;border-radius:6px;background:var(--az);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
     .mail-open-btn:hover{background:var(--az2)}
 
+    /* ── OVERVIEW PANEL ── */
+    .ov-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+    .ov-metric{background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:12px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .ov-metric::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:2px 0 0 2px}
+    .ov-metric.sem-verde::before{background:var(--ve)}
+    .ov-metric.sem-amarillo::before{background:var(--am)}
+    .ov-metric.sem-rojo::before{background:var(--ro)}
+    .ov-metric.sem-azul::before{background:var(--az)}
+    .ov-m-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:4px}
+    .ov-m-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;line-height:1.1}
+    .ov-m-sub{font-size:11px;color:var(--text-muted);margin-top:3px}
+    .ov-m-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:5px}
+    .badge-verde{background:var(--ve-bg);color:#1a6e45;border:1px solid #90d4a8}
+    .badge-amarillo{background:var(--am-bg);color:#7A5C00;border:1px solid var(--am)}
+    .badge-rojo{background:var(--ro-bg);color:#8B1A1A;border:1px solid #e08080}
+    .ov-charts{display:flex;gap:10px;flex-wrap:wrap}
+    .ov-chart-card{background:var(--surface);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow);flex:1;min-width:180px}
+    .ov-chart-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--az);margin-bottom:12px}
+    .ov-donut-wrap{position:relative;width:140px;height:140px;margin:0 auto 10px}
+    .ov-donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+    .ov-pct-big{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--az)}
+    .ov-pct-label{font-size:10px;color:var(--text-muted)}
+    .ov-legend{display:flex;flex-direction:column;gap:5px}
+    .ov-leg-item{display:flex;align-items:center;gap:7px;font-size:11.5px}
+    .ov-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .ov-leg-label{flex:1;color:var(--text-muted)}
+    .ov-leg-val{font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+    /* Gantt */
+    .ov-gantt{font-size:12px}
+    .ov-gantt-hito{margin-bottom:10px}
+    .ov-gh-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+    .ov-gh-label{font-size:11px;font-weight:600;color:var(--text)}
+    .ov-gh-fecha{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace}
+    .ov-gh-bar-wrap{height:8px;background:var(--borde);border-radius:4px;overflow:hidden;position:relative}
+    .ov-gh-bar{height:100%;border-radius:4px;transition:width .4s}
+    .ov-gh-bar.sem-verde{background:var(--ve)}
+    .ov-gh-bar.sem-amarillo{background:var(--am)}
+    .ov-gh-bar.sem-rojo{background:var(--ro)}
+    .ov-gh-today{position:absolute;top:0;bottom:0;width:2px;background:var(--ro);opacity:.7}
+    .ov-gh-stats{display:flex;justify-content:space-between;margin-top:3px;font-size:10px;color:var(--text-muted)}
+    .ov-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--az2);font-weight:600;padding:5px 0;border:none;background:none;font-family:inherit}
+    .ov-toggle:hover{color:var(--az);text-decoration:underline}
+    @media(max-width:900px){
+      .ov-metrics{grid-template-columns:1fr 1fr}
+      .ov-charts{flex-direction:column}
+    }
+
     @keyframes spin{to{transform:rotate(360deg)}}
     .syncing #sync-icon{animation:spin .8s linear infinite}
     #sync-btn:hover{color:white!important}
     .sync-error{color:rgba(255,120,120,.9)!important}
+
+    /* ── REVISIÓN DEL (planif flow) ── */
+    .del-flow{display:flex;flex-direction:column;gap:0;margin:0 0 14px}
+    .del-step{display:flex;align-items:flex-start;gap:10px;position:relative;padding-bottom:10px}
+    .del-step:last-child{padding-bottom:0}
+    .del-step::before{content:'';position:absolute;left:12px;top:26px;bottom:0;width:2px;background:var(--borde)}
+    .del-step:last-child::before{display:none}
+    .del-icon{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;z-index:1;border:2px solid transparent;margin-top:1px}
+    .del-icon.estado-done{background:#E3F7EC;border-color:#90d4a8;color:#1a6e45}
+    .del-icon.estado-active{background:var(--tl);border-color:#007B8A;color:white;box-shadow:0 0 0 3px rgba(0,151,167,.18)}
+    .del-icon.estado-active2{background:var(--tl2);border-color:#004D40;color:white;box-shadow:0 0 0 3px rgba(0,105,92,.18)}
+    .del-icon.estado-pending{background:var(--surface);border-color:var(--borde);color:var(--text-muted)}
+    .del-info{flex:1;padding-top:2px}
+    .del-label{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+    .del-label.active{color:var(--tl)}
+    .del-label.active2{color:var(--tl2)}
+    .del-date{font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'DM Mono',monospace}
+    .del-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+    .del-badge.actual{background:rgba(0,151,167,.12);color:var(--tl);border:1px solid rgba(0,151,167,.3)}
+    .del-badge.actual2{background:rgba(0,105,92,.12);color:var(--tl2);border:1px solid rgba(0,105,92,.3)}
+    .del-badge.hecho{background:#E3F7EC;color:#1a6e45;border:1px solid #90d4a8}
   </style>
 </head>
 <body>
@@ -395,6 +466,11 @@
     <div class="logo-text" style="font-size:13px;letter-spacing:.3px">UNIVERSIDAD SANTO TOMÁS</div>
     <div class="logo-sub">Seguimiento Proyecto e-Learning UST 2026-1</div>
   </div>
+  <div class="header-sep"></div>
+  <button id="overview-toggle" title="Ver panel de estado general" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92);cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span id="overview-toggle-label">Ver resumen</span>
+  </button>
   <div class="header-sep"></div>
   <div class="header-badge">Total <span id="header-count">43</span> asignaturas</div>
   <div class="header-sep"></div>
@@ -415,6 +491,36 @@
 <div class="layout">
   <aside id="sidebar"></aside>
   <main>
+    <!-- ── PANEL VISUAL DE ESTADO GENERAL ── -->
+    <div id="overview-panel" style="display:none;margin-bottom:16px">
+      <!-- Encabezado del panel -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--az)">Resumen ejecutivo — Vista independiente de filtros</span>
+        <button id="ov-refresh-btn" style="display:inline-flex;align-items:center;gap:5px;background:var(--az-bg);border:1px solid #c5d2e8;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--az);cursor:pointer;font-family:inherit">🔄 Actualizar datos</button>
+      </div>
+      <!-- Tarjetas métricas -->
+      <div class="ov-metrics" id="ov-metrics"></div>
+      <!-- Gráficos -->
+      <div class="ov-charts">
+        <div class="ov-chart-card">
+          <div class="ov-chart-title">Avance general del proyecto</div>
+          <div class="ov-donut-wrap">
+            <canvas id="ovDonutChart" width="140" height="140"></canvas>
+            <div class="ov-donut-center" id="ov-pct-label"></div>
+          </div>
+          <div class="ov-legend" id="ov-legend"></div>
+        </div>
+        <div class="ov-chart-card" style="flex:2;min-width:0">
+          <div class="ov-chart-title">Avance por facultad — hitos S0 validados</div>
+          <canvas id="ovBarChart" height="160"></canvas>
+        </div>
+        <div class="ov-chart-card">
+          <div class="ov-chart-title">Posición en Gantt</div>
+          <div class="ov-gantt" id="ov-gantt"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ── FIN PANEL VISUAL ── -->
     <div class="kpi-bar" id="kpi-bar"></div>
     <div class="fac-bar" id="fac-bar"></div>
     <div class="search-row">
@@ -544,6 +650,12 @@
       </div>
     </div>
 
+    <!-- REVISIÓN DEL -->
+    <div class="panel-section" id="p-del-section" style="display:none">
+      <div class="ps-title">Revisión DEL</div>
+      <div class="del-flow" id="p-del-flow"></div>
+    </div>
+
     <!-- ESCALAMIENTO -->
     <div class="panel-section" id="p-escal-section" style="display:none">
       <div class="ps-title">Escalamiento</div>
@@ -658,7 +770,13 @@ const PROD = {
 
 
 // ─── GOOGLE SHEETS EN TIEMPO REAL ───────────────────────────────────────────
+// Hoja principal (puede tener filtros activos del equipo — sólo afecta la tabla)
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&sheet=Seguimiento";
+
+// Hoja de datos para el dashboard ejecutivo — NUNCA filtrar esta hoja en Google Sheets.
+// Crea una hoja llamada "DATA_DASHBOARD" con la fórmula: =Seguimiento!A:AB en la celda A1.
+// De esta forma el dashboard siempre tiene todos los datos, independiente de los filtros del equipo.
+const SHEET_DASHBOARD_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&sheet=DATA_DASHBOARD";
 
 // Parsear CSV respetando comillas y saltos de línea dentro de celdas
 function parseCSV(text){
@@ -718,6 +836,8 @@ function buildData(rows){
       obs:           r[22]||'',
       correo:        r[24]||'',
       fechaSR:       r[25]||'',
+      del1fecha:     r[26]||'',  // Fecha DEL 1° Instancia
+      del2fecha:     r[27]||'',  // Fecha DEL 2° Instancia
     });
     avance[asig]={
       avance: pct,
@@ -740,6 +860,8 @@ function buildData(rows){
 }
 
 let DATA=[], AVANCE={};
+// DATA_ALL: copia completa sin filtros — exclusiva para el overview ejecutivo
+let DATA_ALL=[], AVANCE_ALL={};
 
 function setSyncLabel(txt, isError=false){
   const lbl=document.getElementById('sync-label');
@@ -782,6 +904,26 @@ async function loadSheetData(silent=false){
 }
 
 
+// Carga datos para el overview desde hoja independiente (ignorando filtros del equipo)
+async function loadDashboardData(){
+  try{
+    const res = await fetch(SHEET_DASHBOARD_CSV+'&nocache='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    const built = buildData(rows);
+    DATA_ALL   = built.data;
+    AVANCE_ALL = built.avance;
+    return true;
+  }catch(err){
+    // Si no existe la hoja DATA_DASHBOARD, usar DATA completo como fallback
+    console.warn('DATA_DASHBOARD no disponible, usando DATA como fallback:', err.message);
+    DATA_ALL   = [...DATA];
+    AVANCE_ALL = {...AVANCE};
+    return false;
+  }
+}
+
 // ─── STATE ───
 let filters={jp:null,di:null,dg:null,implementador:null,facultad:null,planif:null};
 let searchQ='',sortCol='facultad',sortDir='asc',selectedIdx=null;
@@ -812,14 +954,26 @@ function filtered(){
 }
 function rbClass(r){if(r==='Realizada')return'rb rb-r';if(r==='Agendada')return'rb rb-a';if(r==='Sin respuesta')return'rb rb-s';return'rb rb-n'}
 function dotClass(p){
-  if(!p||p==='No inicia')return 'r';
-  if(p==='En construcción')return 'y';
+  if(!p||p==='No inicia'||p==='No enviada')return 'r';
+  if(p==='En construcción'||p==='Pendiente')return 'y';
   if(p==='No aplica')return 'x';
-  if(p&&p.toLowerCase().includes('del'))return 'd';
+  if(p==='Enviada a validación DEL')return 'd';
+  if(p==='DEL 1° Instancia')return 'd1';
+  if(p==='DEL 2° Instancia')return 'd2';
   if(p==='Validada')return 'g';
-  if(p==='No enviada')return 'r';
-  if(p==='Pendiente')return 'y';
   return 'g';
+}
+
+// Etiqueta corta para columna planif en tabla
+function planifLabel(p){
+  if(!p||p==='No inicia')return 'No inicia';
+  if(p==='En construcción')return 'En construcción';
+  if(p==='No aplica')return 'No aplica';
+  if(p==='Enviada a validación DEL')return 'Enviada a DEL';
+  if(p==='DEL 1° Instancia')return 'DEL 1° Inst.';
+  if(p==='DEL 2° Instancia')return 'DEL 2° Inst.';
+  if(p==='Validada')return 'Validada';
+  return p;
 }
 
 function getProd(asig){
@@ -956,7 +1110,7 @@ function renderTable(){
       <td>${d.dg!=='—'?`<span class="chip chip-dg">${d.dg}</span>`:'<span style="color:var(--text-light)">—</span>'}</td>
       <td><span class="chip chip-imp">${d.implementador}</span></td>
       <td><span class="${rbClass(d.reunion)}">${d.reunion}</span></td>
-      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${d.planif==='Enviada a validación DEL'?'Enviada a DEL':d.planif||'No inicia'}</span></td>
+      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${planifLabel(d.planif)}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
@@ -1059,6 +1213,9 @@ function openPanel(idx){
     emailEl.style.display='none';
   }
 
+  // REVISIÓN DEL
+  renderDelReview(d);
+
   // ESCALAMIENTO
   renderEscalamiento(d);
 
@@ -1097,13 +1254,25 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
 
 // ─── EXPORT ───
 function exportToExcel(){
-  const rows=filterRows();
+  const rows=filtered(); // corregido: era filterRows() (función inexistente)
   const data=rows.map(d=>{
     const av=AVANCE[d.asignatura]||{};
-    return {'Facultad':d.facultad,'Asignatura':d.asignatura,'Docente':d.docente,'JP':d.jp,'DI':d.di,'DG':d.dg,'Implementador':d.implementador,'Reunión':d.reunion,'Planificación':d.planif,'Avance %':av.avance||0,'S0':av.hitos&&av.hitos.s0||'','S1-S2':av.hitos&&av.hitos.s1s2||'','S3-S4':av.hitos&&av.hitos.s3s4||'','S5-S6':av.hitos&&av.hitos.s5s6||'','S7-S8':av.hitos&&av.hitos.s7s8||'','S9-S10':av.hitos&&av.hitos.s9s10||'','S11-S12':av.hitos&&av.hitos.s11s12||'','S13-S14':av.hitos&&av.hitos.s13s14||'','S15-S16':av.hitos&&av.hitos.s15s16||'','S17-S18':av.hitos&&av.hitos.s17s18||'','Observaciones':av.obs||d.obs||''};
+    return {
+      'Facultad':d.facultad,'Asignatura':d.asignatura,'Docente':d.docente,
+      'JP':d.jp,'DI':d.di,'DG':d.dg,'Implementador':d.implementador,
+      'Reunión':d.reunion,'Planificación':d.planif,
+      'Fecha DEL 1° Inst.':d.del1fecha||'','Fecha DEL 2° Inst.':d.del2fecha||'',
+      'Avance %':av.avance||0,
+      'S0':av.hitos&&av.hitos.s0||'','S1-S2':av.hitos&&av.hitos.s1s2||'',
+      'S3-S4':av.hitos&&av.hitos.s3s4||'','S5-S6':av.hitos&&av.hitos.s5s6||'',
+      'S7-S8':av.hitos&&av.hitos.s7s8||'','S9-S10':av.hitos&&av.hitos.s9s10||'',
+      'S11-S12':av.hitos&&av.hitos.s11s12||'','S13-S14':av.hitos&&av.hitos.s13s14||'',
+      'S15-S16':av.hitos&&av.hitos.s15s16||'','S17-S18':av.hitos&&av.hitos.s17s18||'',
+      'Observaciones':av.obs||d.obs||''
+    };
   });
   const ws=XLSX.utils.json_to_sheet(data);
-  ws['!cols']=[{wch:18},{wch:38},{wch:24},{wch:12},{wch:12},{wch:12},{wch:16},{wch:14},{wch:22},{wch:9},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:40}];
+  ws['!cols']=[{wch:18},{wch:38},{wch:24},{wch:12},{wch:12},{wch:12},{wch:16},{wch:14},{wch:22},{wch:14},{wch:14},{wch:9},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:40}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Seguimiento');
   XLSX.writeFile(wb,'Seguimiento_UST_'+new Date().toISOString().slice(0,10)+'.xlsx');
@@ -1126,7 +1295,11 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
 
 // ─── INIT ASÍNCRONO (datos desde Google Sheets) ───
 (async()=>{
-  const ok = await loadSheetData();
+  // Cargar hoja principal Y hoja del dashboard en paralelo
+  const [ok] = await Promise.all([
+    loadSheetData(),
+    loadDashboardData(),
+  ]);
   if(ok){
     renderSidebar();
     renderKPIs();
@@ -1134,7 +1307,15 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     renderTable();
     document.getElementById('header-count').textContent = DATA.length;
   }
-  // Botón recarga manual
+  // Conectar botón "Actualizar datos" del overview (ya cargado en DOM)
+  document.getElementById('ov-refresh-btn')?.addEventListener('click', async ()=>{
+    const btn = document.getElementById('ov-refresh-btn');
+    if(btn){btn.disabled=true; btn.textContent='Actualizando...';}
+    await loadDashboardData();
+    if(overviewVisible) renderOverview();
+    if(btn){btn.disabled=false; btn.textContent='🔄 Actualizar datos';}
+  });
+  // Botón recarga manual tabla
   document.getElementById('sync-btn')?.addEventListener('click', async()=>{
     await loadSheetData();
     renderSidebar();
@@ -1144,7 +1325,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     document.getElementById('header-count').textContent = DATA.length;
     if(selectedIdx>=0) openPanel(selectedIdx);
   });
-  // Auto-refresh cada 5 minutos
+  // Auto-refresh cada 5 minutos (sólo tabla, no overview)
   setInterval(async()=>{
     await loadSheetData(true);
     renderTable();
@@ -1153,6 +1334,71 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     document.getElementById('header-count').textContent = DATA.length;
   }, 5*60*1000);
 })();
+
+// ─── REVISIÓN DEL ───────────────────────────────────────────────
+// Flujo planificación: No inicia → En construcción → Enviada a DEL → DEL 1° → DEL 2° → Validada
+const PLANIF_FLOW = [
+  {key:'no_inicia',  label:'No inicia',              dot:'r'},
+  {key:'en_const',   label:'En construcción',         dot:'y'},
+  {key:'enviada',    label:'Enviada a validación DEL',dot:'d'},
+  {key:'del1',       label:'DEL 1° Instancia',        dot:'d1', esDelEtapa:true},
+  {key:'del2',       label:'DEL 2° Instancia',        dot:'d2', esDelEtapa:true},
+  {key:'validada',   label:'Validada',                dot:'g'},
+];
+
+function planifStepIndex(planif){
+  if(!planif||planif==='No inicia'||planif==='No enviada')return 0;
+  if(planif==='En construcción'||planif==='Pendiente')return 1;
+  if(planif==='Enviada a validación DEL')return 2;
+  if(planif==='DEL 1° Instancia')return 3;
+  if(planif==='DEL 2° Instancia')return 4;
+  if(planif==='Validada')return 5;
+  return 0;
+}
+
+function renderDelReview(d){
+  const section = document.getElementById('p-del-section');
+  const flow    = document.getElementById('p-del-flow');
+  const stepIdx = planifStepIndex(d.planif);
+
+  // Solo mostrar si hay al menos algún avance en planif
+  if(stepIdx === 0 && !d.del1fecha && !d.del2fecha){
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+
+  flow.innerHTML = PLANIF_FLOW.map((step, i) => {
+    const done   = i < stepIdx;
+    const active = i === stepIdx;
+    const iconCls = active
+      ? (step.key==='del2' ? 'estado-active2' : step.key==='del1' ? 'estado-active' : 'estado-active')
+      : done ? 'estado-done' : 'estado-pending';
+    const labelCls = active
+      ? (step.key==='del2' ? 'active2' : 'active') : '';
+    const badge = active
+      ? `<span class="del-badge ${step.key==='del2'?'actual2':'actual'}">ACTUAL</span>`
+      : done ? `<span class="del-badge hecho">✓</span>` : '';
+
+    // Fecha asociada a los pasos DEL
+    let dateHtml = '';
+    if(step.key==='del1' && d.del1fecha){
+      dateHtml = `<div class="del-date">Enviado: ${d.del1fecha}</div>`;
+    } else if(step.key==='del2' && d.del2fecha){
+      dateHtml = `<div class="del-date">Enviado: ${d.del2fecha}</div>`;
+    } else if(!done && !active){
+      dateHtml = `<div class="del-date" style="color:var(--text-light)">Pendiente</div>`;
+    }
+
+    return `<div class="del-step">
+      <div class="del-icon ${iconCls}">${done ? '✓' : active ? '●' : i+1}</div>
+      <div class="del-info">
+        <div class="del-label ${labelCls}">${step.label}${badge}</div>
+        ${dateHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // ─── ESCALAMIENTO ───────────────────────────────────────────────
 const ESCAL_NIVELES = [
@@ -1350,6 +1596,203 @@ document.getElementById('mail-copy-btn').addEventListener('click',()=>{
     btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
   });
 });
+// ─── OVERVIEW PANEL ─────────────────────────────────────────────────────────
+
+// Fechas del proyecto (Gantt real)
+const GANTT_START = new Date(2026,2,16);  // 16 mar 2026
+const GANTT_END   = new Date(2026,5,12);  // 12 jun 2026
+
+// Hitos Gantt con sus fechas límite
+const GANTT_HITOS = [
+  {label:'S0 Videos B y C',       key:'s0',    fecha: new Date(2026,2,31)},
+  {label:'S1–S2',                  key:'s1s2',  fecha: new Date(2026,3,12)},
+  {label:'S3–S4',                  key:'s3s4',  fecha: new Date(2026,3,19)},
+  {label:'S5–S6',                  key:'s5s6',  fecha: new Date(2026,3,26)},
+  {label:'S7–S8',                  key:'s7s8',  fecha: new Date(2026,4,3)},
+  {label:'S9–S10',                 key:'s9s10', fecha: new Date(2026,4,10)},
+  {label:'S11–S12',                key:'s11s12',fecha: new Date(2026,4,17)},
+  {label:'S13–S14',                key:'s13s14',fecha: new Date(2026,4,24)},
+  {label:'S15–S16',                key:'s15s16',fecha: new Date(2026,4,31)},
+  {label:'S17–S18',                key:'s17s18',fecha: new Date(2026,5,7)},
+];
+
+let ovBarInstance = null, ovDonutInstance = null;
+let overviewVisible = false;
+
+function semaforo(pct, umbralVerde=70, umbralAmarillo=40){
+  if(pct >= umbralVerde) return 'verde';
+  if(pct >= umbralAmarillo) return 'amarillo';
+  return 'rojo';
+}
+
+function renderOverview(){
+  // Siempre usar DATA_ALL para que los filtros del equipo no afecten el overview ejecutivo
+  const src     = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc   = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const totalDias  = Math.round((GANTT_END - GANTT_START) / 86400000);
+  const diasTransc = Math.max(0, Math.round((today - GANTT_START) / 86400000));
+  const pctTiempo  = Math.min(100, Math.round(diasTransc / totalDias * 100));
+
+  // Indicar si se usa fallback
+  const usingFallback = !DATA_ALL.length || DATA_ALL === DATA;
+
+  // ── Conteos generales ──
+  const total = src.length;
+  let validadas=0, enProd=0, sinIniciar=0;
+  src.forEach(d=>{
+    const av = avSrc[d.asignatura]||{};
+    const hitosVals = Object.values(av.hitos||{});
+    const todosV = hitosVals.length>0 && hitosVals.every(h=>h==='Validada'||h==='No aplica'||h==='—'||h==='');
+    const alguno  = hitosVals.some(h=>h==='En construcción'||h==='Enviada'||h.startsWith('Enviada'));
+    if(av.avance>=100||todosV) validadas++;
+    else if(alguno||av.avance>0) enProd++;
+    else sinIniciar++;
+  });
+  const pctAvance = total>0 ? Math.round((validadas+(enProd*.5))/total*100) : 0;
+  const semAv = semaforo(pctAvance);
+
+  // ── Comparar avance con tiempo ──
+  let estado = 'A tiempo';
+  let semEstado = 'verde';
+  const diff = pctAvance - pctTiempo;
+  if(diff < -20){estado='Atrasado'; semEstado='rojo';}
+  else if(diff < -5){estado='En riesgo'; semEstado='amarillo';}
+  else if(diff >= 0){estado='Adelantado'; semEstado='verde';}
+
+  // ── Tarjetas métricas ──
+  document.getElementById('ov-metrics').innerHTML = `
+    <div class="ov-metric sem-${semEstado}">
+      <div class="ov-m-label">Estado del proyecto</div>
+      <div class="ov-m-val" style="color:var(--${semEstado==='verde'?'ve':semEstado==='amarillo'?'am':'ro'})">${estado}</div>
+      <div class="ov-m-sub">Avance ${pctAvance}% vs tiempo ${pctTiempo}%</div>
+    </div>
+    <div class="ov-metric sem-azul">
+      <div class="ov-m-label">Días del proyecto</div>
+      <div class="ov-m-val c-az" style="color:var(--az)">${diasTransc}<span style="font-size:14px;font-weight:400;color:var(--text-muted)"> / ${totalDias}</span></div>
+      <div class="ov-m-sub">${totalDias - diasTransc} días restantes</div>
+    </div>
+    <div class="ov-metric sem-verde">
+      <div class="ov-m-label">Asignaturas completadas</div>
+      <div class="ov-m-val" style="color:var(--ve)">${validadas}<span style="font-size:14px;font-weight:400;color:var(--text-muted)"> / ${total}</span></div>
+      <div class="ov-m-sub">${enProd} en producción · ${sinIniciar} sin iniciar</div>
+    </div>
+    <div class="ov-metric sem-${semAv}">
+      <div class="ov-m-label">Avance ponderado</div>
+      <div class="ov-m-val" style="color:var(--${semAv==='verde'?'ve':semAv==='amarillo'?'am':'ro'})">${pctAvance}%</div>
+      <div class="ov-m-sub">Según hitos y avance por asignatura</div>
+      <div class="ov-m-badge badge-${semAv}">${semAv==='verde'?'A tiempo':semAv==='amarillo'?'En riesgo':'Atrasado'}</div>
+    </div>`;
+
+  // ── Donut general ──
+  document.getElementById('ov-pct-label').innerHTML =
+    `<div class="ov-pct-big">${pctAvance}%</div><div class="ov-pct-label">avance</div>`;
+  const pendiente  = Math.max(0, 100 - pctAvance - Math.round(sinIniciar/total*100));
+  const sinInicPct = Math.round(sinIniciar/total*100);
+  const donutData  = [pctAvance, pendiente, sinInicPct];
+  const donutColors= ['#27A06E','#C8A951','#d1d5db'];
+
+  if(ovDonutInstance){ovDonutInstance.destroy();}
+  const ctxD = document.getElementById('ovDonutChart').getContext('2d');
+  ovDonutInstance = new Chart(ctxD,{
+    type:'doughnut',
+    data:{datasets:[{data:donutData,backgroundColor:donutColors,borderWidth:2,borderColor:'#fff',hoverOffset:3}]},
+    options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}%`}}},animation:{duration:400}}
+  });
+  document.getElementById('ov-legend').innerHTML = [
+    {label:'Completado',color:donutColors[0],val:pctAvance+'%'},
+    {label:'En progreso',color:donutColors[1],val:pendiente+'%'},
+    {label:'Sin iniciar', color:donutColors[2],val:sinInicPct+'%'},
+  ].map(l=>`<div class="ov-leg-item"><span class="ov-leg-dot" style="background:${l.color}"></span><span class="ov-leg-label">${l.label}</span><span class="ov-leg-val">${l.val}</span></div>`).join('');
+
+  // ── Barra por facultad ──
+  const facData = FAC_ORDER.filter(f=>src.some(d=>d.facultad===f)).map(fac=>{
+    const items = src.filter(d=>d.facultad===fac);
+    const val   = items.filter(d=>{const av=avSrc[d.asignatura];return av&&av.hitos&&av.hitos.s0==='Validada'}).length;
+    return {label: FAC_ABBR[fac]||fac, val, total: items.length, pct: Math.round(val/items.length*100)};
+  });
+  const barColors = facData.map(f=>f.pct>=70?'#27A06E':f.pct>=40?'#C8A951':'#D63031');
+
+  if(ovBarInstance){ovBarInstance.destroy();}
+  const ctxB = document.getElementById('ovBarChart').getContext('2d');
+  ovBarInstance = new Chart(ctxB,{
+    type:'bar',
+    data:{
+      labels: facData.map(f=>f.label),
+      datasets:[{
+        data: facData.map(f=>f.pct),
+        backgroundColor: barColors,
+        borderRadius: 4,
+        barThickness: 22,
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      scales:{
+        x:{max:100,grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>v+'%',font:{size:10}}},
+        y:{grid:{display:false},ticks:{font:{size:11}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.raw}% — ${facData[ctx.dataIndex].val}/${facData[ctx.dataIndex].total} asignaturas S0 validadas`}}
+      },
+      animation:{duration:400}
+    }
+  });
+
+  // ── Gantt de hitos ──
+  const totalProj = Math.round((GANTT_END - GANTT_START) / 86400000);
+  const todayPct  = Math.min(100, Math.round((today - GANTT_START) / totalProj / 86400000 * 100 * totalProj / totalProj));
+  const todayPos  = Math.min(100, Math.round((today - GANTT_START) / 86400000 / totalProj * 100));
+
+  document.getElementById('ov-gantt').innerHTML = GANTT_HITOS.map(h=>{
+    // Contar validadas para este hito
+    const validadasH = src.filter(d=>{const av=avSrc[d.asignatura];return av&&av.hitos&&av.hitos[h.key]==='Validada'}).length;
+    const pctH = Math.round(validadasH/src.length*100);
+    const sem  = semaforo(pctH, 70, 40);
+    const vencida = today > h.fecha;
+    const fecLabel = h.fecha.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit'});
+    // posicion de la fecha límite en la barra de tiempo total
+    const fecPos = Math.min(100,Math.round((h.fecha-GANTT_START)/86400000/totalProj*100));
+    return `<div class="ov-gantt-hito">
+      <div class="ov-gh-header">
+        <span class="ov-gh-label"><span class="dot dot-${sem==='verde'?'g':sem==='amarillo'?'y':'r'}" style="display:inline-block;margin-right:4px"></span>${h.label}</span>
+        <span class="ov-gh-fecha">Límite: ${fecLabel}${vencida&&pctH<100?' <span style="color:var(--ro);font-weight:700">●</span>':''}</span>
+      </div>
+      <div class="ov-gh-bar-wrap">
+        <div class="ov-gh-bar sem-${sem}" style="width:${pctH}%"></div>
+        <div class="ov-gh-today" style="left:${todayPos}%" title="Hoy"></div>
+      </div>
+      <div class="ov-gh-stats"><span>${validadasH}/${DATA.length} validadas</span><span style="font-weight:700;color:var(--${sem==='verde'?'ve':sem==='amarillo'?'am':'ro'})">${pctH}%</span></div>
+    </div>`;
+  }).join('');
+}
+
+// Toggle visibilidad del panel
+document.getElementById('overview-toggle').addEventListener('click', async ()=>{
+  overviewVisible = !overviewVisible;
+  const panel = document.getElementById('overview-panel');
+  panel.style.display = overviewVisible ? '' : 'none';
+  document.getElementById('overview-toggle-label').textContent = overviewVisible ? 'Ocultar resumen' : 'Ver resumen';
+  if(overviewVisible && DATA.length){
+    // Cargar fuente independiente (DATA_DASHBOARD) si aún no se ha cargado
+    if(!DATA_ALL.length) await loadDashboardData();
+    renderOverview();
+  }
+});
+
+// Botón "Actualizar snapshot" — recarga DATA_ALL sin afectar filtros activos del equipo
+document.getElementById('ov-refresh-btn')?.addEventListener('click', async ()=>{
+  const btn = document.getElementById('ov-refresh-btn');
+  if(btn){btn.disabled=true; btn.textContent='Actualizando...';}
+  await loadDashboardData();
+  renderOverview();
+  if(btn){btn.disabled=false; btn.textContent='🔄 Actualizar datos';}
+});
+
+// ─── FIN OVERVIEW ────────────────────────────────────────────────────────────
+
 document.getElementById('mail-open-btn').addEventListener('click',()=>{
   const to      = encodeURIComponent(document.getElementById('mail-to').value);
   const cc      = encodeURIComponent(document.getElementById('mail-cc').value);
