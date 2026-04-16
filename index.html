@@ -88,7 +88,8 @@
     .header-badge span{font-weight:700;font-family:'DM Mono',monospace}
 
     /* ── LAYOUT ── */
-    .layout{display:grid;grid-template-columns:215px 1fr;min-height:calc(100vh - 60px)}
+    .layout{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 60px)}
+    #sidebar{display:none}
 
     /* ── SIDEBAR ── */
     aside{
@@ -704,6 +705,27 @@
 
     /* ── VIEW TOGGLE ── */
     .view-toggle{display:flex;gap:2px;background:rgba(255,255,255,.05);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px}
+    /* ── Barra pills facultad ── */
+    .fac-pills-bar{
+      display:flex; align-items:center; flex-wrap:wrap; gap:8px;
+      padding:14px 20px 10px;
+      background:#fff;
+      border-bottom:1px solid rgba(0,0,0,.07);
+    }
+    .fac-pill{
+      display:inline-flex; align-items:center; gap:5px;
+      padding:5px 14px; border-radius:20px;
+      font-size:12px; font-weight:600; cursor:pointer;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff; color:var(--text-muted);
+      transition:all .15s; white-space:nowrap;
+      user-select:none;
+    }
+    .fac-pill:hover{ border-color:var(--az); color:var(--az); background:rgba(26,72,120,.05); }
+    .fac-pill.active{ background:var(--az); color:#fff; border-color:var(--az); }
+    .fac-pill .pill-cnt{ font-size:10px; font-family:'DM Mono',monospace; font-weight:700; opacity:.75; }
+    .fac-pill.active .pill-cnt{ opacity:.85; }
+
     .vt-btn{
       display:inline-flex;align-items:center;gap:5px;
       padding:6px 14px;border-radius:6px;border:none;
@@ -1623,34 +1645,14 @@
     </div>
 
     <div class="kpi-bar" id="kpi-bar"></div>
-    <div class="fac-bar" id="fac-bar"></div>
+    <div class="fac-bar" id="fac-bar" style="display:none"></div>
 
-    <!-- ── TOGGLE DE VISTAS ── -->
-    <div class="view-toggle">
-      <button class="vt-btn" id="vt-table" onclick="setView('table')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
-        Tabla
-      </button>
-      <button class="vt-btn" id="vt-kanban" onclick="setView('kanban')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="13" rx="1"/><rect x="17" y="3" width="5" height="16" rx="1"/></svg>
-        Kanban
-      </button>
-      <button class="vt-btn active" id="vt-fac" onclick="setView('fac')">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Por Facultad
-      </button>
-      <div style="flex:1"></div>
-      <!-- Botón PDF -->
-      <button class="pdf-btn" id="pdf-btn">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Exportar PDF
-      </button>
+    <!-- ── BARRA PILLS FACULTAD ── -->
+    <div class="fac-pills-bar" id="fac-pills-bar">
+      <!-- Se rellena por renderFacPills() -->
     </div>
 
-    <!-- ── FILTRO RÁPIDO JP ── -->
-    <div class="jp-quick" id="jp-quick"></div>
-
-    <!-- ── SEARCH ROW ── -->
+    <!-- ── SEARCH + ACCIONES ── -->
     <div class="search-row">
       <div class="search-wrap">
         <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -1659,9 +1661,15 @@
       <span class="results-info" id="results-info"></span>
       <button class="export-btn" id="export-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Exportar Excel
+        Excel
+      </button>
+      <button class="pdf-btn" id="pdf-btn">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        PDF
       </button>
     </div>
+    <!-- ── FILTRO RÁPIDO JP (oculto) ── -->
+    <div class="jp-quick" id="jp-quick" style="display:none"></div>
     <div id="hint-row-wrap" class="hint-row" style="display:none;align-items:center;gap:14px;flex-wrap:wrap">
       <span style="display:flex;align-items:center;gap:5px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -2075,6 +2083,30 @@ let donaInstance=null;
 // ─── HELPERS ───
 function initials(n){if(!n||n==='—')return'?';return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
 function unique(k){return[...new Set(DATA.map(d=>d[k]).filter(v=>v&&v!=='—'))].sort((a,b)=>a.localeCompare(b,'es'))}
+function renderFacPills(){
+  const bar = document.getElementById('fac-pills-bar');
+  if(!bar || !DATA.length) return;
+  const activeFac = filters.facultad || null;
+  const total = DATA.length;
+  let html = `<button class="fac-pill${!activeFac?' active':''}" onclick="setFacFilter(null)">Todas <span class="pill-cnt">${total}</span></button>`;
+  FAC_ORDER.forEach(fac=>{
+    const n = DATA.filter(d=>d.facultad===fac).length;
+    if(!n) return;
+    const act = activeFac===fac;
+    html += `<button class="fac-pill${act?' active':''}" onclick="setFacFilter('${fac}')">${fac} <span class="pill-cnt">${n}</span></button>`;
+  });
+  bar.innerHTML = html;
+}
+function setFacFilter(fac){
+  filters.facultad = fac;
+  // limpiar otros filtros para no confundir
+  filters.jp=null; filters.di=null; filters.dg=null; filters.implementador=null; filters.planif=null;
+  renderFacPills();
+  renderTable();
+  renderKPIs();
+  if(currentView==='fac') renderFacView();
+}
+
 function filtered(){
   return DATA.filter(d=>{
     if(filters.jp&&d.jp!==filters.jp)return false;
@@ -2243,8 +2275,7 @@ function renderFacBar(){
   container.querySelectorAll('.fac-card').forEach(card=>{
     card.addEventListener('click',()=>{
       const fac=card.dataset.fac;
-      filters.facultad=filters.facultad===fac?null:fac;
-      renderSidebar();renderKPIs();renderFacBar();renderTable();
+      setFacFilter(filters.facultad===fac?null:fac);
     });
   });
 }
@@ -2474,7 +2505,11 @@ document.querySelectorAll('th[data-col]').forEach(th=>{
 });
 
 // ─── SEARCH ───
-document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.value.trim();renderTable();renderKPIs();renderFacBar()});
+document.getElementById('search').addEventListener('input',e=>{
+  searchQ=e.target.value.trim();
+  renderTable();renderKPIs();
+  if(currentView==='fac') renderFacView();
+});
 
 // ─── INIT ASÍNCRONO (datos desde Google Sheets) ───
 (async()=>{
@@ -2485,9 +2520,8 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     loadBenchData(),
   ]);
   if(ok){
-    renderSidebar();
+    renderFacPills();
     renderKPIs();
-    renderFacBar();
     renderTable();
     renderJPQuick();
     document.getElementById('header-count').textContent = DATA.length;
@@ -2521,9 +2555,8 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
   // Botón recarga manual tabla
   document.getElementById('sync-btn')?.addEventListener('click', async()=>{
     await loadSheetData();
-    renderSidebar();
+    renderFacPills();
     renderKPIs();
-    renderFacBar();
     renderTable();
     document.getElementById('header-count').textContent = DATA.length;
     if(selectedIdx>=0) openPanel(selectedIdx);
@@ -2533,8 +2566,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     await loadSheetData(true);
     renderTable();
     renderKPIs();
-    renderFacBar();
-    renderJPQuick();
+    renderFacPills();
     document.getElementById('header-count').textContent = DATA.length;
     renderNextDeadline();
     renderAlertBanner();
