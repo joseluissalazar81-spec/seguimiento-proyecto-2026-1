@@ -773,6 +773,12 @@ const PROD = {
 // Hoja principal (puede tener filtros activos del equipo — sólo afecta la tabla)
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&sheet=Seguimiento";
 
+// Hoja "Ejemplo" — Propuesta Producción
+// Columnas usadas: B (asignatura), C (horas total), E (presencial),
+//   F (sincrónicas), G (asincrónicas), H–K (tipo 1–4 de recursos)
+// Columnas X–AB (valorización en pesos) → IGNORADAS completamente
+const SHEET_BENCH_CSV = "https://docs.google.com/spreadsheets/d/1DpexuKXjou9g_X35VU1oFwyIsoENRXMX/gviz/tq?tqx=out:csv&sheet=Ejemplo";
+
 // Hoja de datos para el dashboard ejecutivo — NUNCA filtrar esta hoja en Google Sheets.
 // Crea una hoja llamada "DATA_DASHBOARD" con la fórmula: =Seguimiento!A:AB en la celda A1.
 // De esta forma el dashboard siempre tiene todos los datos, independiente de los filtros del equipo.
@@ -976,10 +982,54 @@ function planifLabel(p){
   return p;
 }
 
+// BENCH: datos reales desde hoja "Ejemplo" (se carga al iniciar)
+// Sólo columnas pedagógicas B–K. Columnas X–AB (pesos) NO se leen.
+let BENCH = {};
+
+async function loadBenchData(){
+  try{
+    const res  = await fetch(SHEET_BENCH_CSV+'&nocache='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    // Fila 0 = encabezados, filas 1+ = datos
+    // Col idx: 0=tipo, 1=asignatura, 2=horasTotal, 3=TPE, 4=presencial,
+    //          5=sincronica, 6=asincronica, 7=t1, 8=t2, 9=t3, 10=t4
+    // Cols 23-27 (X-AB) = valorización en pesos → se ignoran al no leerlas
+    for(let i=1; i<rows.length; i++){
+      const r = rows[i];
+      const nombre = (r[1]||'').trim();
+      if(!nombre || nombre==='Asignaturas') continue;
+      const num = v => parseFloat((v||'0').replace(',','.'))||0;
+      BENCH[nombre] = {
+        pres:  Math.round(num(r[4])),      // horas presencial  — entero exacto
+        asin:  Math.round(num(r[6])),      // horas asincrónica — entero exacto
+        t1:    Math.floor(num(r[7])),      // tipo 1 → floor si decimal
+        t2:    Math.floor(num(r[8])),      // tipo 2 → floor si decimal
+        t3:    Math.floor(num(r[9])),      // tipo 3 → floor si decimal
+        t4:    Math.floor(num(r[10])),     // tipo 4 → floor si decimal
+      };
+    }
+  }catch(err){
+    console.warn('Bench data no disponible, usando PROD hardcodeado:', err.message);
+  }
+}
+
 function getProd(asig){
-  const p=PROD[asig];
-  if(p)return p;
-  return{sc:40,di:5,vd:1,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:3};
+  // Prioridad: BENCH (datos reales del sheet) → PROD (fallback hardcodeado)
+  const b = BENCH[asig];
+  const p = PROD[asig] || {sc:40,di:5,vd:1,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:3};
+  if(b){
+    // Tomar sc/di/vd/dm/qa/ter del PROD (estados de producción),
+    // pero horas y tipos de recursos del BENCH (datos reales del sheet)
+    return {
+      sc:   p.sc,  di:  p.di,  vd:  p.vd,
+      dm:   p.dm,  qa:  p.qa,  ter: p.ter,
+      pres: b.pres, asin: b.asin,
+      t1: b.t1, t2: b.t2, t3: b.t3, t4: b.t4,
+    };
+  }
+  return p;
 }
 
 // ─── SIDEBAR ───
@@ -1299,6 +1349,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
   const [ok] = await Promise.all([
     loadSheetData(),
     loadDashboardData(),
+    loadBenchData(),
   ]);
   if(ok){
     renderSidebar();
