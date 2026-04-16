@@ -1422,7 +1422,29 @@
     <span style="font-size:9.5px;color:rgba(255,255,255,.5)">Directora e-Learning · UST</span>
     <a href="mailto:pverab@santotomas.cl" style="font-size:9.5px;color:#c8a020;text-decoration:none;font-weight:600">pverab@santotomas.cl</a>
   </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin-left:16px;padding-left:16px;border-left:1px solid rgba(255,255,255,.12)">
+    <span id="header-clock" style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:#fff;letter-spacing:.06em;line-height:1">--:--:--</span>
+    <span id="header-day"   style="font-size:9px;color:#c8a020;font-weight:600;text-transform:capitalize;letter-spacing:.02em;text-align:right">—</span>
+  </div>
 </header>
+
+<script>
+(function headerClock(){
+  function tick(){
+    const now = new Date();
+    const hh  = String(now.getHours()).padStart(2,'0');
+    const mm  = String(now.getMinutes()).padStart(2,'0');
+    const ss  = String(now.getSeconds()).padStart(2,'0');
+    const day = now.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+    const c = document.getElementById('header-clock');
+    const d = document.getElementById('header-day');
+    if(c) c.textContent = hh+':'+mm+':'+ss;
+    if(d) d.textContent = day;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
 
 <div class="layout">
   <aside id="sidebar"></aside>
