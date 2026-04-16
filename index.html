@@ -17,8 +17,8 @@
       --ro:#D63031;   --ro-bg:#FDF0F0;
       --am:#C8A951;   --am-bg:#F5EDD0;
       --gr:#999;      --gr-bg:#F0F0F0;
-      --tl:#0097A7;   --tl-bg:#E0F7FA;   /* teal — DEL 1° Instancia */
-      --tl2:#00695C;  --tl2-bg:#E8F5E9;  /* teal oscuro — DEL 2° Instancia */
+      --tl2:#00695C;  --tl2-bg:#E8F5E9;  /* teal — DEL 2° Instancia */
+      --ca:#1565C0;   --ca-bg:#E3F2FD;   /* azul — Cargada en aula */
       --bg:#EEEAE0;   --surface:#FFFFFF; --surface2:#F8F6EE;
       --borde:#DDD8C4;
       --text:#1C1C1C; --text-muted:#666; --text-light:#AAA;
@@ -155,7 +155,7 @@
     .pl-dot{display:inline-flex;align-items:center;gap:5px;font-size:12.5px}
     .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
     .dot-r{background:var(--ro)}.dot-y{background:var(--am)}.dot-g{background:var(--ve)}.dot-x{background:var(--gr)}.dot-d{background:#7B3FBE}
-    .dot-d1{background:var(--tl)}.dot-d2{background:var(--tl2)}
+    .dot-d2{background:var(--tl2)}.dot-ca{background:var(--ca)}
 
     /* ── EMPTY ── */
     .empty-state{padding:56px 20px;text-align:center;color:var(--text-muted)}
@@ -243,6 +243,8 @@
     .hb-e{background:var(--am-bg);color:#7A5C00;border:1px solid var(--am)}
     .hb-c{background:var(--az-bg);color:var(--az);border:1px solid #9ecff5}
     .hb-n{background:#F5F5F5;color:#888;border:1px solid #ddd}
+    .hb-d2{background:var(--tl2-bg);color:var(--tl2);border:1px solid #80CBC4}
+    .hb-ca{background:var(--ca-bg);color:var(--ca);border:1px solid #90CAF9}
     .hb-x{background:#FAFAFA;color:#bbb;border:1px solid #e5e5e5}
 
     /* ── MINI HITOS EN TABLA PRINCIPAL ── */
@@ -251,8 +253,10 @@
     .mh-key{font-size:7px;font-weight:700;color:var(--text-muted);letter-spacing:.02em;white-space:nowrap;text-transform:uppercase}
     .mh-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
     .mh-v{background:#27A06E}   /* Validada — verde */
+    .mh-ca{background:#1565C0}  /* Cargada en aula — azul */
+    .mh-d2{background:#00695C}  /* DEL 2° Instancia — teal */
     .mh-e{background:#C8A951}   /* Enviada — dorado */
-    .mh-c{background:#2E5FA3}   /* En construcción — azul */
+    .mh-c{background:#2E5FA3}   /* En construcción — azul medio */
     .mh-n{background:#d1d5db}   /* No inicia — gris claro */
     .mh-x{background:#f3f4f6}   /* vacío — gris muy claro */
     th.col-hitos{min-width:130px;text-align:left}
@@ -437,17 +441,20 @@
     .del-step:last-child::before{display:none}
     .del-icon{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;z-index:1;border:2px solid transparent;margin-top:1px}
     .del-icon.estado-done{background:#E3F7EC;border-color:#90d4a8;color:#1a6e45}
-    .del-icon.estado-active{background:var(--tl);border-color:#007B8A;color:white;box-shadow:0 0 0 3px rgba(0,151,167,.18)}
+    .del-icon.estado-active{background:#7B3FBE;border-color:#5c2d91;color:white;box-shadow:0 0 0 3px rgba(123,63,190,.18)}
     .del-icon.estado-active2{background:var(--tl2);border-color:#004D40;color:white;box-shadow:0 0 0 3px rgba(0,105,92,.18)}
+    .del-icon.estado-active-ca{background:var(--ca);border-color:#0D47A1;color:white;box-shadow:0 0 0 3px rgba(21,101,192,.18)}
     .del-icon.estado-pending{background:var(--surface);border-color:var(--borde);color:var(--text-muted)}
     .del-info{flex:1;padding-top:2px}
     .del-label{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
-    .del-label.active{color:var(--tl)}
+    .del-label.active{color:#7B3FBE}
     .del-label.active2{color:var(--tl2)}
+    .del-label.active-ca{color:var(--ca)}
     .del-date{font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'DM Mono',monospace}
     .del-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
-    .del-badge.actual{background:rgba(0,151,167,.12);color:var(--tl);border:1px solid rgba(0,151,167,.3)}
+    .del-badge.actual{background:rgba(123,63,190,.12);color:#7B3FBE;border:1px solid rgba(123,63,190,.3)}
     .del-badge.actual2{background:rgba(0,105,92,.12);color:var(--tl2);border:1px solid rgba(0,105,92,.3)}
+    .del-badge.actual-ca{background:rgba(21,101,192,.12);color:var(--ca);border:1px solid rgba(21,101,192,.3)}
     .del-badge.hecho{background:#E3F7EC;color:#1a6e45;border:1px solid #90d4a8}
   </style>
 </head>
@@ -704,7 +711,9 @@ function miniHitosDot(hitos){
   return '<div class="hitos-row" title="S0 a S17-S18">'+HITO_META.map((h,i)=>{
     const v=hitos[h.key]||'';
     let cls='mh-x';
-    if(v==='Validada') cls='mh-v';
+    if(v==='Cargada en aula') cls='mh-ca';
+    else if(v==='Validada') cls='mh-v';
+    else if(v==='DEL 2° Instancia') cls='mh-d2';
     else if(v.startsWith('Enviada')) cls='mh-e';
     else if(v==='En construcción') cls='mh-c';
     else if(v==='No inicia') cls='mh-n';
@@ -714,7 +723,9 @@ function miniHitosDot(hitos){
 
 function hitoBadge(estado){
   if(!estado||estado==='')return '<span class="hb hb-x">No aplica</span>';
+  if(estado==='Cargada en aula')return '<span class="hb hb-ca">Cargada</span>';
   if(estado==='Validada')return '<span class="hb hb-v">Validada</span>';
+  if(estado==='DEL 2° Instancia')return '<span class="hb hb-d2">DEL 2°</span>';
   if(estado==='Enviada'||estado.startsWith('Enviada'))return '<span class="hb hb-e">Enviada</span>';
   if(estado==='En construcción')return '<span class="hb hb-c">En construcción</span>';
   if(estado==='No inicia')return '<span class="hb hb-n">No inicia</span>';
@@ -842,8 +853,7 @@ function buildData(rows){
       obs:           r[22]||'',
       correo:        r[24]||'',
       fechaSR:       r[25]||'',
-      del1fecha:     r[26]||'',  // Fecha DEL 1° Instancia
-      del2fecha:     r[27]||'',  // Fecha DEL 2° Instancia
+      del2fecha:     r[26]||'',  // Fecha DEL 2° Instancia (col AB)
     });
     avance[asig]={
       avance: pct,
@@ -964,9 +974,9 @@ function dotClass(p){
   if(p==='En construcción'||p==='Pendiente')return 'y';
   if(p==='No aplica')return 'x';
   if(p==='Enviada a validación DEL')return 'd';
-  if(p==='DEL 1° Instancia')return 'd1';
   if(p==='DEL 2° Instancia')return 'd2';
   if(p==='Validada')return 'g';
+  if(p==='Cargada en aula')return 'ca';
   return 'g';
 }
 
@@ -976,9 +986,9 @@ function planifLabel(p){
   if(p==='En construcción')return 'En construcción';
   if(p==='No aplica')return 'No aplica';
   if(p==='Enviada a validación DEL')return 'Enviada a DEL';
-  if(p==='DEL 1° Instancia')return 'DEL 1° Inst.';
   if(p==='DEL 2° Instancia')return 'DEL 2° Inst.';
   if(p==='Validada')return 'Validada';
+  if(p==='Cargada en aula')return 'Cargada';
   return p;
 }
 
@@ -1311,7 +1321,7 @@ function exportToExcel(){
       'Facultad':d.facultad,'Asignatura':d.asignatura,'Docente':d.docente,
       'JP':d.jp,'DI':d.di,'DG':d.dg,'Implementador':d.implementador,
       'Reunión':d.reunion,'Planificación':d.planif,
-      'Fecha DEL 1° Inst.':d.del1fecha||'','Fecha DEL 2° Inst.':d.del2fecha||'',
+      'Fecha DEL 2° Inst.':d.del2fecha||'',
       'Avance %':av.avance||0,
       'S0':av.hitos&&av.hitos.s0||'','S1-S2':av.hitos&&av.hitos.s1s2||'',
       'S3-S4':av.hitos&&av.hitos.s3s4||'','S5-S6':av.hitos&&av.hitos.s5s6||'',
@@ -1387,23 +1397,23 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
 })();
 
 // ─── REVISIÓN DEL ───────────────────────────────────────────────
-// Flujo planificación: No inicia → En construcción → Enviada a DEL → DEL 1° → DEL 2° → Validada
+// Flujo planificación: No inicia → En construcción → Enviada a validación DEL → DEL 2° Instancia → Validada → Cargada en aula
 const PLANIF_FLOW = [
   {key:'no_inicia',  label:'No inicia',              dot:'r'},
   {key:'en_const',   label:'En construcción',         dot:'y'},
   {key:'enviada',    label:'Enviada a validación DEL',dot:'d'},
-  {key:'del1',       label:'DEL 1° Instancia',        dot:'d1', esDelEtapa:true},
   {key:'del2',       label:'DEL 2° Instancia',        dot:'d2', esDelEtapa:true},
   {key:'validada',   label:'Validada',                dot:'g'},
+  {key:'cargada',    label:'Cargada en aula',          dot:'ca'},
 ];
 
 function planifStepIndex(planif){
   if(!planif||planif==='No inicia'||planif==='No enviada')return 0;
   if(planif==='En construcción'||planif==='Pendiente')return 1;
   if(planif==='Enviada a validación DEL')return 2;
-  if(planif==='DEL 1° Instancia')return 3;
-  if(planif==='DEL 2° Instancia')return 4;
-  if(planif==='Validada')return 5;
+  if(planif==='DEL 2° Instancia')return 3;
+  if(planif==='Validada')return 4;
+  if(planif==='Cargada en aula')return 5;
   return 0;
 }
 
@@ -1413,7 +1423,7 @@ function renderDelReview(d){
   const stepIdx = planifStepIndex(d.planif);
 
   // Solo mostrar si hay al menos algún avance en planif
-  if(stepIdx === 0 && !d.del1fecha && !d.del2fecha){
+  if(stepIdx === 0 && !d.del2fecha){
     section.style.display = 'none';
     return;
   }
@@ -1423,19 +1433,17 @@ function renderDelReview(d){
     const done   = i < stepIdx;
     const active = i === stepIdx;
     const iconCls = active
-      ? (step.key==='del2' ? 'estado-active2' : step.key==='del1' ? 'estado-active' : 'estado-active')
+      ? (step.key==='del2' ? 'estado-active2' : step.key==='cargada' ? 'estado-active-ca' : 'estado-active')
       : done ? 'estado-done' : 'estado-pending';
     const labelCls = active
-      ? (step.key==='del2' ? 'active2' : 'active') : '';
+      ? (step.key==='del2' ? 'active2' : step.key==='cargada' ? 'active-ca' : 'active') : '';
     const badge = active
-      ? `<span class="del-badge ${step.key==='del2'?'actual2':'actual'}">ACTUAL</span>`
+      ? `<span class="del-badge ${step.key==='del2'?'actual2':step.key==='cargada'?'actual-ca':'actual'}">ACTUAL</span>`
       : done ? `<span class="del-badge hecho">✓</span>` : '';
 
-    // Fecha asociada a los pasos DEL
+    // Fecha asociada al paso DEL 2°
     let dateHtml = '';
-    if(step.key==='del1' && d.del1fecha){
-      dateHtml = `<div class="del-date">Enviado: ${d.del1fecha}</div>`;
-    } else if(step.key==='del2' && d.del2fecha){
+    if(step.key==='del2' && d.del2fecha){
       dateHtml = `<div class="del-date">Enviado: ${d.del2fecha}</div>`;
     } else if(!done && !active){
       dateHtml = `<div class="del-date" style="color:var(--text-light)">Pendiente</div>`;
