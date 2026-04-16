@@ -1133,8 +1133,15 @@
           <div class="exec-del-row">
             <span class="exec-del-num rojo" id="exec-del-pend">—</span>
             <div class="exec-del-info">
-              <span class="exec-del-lbl">Sin enviar / Atrasadas</span>
-              <span class="exec-del-sub">en construcción o sin iniciar</span>
+              <span class="exec-del-lbl">Atrasadas</span>
+              <span class="exec-del-sub">plazo vencido, sin enviar</span>
+            </div>
+          </div>
+          <div class="exec-del-row">
+            <span class="exec-del-num" style="color:var(--gr)" id="exec-del-ok2">—</span>
+            <div class="exec-del-info">
+              <span class="exec-del-lbl" style="color:var(--text-muted)">En construcción</span>
+              <span class="exec-del-sub" id="exec-del-ok2-sub">dentro del plazo</span>
             </div>
           </div>
         </div>
@@ -2408,6 +2415,17 @@ document.getElementById('mail-copy-btn').addEventListener('click',()=>{
     btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
   });
 });
+// ── Plazos de entrega de planificación a DEL por grupo de facultades ──────────
+// Fuente: CartaGantt_2026-1 + ajuste comunicado por el equipo
+const PLANIF_DEADLINES = {
+  default:            new Date(2026,3,17),  // 17 abril — Ingeniería, Economía, Cs. Sociales, Rec. Naturales
+  "Salud":            new Date(2026,3,24),  // 24 abril — ingresaron a construcción semana 13-apr
+  "Formación General":new Date(2026,3,24),  // 24 abril — mismo grupo
+};
+function planifDeadline(facultad){
+  return PLANIF_DEADLINES[facultad] || PLANIF_DEADLINES.default;
+}
+
 // ─── TOGGLE DETALLES TÉCNICOS ─────────────────────────────────────────────────
 let detallesVisible = false;
 function toggleDetalles(){
@@ -2433,15 +2451,23 @@ function renderExecutiveHero(){
 
   const today = new Date(); today.setHours(0,0,0,0);
 
-  // ── Conteo DEL states ──
-  let delOk=0, delRev=0, delPend=0;
+  // ── Conteo DEL states (con plazos diferenciados por facultad) ──
+  let delOk=0, delRev=0, delAtras=0, delEnTiempo=0;
   src.forEach(d=>{
-    const planif = d.planif || '';
+    const planif  = d.planif || '';
     const stepIdx = planifStepIndex(planif);
-    if(stepIdx >= 4) delOk++;         // Validada + Cargada en aula
-    else if(stepIdx >= 2) delRev++;   // Enviada a DEL + DEL 2°
-    else delPend++;                   // No inicia + En construcción
+    if(stepIdx >= 4){
+      delOk++;                                     // Validada + Cargada en aula
+    } else if(stepIdx >= 2){
+      delRev++;                                    // Enviada a DEL + DEL 2°
+    } else {
+      // Sin enviar: verificar si el plazo de su facultad ya venció
+      const deadline = planifDeadline(d.facultad);
+      if(today > deadline) delAtras++;             // Plazo vencido — atrasada
+      else                 delEnTiempo++;          // Aún dentro del plazo
+    }
   });
+  const delPend = delAtras; // alias para compatibilidad
   const total = src.length;
 
   // ── % avance real (ponderado por hitos) ──
@@ -2469,11 +2495,14 @@ function renderExecutiveHero(){
   // Semana esperada = weeksDone del último bloque pasado / 18 * 100
   const pctEsperado = Math.round(currentWeek / 18 * 100);
 
-  // ── Semáforo ──
+  // ── Semáforo (considera plazos diferenciados: delAtras excluye grupos con plazo extendido) ──
   const diff = pctReal - pctEsperado;
+  // Si hay atrasadas reales (plazo vencido, sin enviar) → penalizar semáforo
+  const atrasadoPenalty = delAtras > 0 ? -10 : 0;
+  const diffAjustado = diff + atrasadoPenalty;
   let semClass='rojo', semEmoji='🔴', semLabel='Atrasado', semSub='';
-  if(diff >= 5)   { semClass='verde';   semEmoji='🟢'; semLabel='A tiempo'; }
-  else if(diff >= -15){ semClass='amarillo'; semEmoji='🟡'; semLabel='En riesgo'; }
+  if(diffAjustado >= 5)    { semClass='verde';   semEmoji='🟢'; semLabel='A tiempo'; }
+  else if(diffAjustado >= -15){ semClass='amarillo'; semEmoji='🟡'; semLabel='En riesgo'; }
   semSub = `Real ${pctReal}% vs esperado ${pctEsperado}%`;
 
   const semEl = document.getElementById('exec-sem');
@@ -2499,10 +2528,21 @@ function renderExecutiveHero(){
   if(vEt) vEt.textContent = pctEsperado+'%';
 
   // ── DEL stats ──
-  const dOk=document.getElementById('exec-del-ok'), dRv=document.getElementById('exec-del-rev'), dPd=document.getElementById('exec-del-pend');
-  if(dOk) dOk.textContent = delOk;
-  if(dRv) dRv.textContent = delRev;
-  if(dPd) dPd.textContent = delPend;
+  const dOk=document.getElementById('exec-del-ok'), dRv=document.getElementById('exec-del-rev');
+  const dPd=document.getElementById('exec-del-pend'), dOk2=document.getElementById('exec-del-ok2');
+  if(dOk)  dOk.textContent  = delOk;
+  if(dRv)  dRv.textContent  = delRev;
+  if(dPd)  dPd.textContent  = delAtras;
+  if(dOk2) dOk2.textContent = delEnTiempo;
+  // Sub-label dinámico con próximo plazo
+  const subEl = document.getElementById('exec-del-ok2-sub');
+  if(subEl){
+    const extDeadline = PLANIF_DEADLINES['Salud'];
+    const diasExt = Math.round((extDeadline - today) / 86400000);
+    subEl.textContent = diasExt > 0
+      ? `Salud y Form. General — plazo ${extDeadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})} (${diasExt}d)`
+      : `plazo extendido vencido`;
+  }
 
   // ── Semana ──
   const wB = document.getElementById('exec-week-big');
