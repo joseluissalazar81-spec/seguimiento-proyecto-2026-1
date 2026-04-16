@@ -1000,20 +1000,56 @@
       color:var(--ca); font-weight:800;
     }
     /* Facultades strip */
+    /* ── DEL por Facultad ── */
     .exec-fac-strip {
       border-top:1px solid var(--borde); padding-top:14px; margin-top:4px;
     }
     .exec-fac-strip-title {
       font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
-      color:var(--text-muted); margin-bottom:8px;
+      color:var(--text-muted); margin-bottom:10px;
+      display:flex; align-items:center; gap:16px;
     }
-    .exec-fac-rows {display:flex; flex-direction:column; gap:5px;}
-    .exec-fac-row {display:flex; align-items:center; gap:8px;}
-    .exec-fac-name {font-size:10.5px; color:var(--text-muted); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .exec-fac-track {flex:1; height:8px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; position:relative;}
-    .exec-fac-fill  {height:100%; border-radius:4px; transition:width .6s;}
-    .exec-fac-pct   {font-size:10.5px; font-family:'DM Mono',monospace; font-weight:700; width:34px; text-align:right;}
-    .exec-fac-count {font-size:9.5px; color:var(--text-muted);}
+    .exec-fac-legend {display:flex; gap:12px; margin-left:auto;}
+    .exec-fac-legend-item {display:flex; align-items:center; gap:4px; font-size:9.5px; color:var(--text-muted); font-weight:600;}
+    .exec-fac-legend-dot {width:8px; height:8px; border-radius:2px; flex-shrink:0;}
+    .exec-fac-rows {display:flex; flex-direction:column; gap:6px;}
+    .exec-fac-row {display:grid; grid-template-columns:138px 1fr 24px 90px; align-items:center; gap:8px;}
+    .exec-fac-name {
+      font-size:11px; color:var(--text); font-weight:600;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    /* Barra apilada DEL */
+    .exec-fac-stack {
+      height:14px; border-radius:4px; overflow:hidden;
+      background:rgba(255,255,255,.05); display:flex; position:relative;
+    }
+    .exec-fac-seg {height:100%; transition:width .6s cubic-bezier(.4,0,.2,1); position:relative;}
+    .exec-fac-seg:first-child {border-radius:4px 0 0 4px;}
+    .exec-fac-seg:last-child  {border-radius:0 4px 4px 0;}
+    .exec-fac-seg.seg-ok   {background:rgba(52,211,153,.7);}
+    .exec-fac-seg.seg-rev  {background:rgba(251,191,36,.6);}
+    .exec-fac-seg.seg-at   {background:rgba(248,113,113,.7);}
+    .exec-fac-seg.seg-enT  {background:rgba(255,255,255,.15);}
+    /* Semáforo mini */
+    .exec-fac-sem {
+      width:20px; height:20px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:10px;
+    }
+    /* Números DEL */
+    .exec-fac-nums {
+      display:flex; gap:4px; justify-content:flex-end; align-items:center;
+      font-size:9.5px; font-family:'DM Mono',monospace; font-weight:700;
+    }
+    .exec-fac-n {padding:1px 5px; border-radius:4px; min-width:18px; text-align:center;}
+    .exec-fac-n.ok  {background:rgba(52,211,153,.15); color:var(--ve);}
+    .exec-fac-n.rev {background:rgba(251,191,36,.15);  color:var(--am);}
+    .exec-fac-n.at  {background:rgba(248,113,113,.15); color:var(--ro);}
+    .exec-fac-n.enT {background:rgba(255,255,255,.06); color:var(--text-muted);}
+    /* Nota plazo extendido */
+    .exec-fac-nota {
+      font-size:9px; color:var(--az); font-style:italic;
+      grid-column:2/-1; margin-top:-2px; margin-bottom:2px;
+    }
     .exec-detalles-toggle {
       display:inline-flex; align-items:center; gap:5px;
       background:rgba(255,255,255,.05); border:1px solid var(--borde2);
@@ -1163,9 +1199,17 @@
         <div id="exec-blocks"></div>
       </div>
 
-      <!-- Avance por facultad (strip) -->
+      <!-- DEL por facultad -->
       <div class="exec-fac-strip" id="exec-fac-strip">
-        <div class="exec-fac-strip-title">Avance por Facultad / Programa</div>
+        <div class="exec-fac-strip-title">
+          Estado DEL por Facultad
+          <div class="exec-fac-legend">
+            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(52,211,153,.7)"></span>Validadas</span>
+            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(251,191,36,.6)"></span>En revisión</span>
+            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(248,113,113,.7)"></span>Atrasadas</span>
+            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(255,255,255,.2)"></span>En construcción</span>
+          </div>
+        </div>
         <div class="exec-fac-rows" id="exec-fac-rows"></div>
       </div>
 
@@ -2582,32 +2626,58 @@ function renderExecutiveHero(){
     }).join('');
   }
 
-  // ── Avance por Facultad (strip) ──
+  // ── Estado DEL por Facultad — barras apiladas ──
   const facRows = document.getElementById('exec-fac-rows');
   if(facRows){
     const facData = FAC_ORDER.filter(f=>src.some(d=>d.facultad===f)).map(fac=>{
       const items = src.filter(d=>d.facultad===fac);
-      // Avance ponderado por asignatura
-      let sumPct=0;
+      const n = items.length;
+      let ok=0, rev=0, atras=0, enT=0;
+      const deadline = planifDeadline(fac);
+      const hasExtended = today <= deadline && (fac==='Salud'||fac==='Formación General');
       items.forEach(d=>{
-        const av=avSrc[d.asignatura]||{};
-        const hv=Object.values(av.hitos||{});
-        const allV=hv.length>0&&hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||h==='');
-        if(av.avance>=100||allV) sumPct+=100;
-        else sumPct+=av.avance||0;
+        const step = planifStepIndex(d.planif||'');
+        if(step >= 4)       ok++;
+        else if(step >= 2)  rev++;
+        else if(today > deadline) atras++;
+        else                enT++;
       });
-      const pct = items.length>0 ? Math.round(sumPct/items.length) : 0;
-      return {label: FAC_ABBR[fac]||fac, pct, count: items.length};
-    }).sort((a,b)=>b.pct-a.pct);
+      // Semáforo por facultad
+      let sem = '🔴';
+      const pctOk = n>0 ? ok/n : 0;
+      if(atras===0 && ok+rev===n) sem='🟢';
+      else if(atras===0)          sem='🟡';
+      else if(atras/n > 0.5)      sem='🔴';
+      else                        sem='🟡';
+      return {label:FAC_ABBR[fac]||fac, n, ok, rev, atras, enT, sem, hasExtended, deadline};
+    });
 
     facRows.innerHTML = facData.map(f=>{
-      const color = f.pct>=70 ? 'var(--ve)' : f.pct>=40 ? 'var(--am)' : 'var(--ro)';
-      return `<div class="exec-fac-row">
-        <span class="exec-fac-name" title="${f.label}">${f.label}</span>
-        <div class="exec-fac-track"><div class="exec-fac-fill" style="width:${f.pct}%;background:${color}"></div></div>
-        <span class="exec-fac-pct" style="color:${color}">${f.pct}%</span>
-        <span class="exec-fac-count">${f.count} asig.</span>
-      </div>`;
+      const n = f.n || 1; // evitar /0
+      const wOk   = Math.round(f.ok/n*100);
+      const wRev  = Math.round(f.rev/n*100);
+      const wAt   = Math.round(f.atras/n*100);
+      const wEnT  = Math.round(f.enT/n*100);
+      const notaHTML = f.hasExtended
+        ? `<div class="exec-fac-nota" style="grid-column:2/-1">⏳ Plazo extendido hasta ${f.deadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</div>`
+        : '';
+      return `<div class="exec-fac-row" title="${f.label}: ${f.ok} validadas · ${f.rev} en revisión · ${f.atras} atrasadas · ${f.enT} en construcción">
+        <span class="exec-fac-name">${f.label}</span>
+        <div class="exec-fac-stack">
+          ${wOk  > 0 ? `<div class="exec-fac-seg seg-ok"  style="width:${wOk}%"  title="${f.ok} validadas"></div>` : ''}
+          ${wRev > 0 ? `<div class="exec-fac-seg seg-rev" style="width:${wRev}%" title="${f.rev} en revisión"></div>` : ''}
+          ${wAt  > 0 ? `<div class="exec-fac-seg seg-at"  style="width:${wAt}%"  title="${f.atras} atrasadas"></div>` : ''}
+          ${wEnT > 0 ? `<div class="exec-fac-seg seg-enT" style="width:${wEnT}%" title="${f.enT} en construcción"></div>` : ''}
+        </div>
+        <span class="exec-fac-sem" title="Estado ${f.sem}">${f.sem}</span>
+        <div class="exec-fac-nums">
+          <span class="exec-fac-n ok"  title="Validadas">${f.ok}</span>
+          <span class="exec-fac-n rev" title="En revisión">${f.rev}</span>
+          ${f.atras > 0 ? `<span class="exec-fac-n at" title="Atrasadas">${f.atras}</span>` : ''}
+          ${f.enT   > 0 ? `<span class="exec-fac-n enT" title="En construcción">${f.enT}</span>` : ''}
+        </div>
+      </div>
+      ${notaHTML}`;
     }).join('');
   }
 }
