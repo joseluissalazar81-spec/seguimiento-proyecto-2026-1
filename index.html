@@ -1586,14 +1586,16 @@
         <!-- Gantt de fases -->
         <div class="proj-gantt-panel">
           <div class="proj-panel-title">Fases del Proyecto — Carta Gantt</div>
-          <div style="position:relative">
-            <canvas id="projGanttChart" height="220"></canvas>
+          <div style="position:relative;height:200px">
+            <canvas id="projGanttChart"></canvas>
           </div>
         </div>
         <!-- Avance real vs esperado -->
         <div class="proj-progress-panel">
           <div class="proj-panel-title">Avance Real vs Esperado (%)</div>
-          <canvas id="projProgressChart" height="220"></canvas>
+          <div style="position:relative;height:200px">
+          <canvas id="projProgressChart"></canvas>
+          </div>
           <div class="proj-progress-legend">
             <span><span class="proj-leg-dot" style="background:rgba(130,120,190,.8)"></span>Avance real</span>
             <span><span class="proj-leg-dot" style="background:rgba(0,0,0,.2);border:1px dashed rgba(0,0,0,.3)"></span>Avance esperado</span>
@@ -2828,13 +2830,13 @@ function renderProjectCharts(){
 
   // ── 1. GANTT HORIZONTAL — fases del proyecto ──
   const FASES = [
-    {label:'Preparación Inst.',      inicio:new Date(2026,2,2),  fin:new Date(2026,2,16), color:'rgba(168,196,160,.75)'},
-    {label:'Kick-off y Alineación',  inicio:new Date(2026,2,16), fin:new Date(2026,2,27), color:'rgba(168,196,160,.6)'},
-    {label:'Co-diseño Planif.',      inicio:new Date(2026,2,16), fin:new Date(2026,3,17), color:'rgba(212,184,120,.75)'},
-    {label:'QA Planif. (DEL)',       inicio:new Date(2026,3,20), fin:new Date(2026,4,15), color:'rgba(176,184,204,.75)'},
-    {label:'Producción Recursos',    inicio:new Date(2026,3,1),  fin:new Date(2026,5,5),  color:'rgba(154,184,204,.65)'},
-    {label:'Validación PPRD',        inicio:new Date(2026,5,15), fin:new Date(2026,6,10), color:'rgba(144,188,180,.75)'},
-    {label:'Clonación y Habilitac.', inicio:new Date(2026,6,13), fin:new Date(2026,6,17), color:'rgba(200,160,144,.8)'},
+    {label:'Preparación Inst.',      inicio:new Date(2026,2,2),  fin:new Date(2026,2,16), color:'#5a9e74'},
+    {label:'Kick-off y Alineación',  inicio:new Date(2026,2,16), fin:new Date(2026,2,27), color:'#4a8864'},
+    {label:'Co-diseño Planif.',      inicio:new Date(2026,2,16), fin:new Date(2026,3,17), color:'#c09448'},
+    {label:'QA Planif. (DEL)',       inicio:new Date(2026,3,20), fin:new Date(2026,4,15), color:'#7a88be'},
+    {label:'Producción Recursos',    inicio:new Date(2026,3,1),  fin:new Date(2026,5,5),  color:'#3a6898'},
+    {label:'Validación PPRD',        inicio:new Date(2026,5,15), fin:new Date(2026,6,10), color:'#3a8888'},
+    {label:'Clonación y Habilitac.', inicio:new Date(2026,6,13), fin:new Date(2026,6,17), color:'#b05848'},
   ];
 
   // Para barras apiladas: [offset transparente, duración de la fase]
@@ -2890,6 +2892,7 @@ function renderProjectCharts(){
       options:{
         indexAxis:'y',
         responsive:true,
+        maintainAspectRatio:false,
         plugins:{
           legend:{display:false},
           tooltip:{
@@ -2993,6 +2996,7 @@ function renderProjectCharts(){
       },
       options:{
         responsive:true,
+        maintainAspectRatio:false,
         plugins:{
           legend:{display:false},
           tooltip:{
