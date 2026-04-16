@@ -756,21 +756,121 @@
 
     /* ── VISTA FACULTAD ── */
     #fac-view{display:none}
-    .fv-group{margin-bottom:16px;animation:fadeUp .3s ease both}
-    .fv-header{
-      display:flex;align-items:center;gap:10px;padding:10px 14px;
-      background:var(--surface);border:1px solid var(--borde);
-      border-radius:var(--radius) var(--radius) 0 0;
-      cursor:pointer;transition:background .2s;
+    /* ══ TARJETAS POR FACULTAD — vista principal ══ */
+    #fac-view{display:none;padding-bottom:20px}
+    .fv-grid{display:flex;flex-direction:column;gap:14px}
+
+    .fv-card{
+      border-radius:var(--radius);overflow:hidden;
+      border:1px solid var(--borde2);
+      background:rgba(255,255,255,.03);
+      backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);
+      box-shadow:0 4px 24px rgba(0,0,0,.25);
+      animation:fadeUp .35s ease both;
     }
-    .fv-header:hover{background:var(--surface2)}
-    .fv-header-collapsed{border-radius:var(--radius)}
-    .fv-fac-name{font-size:12px;font-weight:700;color:var(--az);text-transform:uppercase;letter-spacing:.05em;flex:1}
-    .fv-stats{display:flex;gap:10px;font-size:11px;color:var(--text-muted)}
-    .fv-chevron{transition:transform .2s;color:var(--text-muted)}
+    /* Header de la tarjeta */
+    .fv-hdr{
+      display:grid;grid-template-columns:auto 1fr auto auto;
+      align-items:center;gap:14px;
+      padding:14px 18px;cursor:pointer;
+      background:rgba(255,255,255,.025);
+      border-bottom:1px solid var(--borde);
+      transition:background .18s;
+      position:relative;overflow:hidden;
+    }
+    .fv-hdr::before{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(90deg,rgba(99,102,241,.07) 0%,transparent 60%);
+      pointer-events:none;
+    }
+    .fv-hdr:hover{background:rgba(255,255,255,.04)}
+    /* Semáforo mini en el header */
+    .fv-hdr-sem{
+      width:36px;height:36px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;flex-shrink:0;
+      border:2px solid;
+    }
+    .fv-hdr-sem.verde   {background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4);}
+    .fv-hdr-sem.amarillo{background:rgba(251,191,36,.15); border-color:rgba(251,191,36,.4);}
+    .fv-hdr-sem.rojo    {background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);}
+    /* Info principal */
+    .fv-hdr-info{min-width:0}
+    .fv-hdr-name{font-size:14px;font-weight:800;color:var(--text);letter-spacing:.01em}
+    .fv-hdr-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+    /* Barra apilada en header */
+    .fv-hdr-bar{display:flex;flex-direction:column;gap:4px;width:200px}
+    .fv-hdr-bar-track{height:8px;border-radius:4px;background:rgba(255,255,255,.06);display:flex;overflow:hidden}
+    .fv-hdr-bar-seg{height:100%;transition:width .5s;}
+    .fv-hdr-bar-seg.ok  {background:rgba(52,211,153,.75);}
+    .fv-hdr-bar-seg.rev {background:rgba(251,191,36,.65);}
+    .fv-hdr-bar-seg.at  {background:rgba(248,113,113,.75);}
+    .fv-hdr-bar-seg.enT {background:rgba(255,255,255,.18);}
+    .fv-hdr-bar-lbls{display:flex;gap:8px;flex-wrap:wrap}
+    .fv-hdr-lbl{font-size:10px;font-weight:700;display:flex;align-items:center;gap:3px}
+    .fv-hdr-lbl.ok  {color:var(--ve)}
+    .fv-hdr-lbl.rev {color:var(--am)}
+    .fv-hdr-lbl.at  {color:var(--ro)}
+    .fv-hdr-lbl.enT {color:var(--text-muted)}
+    .fv-hdr-lbl-dot{width:6px;height:6px;border-radius:2px}
+    /* Chevron */
+    .fv-chevron{transition:transform .25s;color:var(--text-muted);flex-shrink:0}
     .fv-chevron.open{transform:rotate(90deg)}
-    .fv-body{background:var(--surface);border:1px solid var(--borde);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
-    .fv-body table{width:100%;border-collapse:collapse}
+
+    /* Body de la tarjeta — tabla de asignaturas */
+    .fv-body{overflow:hidden;transition:max-height .3s ease}
+    .fv-table{width:100%;border-collapse:collapse}
+    .fv-table thead tr{
+      background:linear-gradient(90deg,rgba(99,102,241,.12),rgba(6,182,212,.06));
+    }
+    .fv-table th{
+      padding:8px 14px;font-size:9.5px;font-weight:800;
+      text-transform:uppercase;letter-spacing:.07em;
+      color:rgba(255,255,255,.5);text-align:left;
+      border-bottom:1px solid var(--borde);white-space:nowrap;
+    }
+    .fv-table td{
+      padding:10px 14px;font-size:12.5px;
+      border-bottom:1px solid rgba(255,255,255,.04);
+      vertical-align:middle;
+    }
+    .fv-table tbody tr{cursor:pointer;transition:background .15s}
+    .fv-table tbody tr:hover{background:rgba(255,255,255,.03)}
+    .fv-table tbody tr.urg{background:rgba(248,113,113,.04)}
+    .fv-table tbody tr:last-child td{border-bottom:none}
+    /* Nombre asignatura */
+    .fv-asig-name{font-weight:600;color:var(--text);line-height:1.3}
+    .fv-asig-doc{font-size:11px;color:var(--text-muted);margin-top:2px}
+    /* Chips compactos */
+    .fv-chip{
+      display:inline-block;padding:2px 8px;border-radius:20px;
+      font-size:10.5px;font-weight:700;white-space:nowrap;border:1px solid transparent;
+    }
+    .fv-chip.jp {background:rgba(167,139,250,.15);color:#c4b5fd;border-color:rgba(167,139,250,.3)}
+    .fv-chip.di {background:rgba(52,211,153,.12); color:var(--ve); border-color:rgba(52,211,153,.25)}
+    /* Planif badge profesional */
+    .fv-planif{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
+    .fv-planif.p-ok   {background:rgba(52,211,153,.12);color:var(--ve);  border:1px solid rgba(52,211,153,.25)}
+    .fv-planif.p-del  {background:rgba(251,191,36,.12); color:var(--am); border:1px solid rgba(251,191,36,.25)}
+    .fv-planif.p-del2 {background:rgba(45,212,191,.12); color:var(--tl2);border:1px solid rgba(45,212,191,.25)}
+    .fv-planif.p-env  {background:rgba(96,165,250,.12); color:var(--ca); border:1px solid rgba(96,165,250,.25)}
+    .fv-planif.p-const{background:rgba(251,191,36,.08); color:var(--am); border:1px solid rgba(251,191,36,.18)}
+    .fv-planif.p-none {background:rgba(255,255,255,.04);color:var(--text-muted);border:1px solid var(--borde)}
+    .fv-planif.p-na   {background:rgba(107,114,128,.08);color:var(--gr); border:1px solid rgba(107,114,128,.2)}
+    .fv-planif.p-car  {background:rgba(139,92,246,.12); color:#c4b5fd;   border:1px solid rgba(139,92,246,.25)}
+    /* Avance mini */
+    .fv-av-cell{display:flex;align-items:center;gap:7px;min-width:80px}
+    .fv-av-bar{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+    .fv-av-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--az2),var(--tl2));transition:width .4s}
+    .fv-av-pct{font-size:10.5px;font-family:'DM Mono',monospace;font-weight:700;color:var(--text-muted);min-width:28px}
+    /* Hitos dots */
+    .fv-hitos{display:flex;gap:2px;flex-wrap:nowrap}
+    .fv-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+    .fv-dot.val{background:rgba(52,211,153,.8)}
+    .fv-dot.env{background:rgba(251,191,36,.7)}
+    .fv-dot.con{background:rgba(96,165,250,.5)}
+    .fv-dot.nin{background:rgba(255,255,255,.1)}
+    .fv-dot.nap{background:rgba(107,114,128,.3)}
 
     /* ── HISTORIAL DE CAMBIOS ── */
     .hist-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)}
@@ -1264,7 +1364,7 @@
 
     <!-- ── TOGGLE DE VISTAS ── -->
     <div class="view-toggle">
-      <button class="vt-btn active" id="vt-table" onclick="setView('table')">
+      <button class="vt-btn" id="vt-table" onclick="setView('table')">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
         Tabla
       </button>
@@ -1272,7 +1372,7 @@
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="13" rx="1"/><rect x="17" y="3" width="5" height="16" rx="1"/></svg>
         Kanban
       </button>
-      <button class="vt-btn" id="vt-fac" onclick="setView('fac')">
+      <button class="vt-btn active" id="vt-fac" onclick="setView('fac')">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Por Facultad
       </button>
@@ -1299,7 +1399,7 @@
         Exportar Excel
       </button>
     </div>
-    <div id="hint-row-wrap" class="hint-row" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div id="hint-row-wrap" class="hint-row" style="display:none;align-items:center;gap:14px;flex-wrap:wrap">
       <span style="display:flex;align-items:center;gap:5px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
         Haz clic en cualquier fila para ver el detalle completo
@@ -1312,7 +1412,7 @@
         <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;border-radius:2px;background:#d1d5db;display:inline-block"></span><span style="font-size:10px;color:var(--text-muted)">No inicia</span></span>
       </span>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap" style="display:none">
       <table>
         <thead>
           <tr>
@@ -1338,7 +1438,7 @@
     </div>
 
     <!-- ── VISTA FACULTAD ── -->
-    <div id="fac-view"></div>
+    <div id="fac-view" style="display:block"></div>
 
   </main>
 </div>
@@ -1549,19 +1649,14 @@ const PROD = {
 
 
 // ─── GOOGLE SHEETS EN TIEMPO REAL ───────────────────────────────────────────
-// Hoja principal (puede tener filtros activos del equipo — sólo afecta la tabla)
-const SHEET_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&sheet=Seguimiento";
+// Usa gid= en lugar de sheet= para ignorar completamente los filtros activos del Excel.
+// gid=1889016436 → hoja "Seguimiento"
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&gid=1889016436";
 
-// Hoja "Ejemplo" — Propuesta Producción
-// Columnas usadas: B (asignatura), C (horas total), E (presencial),
-//   F (sincrónicas), G (asincrónicas), H–K (tipo 1–4 de recursos)
-// Columnas X–AB (valorización en pesos) → IGNORADAS completamente
 const SHEET_BENCH_CSV = "https://docs.google.com/spreadsheets/d/1DpexuKXjou9g_X35VU1oFwyIsoENRXMX/gviz/tq?tqx=out:csv&sheet=Ejemplo";
 
-// Hoja de datos para el dashboard ejecutivo — NUNCA filtrar esta hoja en Google Sheets.
-// Crea una hoja llamada "DATA_DASHBOARD" con la fórmula: =Seguimiento!A:AB en la celda A1.
-// De esta forma el dashboard siempre tiene todos los datos, independiente de los filtros del equipo.
-const SHEET_DASHBOARD_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&sheet=DATA_DASHBOARD";
+// Dashboard usa la misma hoja con gid — así ignora cualquier filtro activo.
+const SHEET_DASHBOARD_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&gid=1889016436";
 
 // Parsear CSV respetando comillas y saltos de línea dentro de celdas
 function parseCSV(text){
@@ -3146,58 +3241,148 @@ function renderKanban(){
 }
 
 // ── 10. VISTA POR FACULTAD ────────────────────────────────────────────────────
+function fvPlanifClass(p){
+  if(!p||p==='No inicia'||p==='No enviada') return 'p-none';
+  if(p==='En construcción'||p==='Pendiente') return 'p-const';
+  if(p==='Enviada a validación DEL')          return 'p-env';
+  if(p==='DEL 2° Instancia')                 return 'p-del2';
+  if(p==='Validada')                         return 'p-del';
+  if(p==='Cargada en aula')                  return 'p-car';
+  if(p==='No aplica')                        return 'p-na';
+  return 'p-none';
+}
+function fvPlanifIcon(p){
+  if(!p||p==='No inicia'||p==='No enviada') return '○';
+  if(p==='En construcción'||p==='Pendiente') return '◐';
+  if(p==='Enviada a validación DEL')          return '→';
+  if(p==='DEL 2° Instancia')                 return '⟳';
+  if(p==='Validada')                         return '✓';
+  if(p==='Cargada en aula')                  return '★';
+  if(p==='No aplica')                        return '—';
+  return '○';
+}
+function fvHitosDots(hitos){
+  const keys=['s0','s1s2','s3s4','s5s6','s7s8','s9s10','s11s12','s13s14','s15s16','s17s18'];
+  return keys.map(k=>{
+    const v=hitos[k]||'';
+    let cls='nin';
+    if(v==='Validada') cls='val';
+    else if(v==='Enviada'||v.startsWith('Enviada')) cls='env';
+    else if(v==='En construcción') cls='con';
+    else if(v==='No aplica') cls='nap';
+    return `<div class="fv-dot ${cls}" title="${k}: ${v||'Sin iniciar'}"></div>`;
+  }).join('');
+}
+
 function renderFacView(){
   const rows = filtered();
   const container = document.getElementById('fac-view');
   if(!container) return;
+
+  const today = new Date(); today.setHours(0,0,0,0);
   const byFac = {};
   FAC_ORDER.forEach(f=>{ if(rows.some(d=>d.facultad===f)) byFac[f]=[]; });
   rows.forEach(d=>{ if(byFac[d.facultad]) byFac[d.facultad].push(d); });
-  container.innerHTML = Object.entries(byFac).map(([fac,items])=>{
-    const compl = items.filter(d=>(AVANCE[d.asignatura]||{}).avance>=100).length;
-    return `<div class="fv-group">
-      <div class="fv-header" onclick="toggleFvGroup(this)">
-        <svg class="fv-chevron open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        <span class="fv-fac-name">${fac}</span>
-        <span class="fv-stats">
-          <span>${items.length} asig.</span>
-          <span style="color:var(--ve)">${compl} completas</span>
-        </span>
+
+  container.innerHTML = `<div class="fv-grid">${Object.entries(byFac).map(([fac,items])=>{
+    const n = items.length;
+    const deadline = planifDeadline(fac);
+    let ok=0,rev=0,atras=0,enT=0;
+    items.forEach(d=>{
+      const s=planifStepIndex(d.planif||'');
+      if(s>=4) ok++;
+      else if(s>=2) rev++;
+      else if(today>deadline) atras++;
+      else enT++;
+    });
+    // Semáforo
+    let semCls='rojo', semE='🔴';
+    if(atras===0&&ok+rev===n){semCls='verde';semE='🟢';}
+    else if(atras===0){semCls='amarillo';semE='🟡';}
+    else if(atras/n>0.5){semCls='rojo';semE='🔴';}
+    else {semCls='amarillo';semE='🟡';}
+    // Widths para barra
+    const wOk=Math.round(ok/n*100), wRev=Math.round(rev/n*100),
+          wAt=Math.round(atras/n*100), wEnT=Math.round(enT/n*100);
+    // Sub-text
+    const parts=[];
+    if(ok>0)    parts.push(`<span class="fv-hdr-lbl ok"><span class="fv-hdr-lbl-dot" style="background:rgba(52,211,153,.75)"></span>${ok} validada${ok>1?'s':''}</span>`);
+    if(rev>0)   parts.push(`<span class="fv-hdr-lbl rev"><span class="fv-hdr-lbl-dot" style="background:rgba(251,191,36,.65)"></span>${rev} en DEL</span>`);
+    if(atras>0) parts.push(`<span class="fv-hdr-lbl at"><span class="fv-hdr-lbl-dot" style="background:rgba(248,113,113,.75)"></span>${atras} atrasada${atras>1?'s':''}</span>`);
+    if(enT>0)   parts.push(`<span class="fv-hdr-lbl enT"><span class="fv-hdr-lbl-dot" style="background:rgba(255,255,255,.18)"></span>${enT} en construcción</span>`);
+    const notaExt = (fac==='Salud'||fac==='Formación General')
+      ? `<span style="font-size:9.5px;color:var(--az);font-weight:600;margin-left:6px">⏳ Plazo ${deadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</span>`
+      : '';
+
+    const rows_html = items.map(d=>{
+      const idx = DATA.findIndex(x=>x.asignatura===d.asignatura);
+      const av = (AVANCE[d.asignatura]||{}).avance||0;
+      const hitos = (AVANCE[d.asignatura]||{}).hitos||{};
+      const isVenc = isHitoVencido(d);
+      const step = planifStepIndex(d.planif||'');
+      const isAt = step<2 && today>deadline;
+      return `<tr class="${isVenc||isAt?'urg':''}" onclick="openPanel(${idx})">
+        <td>
+          <div class="fv-asig-name">${d.asignatura}${isAt?'<span style="margin-left:6px;font-size:9px;color:var(--ro);font-weight:800">⚠ ATRASADA</span>':''}</div>
+          <div class="fv-asig-doc">${d.docente}</div>
+        </td>
+        <td>
+          <span class="fv-chip jp">${d.jp}</span>
+          <span class="fv-chip di" style="margin-left:3px">${d.di}</span>
+        </td>
+        <td>
+          <span class="fv-planif ${fvPlanifClass(d.planif)}">${fvPlanifIcon(d.planif)} ${planifLabel(d.planif)}</span>
+        </td>
+        <td>
+          <div class="fv-hitos">${fvHitosDots(hitos)}</div>
+        </td>
+        <td>
+          <div class="fv-av-cell">
+            <div class="fv-av-bar"><div class="fv-av-fill" style="width:${av}%"></div></div>
+            <span class="fv-av-pct">${av}%</span>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="fv-card">
+      <div class="fv-hdr" onclick="toggleFvGroup(this)">
+        <div class="fv-hdr-sem ${semCls}">${semE}</div>
+        <div class="fv-hdr-info">
+          <div class="fv-hdr-name">${fac}${notaExt}</div>
+          <div class="fv-hdr-sub">${n} asignaturas · ${parts.join(' · ')}</div>
+        </div>
+        <div class="fv-hdr-bar">
+          <div class="fv-hdr-bar-track">
+            ${wOk >0?`<div class="fv-hdr-bar-seg ok"  style="width:${wOk}%"></div>`:''}
+            ${wRev>0?`<div class="fv-hdr-bar-seg rev" style="width:${wRev}%"></div>`:''}
+            ${wAt >0?`<div class="fv-hdr-bar-seg at"  style="width:${wAt}%"></div>`:''}
+            ${wEnT>0?`<div class="fv-hdr-bar-seg enT" style="width:${wEnT}%"></div>`:''}
+          </div>
+        </div>
+        <svg class="fv-chevron open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
       <div class="fv-body">
-        <table>
-          <thead><tr style="background:linear-gradient(90deg,rgba(99,102,241,.15),rgba(6,182,212,.08));border-bottom:1px solid var(--borde)">
-            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Asignatura</th>
-            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">JP</th>
-            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">DI</th>
-            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Planificación</th>
-            <th style="padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Avance</th>
+        <table class="fv-table">
+          <thead><tr>
+            <th style="width:30%">Asignatura / Docente</th>
+            <th>JP · DI</th>
+            <th>Planificación DEL</th>
+            <th>Hitos S0–S17/18</th>
+            <th>Avance</th>
           </tr></thead>
-          <tbody>
-            ${items.map((d,i)=>{
-              const av=(AVANCE[d.asignatura]||{}).avance||0;
-              const venc = isHitoVencido(d)?'background:rgba(248,113,113,.04);':'';
-              return `<tr style="border-bottom:1px solid var(--borde);cursor:pointer;${venc}" onclick="openPanel(DATA.findIndex(x=>x.asignatura==='${d.asignatura.replace(/'/g,"\\'")}'))">
-                <td style="padding:9px 12px;font-size:13px;font-weight:500">${d.asignatura}</td>
-                <td style="padding:9px 12px"><span class="chip chip-jp">${d.jp}</span></td>
-                <td style="padding:9px 12px"><span class="chip chip-di">${d.di}</span></td>
-                <td style="padding:9px 12px"><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${planifLabel(d.planif)}</span></td>
-                <td style="padding:9px 12px"><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${av}%"></div></div><span class="av-pct ${av>=50?'hi':av>0?'mid':'lo'}">${av}%</span></div></td>
-              </tr>`;
-            }).join('')}
-          </tbody>
+          <tbody>${rows_html}</tbody>
         </table>
       </div>
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
 }
-function toggleFvGroup(header){
-  const body = header.nextElementSibling;
-  const chev = header.querySelector('.fv-chevron');
-  const collapsed = body.style.display==='none';
-  body.style.display = collapsed?'':'none';
-  chev.classList.toggle('open', collapsed);
-  header.classList.toggle('fv-header-collapsed',!collapsed);
+function toggleFvGroup(hdr){
+  const body = hdr.nextElementSibling;
+  const chev = hdr.querySelector('.fv-chevron');
+  const isOpen = body.style.display!=='none';
+  body.style.display = isOpen ? 'none' : '';
+  chev.classList.toggle('open', !isOpen);
 }
 
 // ── 11. MODO PRESENTACIÓN FULLSCREEN ─────────────────────────────────────────
@@ -3225,7 +3410,7 @@ function updateTimestamp(){
 }
 
 // ── GESTOR DE VISTAS ──────────────────────────────────────────────────────────
-let currentView = 'table';
+let currentView = 'fac';  // Vista por defecto: tarjetas por facultad
 function setView(v){
   currentView = v;
   document.querySelector('.table-wrap').style.display   = v==='table' ?'':'none';
