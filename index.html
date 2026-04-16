@@ -1648,9 +1648,9 @@
     <div class="fac-bar" id="fac-bar" style="display:none"></div>
 
     <!-- ── BARRA PILLS FACULTAD ── -->
-    <div class="fac-pills-bar" id="fac-pills-bar">
-      <!-- Se rellena por renderFacPills() -->
-    </div>
+    <div class="fac-pills-bar" id="fac-pills-bar"></div>
+    <!-- ── BARRA PILLS EQUIPO ── -->
+    <div class="fac-pills-bar" id="team-pills-bar" style="border-top:1px solid rgba(0,0,0,.05);padding-top:10px;padding-bottom:12px;background:#faf7f0"></div>
 
     <!-- ── SEARCH + ACCIONES ── -->
     <div class="search-row">
@@ -2097,11 +2097,45 @@ function renderFacPills(){
   });
   bar.innerHTML = html;
 }
+function renderTeamPills(){
+  const bar = document.getElementById('team-pills-bar');
+  if(!bar || !DATA.length) return;
+  const roles = [
+    {key:'jp',  label:'JP',  field:'jp'},
+    {key:'di',  label:'DI',  field:'di'},
+    {key:'dg',  label:'DG',  field:'dg'},
+    {key:'implementador', label:'IMP', field:'implementador'},
+  ];
+  let html = '';
+  roles.forEach(r=>{
+    const vals = [...new Set(DATA.map(d=>d[r.field]).filter(v=>v&&v!=='—'))].sort();
+    if(!vals.length) return;
+    html += `<span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:rgba(18,16,28,.35);padding:0 4px">${r.label}</span>`;
+    vals.forEach(v=>{
+      const act = filters[r.key]===v;
+      const cnt = DATA.filter(d=>d[r.field]===v).length;
+      html += `<button class="fac-pill${act?' active':''}" style="font-size:11px;padding:3px 10px" onclick="setTeamFilter('${r.key}','${v}')">${v} <span class="pill-cnt">${cnt}</span></button>`;
+    });
+    html += `<span style="width:1px;height:20px;background:rgba(0,0,0,.1);display:inline-block;margin:0 6px;vertical-align:middle"></span>`;
+  });
+  bar.innerHTML = html;
+}
+function setTeamFilter(role, val){
+  // toggle: si ya está activo, lo limpia
+  filters[role] = filters[role]===val ? null : val;
+  // limpiar los otros roles de equipo
+  ['jp','di','dg','implementador'].forEach(k=>{ if(k!==role) filters[k]=null; });
+  renderTeamPills();
+  renderTable();
+  renderKPIs();
+  if(currentView==='fac') renderFacView();
+}
+
 function setFacFilter(fac){
   filters.facultad = fac;
-  // limpiar otros filtros para no confundir
   filters.jp=null; filters.di=null; filters.dg=null; filters.implementador=null; filters.planif=null;
   renderFacPills();
+  renderTeamPills();
   renderTable();
   renderKPIs();
   if(currentView==='fac') renderFacView();
@@ -2521,6 +2555,7 @@ document.getElementById('search').addEventListener('input',e=>{
   ]);
   if(ok){
     renderFacPills();
+    renderTeamPills();
     renderKPIs();
     renderTable();
     renderJPQuick();
