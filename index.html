@@ -1158,6 +1158,69 @@
       transition:all .18s; margin-top:12px;
     }
     .exec-detalles-toggle:hover {background:rgba(255,255,255,.1); color:var(--text);}
+
+    /* ══ GRÁFICO GENERAL DEL PROYECTO ══ */
+    .proj-chart-wrap {
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--borde2);
+      border-radius:var(--radius);
+      padding:18px 20px 16px;
+      margin-bottom:14px;
+      backdrop-filter:var(--glass);
+      -webkit-backdrop-filter:var(--glass);
+      animation:fadeUp .4s ease both;
+    }
+    .proj-chart-hdr {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .proj-chart-title {
+      font-size:10px; font-weight:800; text-transform:uppercase;
+      letter-spacing:.09em; color:var(--az);
+    }
+    .proj-chart-sub {font-size:10.5px; color:var(--text-muted);}
+    .proj-chart-body {
+      display:grid;
+      grid-template-columns:1fr 1fr 180px;
+      gap:16px;
+      align-items:start;
+    }
+    @media(max-width:900px){.proj-chart-body{grid-template-columns:1fr;}}
+    .proj-gantt-panel, .proj-progress-panel, .proj-donut-panel {
+      background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:var(--radius-sm);
+      padding:12px 14px;
+    }
+    .proj-panel-title {
+      font-size:10px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;
+    }
+    /* Avance vs esperado legend */
+    .proj-progress-legend {
+      display:flex; gap:14px; margin-top:8px; justify-content:center;
+      font-size:10px; color:var(--text-muted);
+    }
+    .proj-leg-dot {
+      display:inline-block; width:10px; height:10px;
+      border-radius:2px; margin-right:4px; vertical-align:middle;
+    }
+    /* Mini donut planif */
+    .proj-donut-wrap {
+      position:relative; width:150px; height:150px; margin:0 auto 10px;
+    }
+    .proj-donut-center {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      pointer-events:none;
+    }
+    .proj-donut-big  {font-size:26px; font-weight:800; font-family:'DM Mono',monospace; color:var(--text); line-height:1;}
+    .proj-donut-lbl  {font-size:9.5px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.05em;}
+    .proj-planif-legend {display:flex; flex-direction:column; gap:4px;}
+    .proj-planif-row {display:flex; align-items:center; gap:6px; font-size:10px;}
+    .proj-planif-dot {width:8px; height:8px; border-radius:2px; flex-shrink:0;}
+    .proj-planif-lbl {flex:1; color:var(--text-muted);}
+    .proj-planif-cnt {font-family:'DM Mono',monospace; font-weight:700; color:var(--text);}
   </style>
 </head>
 <body>
@@ -1349,6 +1412,41 @@
       </div>
     </div>
     <!-- ── FIN PANEL VISUAL ── -->
+
+    <!-- ══ GRÁFICO GENERAL DEL PROYECTO ══ -->
+    <div class="proj-chart-wrap" id="proj-chart-wrap">
+      <div class="proj-chart-hdr">
+        <span class="proj-chart-title">Gráfico General del Proyecto</span>
+        <span class="proj-chart-sub" id="proj-chart-sub"></span>
+      </div>
+      <div class="proj-chart-body">
+        <!-- Gantt de fases -->
+        <div class="proj-gantt-panel">
+          <div class="proj-panel-title">Fases del Proyecto — Carta Gantt</div>
+          <div style="position:relative">
+            <canvas id="projGanttChart" height="220"></canvas>
+          </div>
+        </div>
+        <!-- Avance real vs esperado -->
+        <div class="proj-progress-panel">
+          <div class="proj-panel-title">Avance Real vs Esperado (%)</div>
+          <canvas id="projProgressChart" height="220"></canvas>
+          <div class="proj-progress-legend">
+            <span><span class="proj-leg-dot" style="background:rgba(99,102,241,.8)"></span>Avance real</span>
+            <span><span class="proj-leg-dot" style="background:rgba(255,255,255,.25)"></span>Avance esperado</span>
+          </div>
+        </div>
+        <!-- Mini-torta estados planif -->
+        <div class="proj-donut-panel">
+          <div class="proj-panel-title">Estado Planificaciones</div>
+          <div class="proj-donut-wrap">
+            <canvas id="projPlanifDonut" width="150" height="150"></canvas>
+            <div class="proj-donut-center" id="proj-donut-center"></div>
+          </div>
+          <div class="proj-planif-legend" id="proj-planif-legend"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- ── BANNER ALERTAS ── -->
     <div id="alert-banner">
@@ -2237,6 +2335,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     renderGlobalSemaforo();
     // Executive hero — visible inmediatamente
     renderExecutiveHero();
+    renderProjectCharts();
     // Guardar snapshot tendencia
     const src2=DATA_ALL.length?DATA_ALL:DATA; const avS2=DATA_ALL.length?AVANCE_ALL:AVANCE;
     let val2=0,ep2=0;
@@ -2278,6 +2377,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     detectChanges();
     renderGlobalSemaforo();
     renderExecutiveHero();
+    renderProjectCharts();
     if(currentView==='kanban') renderKanban();
     if(currentView==='fac')    renderFacView();
   }, 5*60*1000);
@@ -2544,6 +2644,280 @@ document.getElementById('mail-copy-btn').addEventListener('click',()=>{
     btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
   });
 });
+// ══ GRÁFICO GENERAL DEL PROYECTO ════════════════════════════════════════════════
+let projGanttInst=null, projProgressInst=null, projDonutInst=null;
+
+function renderProjectCharts(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const src  = DATA_ALL.length ? DATA_ALL : DATA;
+  const total = src.length || 1;
+
+  // Fechas proyecto
+  const pStart = new Date(2026,2,2);   // Mar 2
+  const pEnd   = new Date(2026,6,17);  // Jul 17
+  const pTotal = Math.round((pEnd-pStart)/86400000);
+  const todayPos = Math.min(pTotal, Math.round((today-pStart)/86400000));
+
+  // Sub-text header
+  const dRestantes = Math.max(0, Math.round((pEnd-today)/86400000));
+  const el = document.getElementById('proj-chart-sub');
+  if(el) el.textContent = `Hoy: ${today.toLocaleDateString('es-CL',{day:'numeric',month:'short',year:'numeric'})} · ${dRestantes} días restantes`;
+
+  // ── 1. GANTT HORIZONTAL — fases del proyecto ──
+  const FASES = [
+    {label:'Preparación Inst.',      inicio:new Date(2026,2,2),  fin:new Date(2026,2,16), color:'rgba(52,211,153,.75)'},
+    {label:'Kick-off y Alineación',  inicio:new Date(2026,2,16), fin:new Date(2026,2,27), color:'rgba(52,211,153,.6)'},
+    {label:'Co-diseño Planif.',      inicio:new Date(2026,2,16), fin:new Date(2026,3,17), color:'rgba(251,191,36,.75)'},
+    {label:'QA Planif. (DEL)',       inicio:new Date(2026,3,20), fin:new Date(2026,4,15), color:'rgba(129,140,248,.75)'},
+    {label:'Producción Recursos',    inicio:new Date(2026,3,1),  fin:new Date(2026,5,5),  color:'rgba(96,165,250,.65)'},
+    {label:'Validación PPRD',        inicio:new Date(2026,5,15), fin:new Date(2026,6,10), color:'rgba(45,212,191,.75)'},
+    {label:'Clonación y Habilitac.', inicio:new Date(2026,6,13), fin:new Date(2026,6,17), color:'rgba(248,113,113,.8)'},
+  ];
+
+  // Para barras apiladas: [offset transparente, duración de la fase]
+  const ganttLabels = FASES.map(f=>f.label);
+  const ganttOffset = FASES.map(f=>Math.round((f.inicio-pStart)/86400000));
+  const ganttDur    = FASES.map(f=>Math.round((f.fin-f.inicio)/86400000));
+  const ganttColors = FASES.map(f=>f.color);
+  // Estado de cada fase
+  const ganttBorder = FASES.map(f=>{
+    const doneF = today > f.fin;
+    const actF  = today >= f.inicio && today <= f.fin;
+    return actF ? 'rgba(255,255,255,.6)' : 'transparent';
+  });
+
+  // Anotación "Hoy" como barra vertical ficticia
+  const todayLine = FASES.map(()=>todayPos);
+  const todayWidth= FASES.map(()=>1);
+
+  if(projGanttInst){ projGanttInst.destroy(); projGanttInst=null; }
+  const ctxG = document.getElementById('projGanttChart')?.getContext('2d');
+  if(ctxG){
+    projGanttInst = new Chart(ctxG,{
+      type:'bar',
+      data:{
+        labels: ganttLabels,
+        datasets:[
+          {
+            label:'Fase',
+            data: ganttOffset,
+            backgroundColor:'transparent',
+            borderWidth:0,
+            borderSkipped:false,
+          },
+          {
+            label:'Duración',
+            data: ganttDur,
+            backgroundColor: ganttColors,
+            borderColor: ganttBorder,
+            borderWidth: 2,
+            borderRadius:4,
+            borderSkipped:false,
+          },
+          {
+            label:'Hoy',
+            data: todayLine,
+            backgroundColor:'rgba(248,113,113,.9)',
+            borderWidth:0,
+            borderRadius:0,
+            barThickness:3,
+            borderSkipped:false,
+          },
+        ]
+      },
+      options:{
+        indexAxis:'y',
+        responsive:true,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            callbacks:{
+              label(ctx){
+                if(ctx.datasetIndex===0) return null;
+                if(ctx.datasetIndex===2) return '📍 Hoy (día '+todayPos+')';
+                const f=FASES[ctx.dataIndex];
+                const ini=f.inicio.toLocaleDateString('es-CL',{day:'numeric',month:'short'});
+                const fin=f.fin.toLocaleDateString('es-CL',{day:'numeric',month:'short'});
+                return `${ini} → ${fin} (${ctx.raw}d)`;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{
+            stacked:true,
+            max: pTotal,
+            ticks:{
+              callback(v){
+                // Mostrar solo meses
+                const d = new Date(pStart.getTime()+v*86400000);
+                if(d.getDate()<=3) return d.toLocaleDateString('es-CL',{month:'short'});
+                return null;
+              },
+              maxTicksLimit:6,
+              color:'rgba(255,255,255,.35)',
+              font:{size:9}
+            },
+            grid:{color:'rgba(255,255,255,.05)'},
+            border:{color:'transparent'}
+          },
+          y:{
+            stacked:true,
+            ticks:{color:'rgba(255,255,255,.6)',font:{size:10}},
+            grid:{display:false},
+            border:{color:'transparent'}
+          }
+        },
+        animation:{duration:600}
+      }
+    });
+  }
+
+  // ── 2. LÍNEA avance real vs esperado ──
+  // Puntos: cada semana de la producción (S0 a S17-S18)
+  const lineLabels = ['Inicio', ...GANTT_HITOS.map(h=>h.label)];
+  const espPcts    = [0, ...GANTT_HITOS.map(h=>Math.round(h.weeksDone/18*100))];
+
+  // Avance real ponderado actual (un solo punto: hoy)
+  let validated=0, inProd=0;
+  src.forEach(d=>{
+    const av=(DATA_ALL.length?AVANCE_ALL:AVANCE)[d.asignatura]||{};
+    const hv=Object.values(av.hitos||{});
+    if(av.avance>=100||hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||!h)) validated++;
+    else if(av.avance>0) inProd++;
+  });
+  const pctReal = Math.round((validated+(inProd*.5))/total*100);
+  // Posición del punto real: índice del último hito vencido
+  const currentHitoIdx = GANTT_HITOS.filter(h=>today>=h.fecha).length;
+  const realData = lineLabels.map((_,i)=>i===currentHitoIdx+1?pctReal:null);
+  // Línea de avance esperado hasta hoy
+  const espActual = espPcts.map((v,i)=>{
+    const hitoDate = i===0 ? pStart : GANTT_HITOS[i-1]?.fecha;
+    return hitoDate && today >= hitoDate ? v : null;
+  });
+
+  if(projProgressInst){ projProgressInst.destroy(); projProgressInst=null; }
+  const ctxP = document.getElementById('projProgressChart')?.getContext('2d');
+  if(ctxP){
+    projProgressInst = new Chart(ctxP,{
+      type:'line',
+      data:{
+        labels: lineLabels,
+        datasets:[
+          {
+            label:'Avance esperado',
+            data: espPcts,
+            borderColor:'rgba(255,255,255,.2)',
+            backgroundColor:'rgba(255,255,255,.04)',
+            fill:true,
+            borderDash:[5,4],
+            pointRadius:3,
+            pointBackgroundColor:'rgba(255,255,255,.3)',
+            tension:0.3,
+          },
+          {
+            label:'Avance real',
+            data: realData,
+            borderColor:'rgba(99,102,241,.9)',
+            backgroundColor:'rgba(99,102,241,.15)',
+            fill:true,
+            pointRadius:8,
+            pointBackgroundColor:'rgba(99,102,241,1)',
+            pointBorderColor:'white',
+            pointBorderWidth:2,
+            showLine:false,
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            callbacks:{
+              label(ctx){
+                return `${ctx.dataset.label}: ${ctx.raw}%`;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{
+            ticks:{color:'rgba(255,255,255,.4)',font:{size:9},maxRotation:45},
+            grid:{color:'rgba(255,255,255,.05)'},
+            border:{color:'transparent'}
+          },
+          y:{
+            min:0,max:100,
+            ticks:{color:'rgba(255,255,255,.35)',font:{size:9},callback:v=>v+'%'},
+            grid:{color:'rgba(255,255,255,.05)'},
+            border:{color:'transparent'}
+          }
+        },
+        animation:{duration:500}
+      }
+    });
+  }
+
+  // ── 3. DONUT estados planificación ──
+  const planifCounts={};
+  src.forEach(d=>{
+    const p=d.planif||'Sin estado';
+    planifCounts[p]=(planifCounts[p]||0)+1;
+  });
+  const PLANIF_COLORS={
+    'Cargada en aula':'rgba(139,92,246,.85)',
+    'Validada':'rgba(52,211,153,.85)',
+    'DEL 2° Instancia':'rgba(45,212,191,.8)',
+    'Enviada a validación DEL':'rgba(96,165,250,.8)',
+    'En construcción':'rgba(251,191,36,.75)',
+    'No inicia':'rgba(107,114,128,.6)',
+    'No aplica':'rgba(107,114,128,.35)',
+  };
+  const pLabels = Object.keys(planifCounts);
+  const pData   = pLabels.map(k=>planifCounts[k]);
+  const pColors = pLabels.map(k=>PLANIF_COLORS[k]||'rgba(255,255,255,.2)');
+
+  // Centro del donut: total enviadas+
+  const enviadas = (planifCounts['Enviada a validación DEL']||0)
+                 + (planifCounts['DEL 2° Instancia']||0)
+                 + (planifCounts['Validada']||0)
+                 + (planifCounts['Cargada en aula']||0);
+  const dcEl = document.getElementById('proj-donut-center');
+  if(dcEl) dcEl.innerHTML = `<div class="proj-donut-big">${enviadas}</div><div class="proj-donut-lbl">enviadas</div>`;
+
+  if(projDonutInst){ projDonutInst.destroy(); projDonutInst=null; }
+  const ctxD2 = document.getElementById('projPlanifDonut')?.getContext('2d');
+  if(ctxD2){
+    projDonutInst = new Chart(ctxD2,{
+      type:'doughnut',
+      data:{
+        labels:pLabels,
+        datasets:[{data:pData,backgroundColor:pColors,borderWidth:2,borderColor:'rgba(10,10,26,.6)',hoverOffset:4}]
+      },
+      options:{
+        cutout:'68%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}`}}
+        },
+        animation:{duration:400}
+      }
+    });
+  }
+
+  // Leyenda planif
+  const legEl = document.getElementById('proj-planif-legend');
+  if(legEl){
+    legEl.innerHTML = pLabels.map((l,i)=>`
+      <div class="proj-planif-row">
+        <span class="proj-planif-dot" style="background:${pColors[i]}"></span>
+        <span class="proj-planif-lbl">${l}</span>
+        <span class="proj-planif-cnt">${pData[i]}</span>
+      </div>`).join('');
+  }
+}
+
 // ── Plazos de entrega de planificación a DEL por grupo de facultades ──────────
 // Fuente: CartaGantt_2026-1 + ajuste comunicado por el equipo
 const PLANIF_DEADLINES = {
