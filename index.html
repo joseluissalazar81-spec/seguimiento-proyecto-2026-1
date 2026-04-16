@@ -1272,10 +1272,11 @@
     Presentación
   </button>
   <div class="header-sep"></div>
-  <a href="mailto:pverab@santotomas.cl" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92)" title="Directora E-Learning UST">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
-    Paulina Vera
-  </a>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;line-height:1.25">
+    <span style="font-size:11.5px;font-weight:700;color:rgba(255,248,235,.88)">Paulina Vera Benavente</span>
+    <span style="font-size:10px;color:rgba(255,240,220,.5)">Directora e-Learning · Universidad Santo Tomás</span>
+    <a href="mailto:pverab@santotomas.cl" style="font-size:10px;color:var(--az);text-decoration:none">pverab@santotomas.cl</a>
+  </div>
 </header>
 
 <div class="layout">
@@ -3779,8 +3780,13 @@ document.addEventListener('fullscreenchange',()=>{
 
 // ── 12. TIMESTAMP ÚLTIMA ACTUALIZACIÓN ────────────────────────────────────────
 function updateTimestamp(){
+  const now = new Date();
+  const time = now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  const date = now.toLocaleDateString('es-CL',{day:'numeric',month:'short',year:'numeric'});
   const el = document.getElementById('last-update');
-  if(el) el.textContent = '· '+new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  if(el) el.textContent = '· '+time;
+  const fe = document.getElementById('footer-update');
+  if(fe) fe.textContent = date+', '+time;
 }
 
 // ── GESTOR DE VISTAS ──────────────────────────────────────────────────────────
@@ -3855,5 +3861,31 @@ document.getElementById('mail-open-btn').addEventListener('click',()=>{
     </div>
   </div>
 </div>
+
+<!-- ── FOOTER ── -->
+<footer style="
+  border-top:1px solid rgba(255,248,240,.08);
+  background:rgba(10,8,6,.6);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  padding:14px 32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  font-size:11px;
+  color:rgba(255,240,220,.4);
+">
+  <div style="display:flex;flex-direction:column;gap:2px">
+    <span style="font-weight:700;font-size:12px;color:rgba(255,248,235,.7)">Paulina Vera Benavente</span>
+    <span>Directora e-Learning · Universidad Santo Tomás</span>
+    <a href="mailto:pverab@santotomas.cl" style="color:var(--az);text-decoration:none;font-size:11px">pverab@santotomas.cl</a>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right">
+    <span style="font-weight:600;font-size:11.5px;color:rgba(255,248,235,.55)">Proyecto e-Learning 2026-1</span>
+    <span>Datos al <span id="footer-update">—</span></span>
+  </div>
+</footer>
 </body>
 </html>
