@@ -88,8 +88,7 @@
     .header-badge span{font-weight:700;font-family:'DM Mono',monospace}
 
     /* ── LAYOUT ── */
-    .layout{display:grid;grid-template-columns:1fr;min-height:calc(100vh - 60px)}
-    #sidebar{display:none}
+    .layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 60px)}
 
     /* ── SIDEBAR ── */
     aside{
@@ -705,7 +704,29 @@
 
     /* ── VIEW TOGGLE ── */
     .view-toggle{display:flex;gap:2px;background:rgba(255,255,255,.05);border:1px solid var(--borde);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px}
-    /* ── Barra pills facultad ── */
+    /* ── Pills sidebar (vertical) ── */
+    .sb-section-label{
+      font-size:9.5px; font-weight:800; text-transform:uppercase;
+      letter-spacing:.09em; color:var(--az); margin-bottom:6px;
+      padding-bottom:4px; border-bottom:1px solid rgba(0,0,0,.07);
+    }
+    .sb-pill{
+      display:flex; align-items:center; justify-content:space-between;
+      width:100%; padding:6px 10px; border-radius:6px;
+      font-size:12px; font-weight:500; cursor:pointer;
+      border:none; background:transparent; color:var(--text-muted);
+      transition:all .15s; text-align:left; margin-bottom:2px;
+    }
+    .sb-pill:hover{ background:rgba(26,72,120,.07); color:var(--az); }
+    .sb-pill.active{ background:var(--az); color:#fff; font-weight:700; }
+    .sb-cnt{
+      font-size:10px; font-family:'DM Mono',monospace; font-weight:700;
+      background:rgba(0,0,0,.08); color:inherit; padding:1px 5px;
+      border-radius:10px; margin-left:4px; flex-shrink:0;
+    }
+    .sb-pill.active .sb-cnt{ background:rgba(255,255,255,.2); }
+
+    /* ── Barra pills facultad (legacy, puede quedar oculta) ── */
     .fac-pills-bar{
       display:flex; align-items:center; flex-wrap:wrap; gap:8px;
       padding:14px 20px 10px;
@@ -1464,7 +1485,10 @@
 </script>
 
 <div class="layout">
-  <aside id="sidebar"></aside>
+  <aside id="sidebar">
+    <div id="fac-pills-bar"></div>
+    <div id="team-pills-bar"></div>
+  </aside>
   <main>
     <!-- ══════════════════════════════════════════════════════
          EXECUTIVE HERO — visible inmediatamente al cargar
@@ -1647,10 +1671,7 @@
     <div class="kpi-bar" id="kpi-bar"></div>
     <div class="fac-bar" id="fac-bar" style="display:none"></div>
 
-    <!-- ── BARRA PILLS FACULTAD ── -->
-    <div class="fac-pills-bar" id="fac-pills-bar"></div>
-    <!-- ── BARRA PILLS EQUIPO ── -->
-    <div class="fac-pills-bar" id="team-pills-bar" style="border-top:1px solid rgba(0,0,0,.05);padding-top:10px;padding-bottom:12px;background:#faf7f0"></div>
+    <!-- pills se renderizan en el sidebar -->
 
     <!-- ── SEARCH + ACCIONES ── -->
     <div class="search-row">
@@ -2088,12 +2109,13 @@ function renderFacPills(){
   if(!bar || !DATA.length) return;
   const activeFac = filters.facultad || null;
   const total = DATA.length;
-  let html = `<button class="fac-pill${!activeFac?' active':''}" onclick="setFacFilter(null)">Todas <span class="pill-cnt">${total}</span></button>`;
+  let html = `<div class="sb-section-label">Facultad</div>`;
+  html += `<button class="sb-pill${!activeFac?' active':''}" onclick="setFacFilter(null)">Todas <span class="sb-cnt">${total}</span></button>`;
   FAC_ORDER.forEach(fac=>{
     const n = DATA.filter(d=>d.facultad===fac).length;
     if(!n) return;
     const act = activeFac===fac;
-    html += `<button class="fac-pill${act?' active':''}" onclick="setFacFilter('${fac}')">${fac} <span class="pill-cnt">${n}</span></button>`;
+    html += `<button class="sb-pill${act?' active':''}" onclick="setFacFilter('${fac}')">${fac} <span class="sb-cnt">${n}</span></button>`;
   });
   bar.innerHTML = html;
 }
@@ -2101,22 +2123,21 @@ function renderTeamPills(){
   const bar = document.getElementById('team-pills-bar');
   if(!bar || !DATA.length) return;
   const roles = [
-    {key:'jp',  label:'JP',  field:'jp'},
-    {key:'di',  label:'DI',  field:'di'},
-    {key:'dg',  label:'DG',  field:'dg'},
-    {key:'implementador', label:'IMP', field:'implementador'},
+    {key:'jp',  label:'JP — Jefe de Proyecto', field:'jp'},
+    {key:'di',  label:'DI — Diseño Instruc.',  field:'di'},
+    {key:'dg',  label:'DG — Diseño Gráfico',   field:'dg'},
+    {key:'implementador', label:'IMP — Implementador', field:'implementador'},
   ];
   let html = '';
   roles.forEach(r=>{
     const vals = [...new Set(DATA.map(d=>d[r.field]).filter(v=>v&&v!=='—'))].sort();
     if(!vals.length) return;
-    html += `<span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:rgba(18,16,28,.35);padding:0 4px">${r.label}</span>`;
+    html += `<div class="sb-section-label" style="margin-top:14px">${r.label}</div>`;
     vals.forEach(v=>{
       const act = filters[r.key]===v;
       const cnt = DATA.filter(d=>d[r.field]===v).length;
-      html += `<button class="fac-pill${act?' active':''}" style="font-size:11px;padding:3px 10px" onclick="setTeamFilter('${r.key}','${v}')">${v} <span class="pill-cnt">${cnt}</span></button>`;
+      html += `<button class="sb-pill${act?' active':''}" onclick="setTeamFilter('${r.key}','${v}')">${v} <span class="sb-cnt">${cnt}</span></button>`;
     });
-    html += `<span style="width:1px;height:20px;background:rgba(0,0,0,.1);display:inline-block;margin:0 6px;vertical-align:middle"></span>`;
   });
   bar.innerHTML = html;
 }
