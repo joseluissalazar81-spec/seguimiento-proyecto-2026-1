@@ -1176,8 +1176,8 @@
     }
     @media(max-width:900px){.proj-chart-body{grid-template-columns:1fr;}}
     .proj-gantt-panel, .proj-progress-panel, .proj-donut-panel {
-      background:rgba(255,255,255,.025);
-      border:1px solid rgba(255,255,255,.07);
+      background:#f8f4ec;
+      border:1px solid rgba(0,0,0,.08);
       border-radius:var(--radius-sm);
       padding:12px 14px;
     }
@@ -1417,12 +1417,7 @@
     Presentación
   </button>
   <div class="header-sep"></div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1.25">
-    <span style="font-size:12px;font-weight:800;color:#fff">Paulina Vera Benavente</span>
-    <span style="font-size:9.5px;color:rgba(255,255,255,.5)">Directora e-Learning · UST</span>
-    <a href="mailto:pverab@santotomas.cl" style="font-size:9.5px;color:#c8a020;text-decoration:none;font-weight:600">pverab@santotomas.cl</a>
-  </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin-left:16px;padding-left:16px;border-left:1px solid rgba(255,255,255,.12)">
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
     <span id="header-clock" style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:#fff;letter-spacing:.06em;line-height:1">--:--:--</span>
     <span id="header-day"   style="font-size:9px;color:#c8a020;font-weight:600;text-transform:capitalize;letter-spacing:.02em;text-align:right">—</span>
   </div>
@@ -1601,7 +1596,7 @@
           <canvas id="projProgressChart" height="220"></canvas>
           <div class="proj-progress-legend">
             <span><span class="proj-leg-dot" style="background:rgba(130,120,190,.8)"></span>Avance real</span>
-            <span><span class="proj-leg-dot" style="background:rgba(255,255,255,.25)"></span>Avance esperado</span>
+            <span><span class="proj-leg-dot" style="background:rgba(0,0,0,.2);border:1px dashed rgba(0,0,0,.3)"></span>Avance esperado</span>
           </div>
         </div>
         <!-- Mini-torta estados planif -->
@@ -2849,9 +2844,8 @@ function renderProjectCharts(){
   const ganttColors = FASES.map(f=>f.color);
   // Estado de cada fase
   const ganttBorder = FASES.map(f=>{
-    const doneF = today > f.fin;
-    const actF  = today >= f.inicio && today <= f.fin;
-    return actF ? 'rgba(255,255,255,.6)' : 'transparent';
+    const actF = today >= f.inicio && today <= f.fin;
+    return actF ? 'rgba(26,72,120,.6)' : 'transparent';
   });
 
   // Anotación "Hoy" como barra vertical ficticia
@@ -2923,15 +2917,15 @@ function renderProjectCharts(){
                 return null;
               },
               maxTicksLimit:6,
-              color:'rgba(255,255,255,.35)',
+              color:'rgba(18,16,28,.45)',
               font:{size:9}
             },
-            grid:{color:'rgba(255,255,255,.05)'},
-            border:{color:'transparent'}
+            grid:{color:'rgba(0,0,0,.05)'},
+            border:{color:'rgba(0,0,0,.08)'}
           },
           y:{
             stacked:true,
-            ticks:{color:'rgba(255,255,255,.6)',font:{size:10}},
+            ticks:{color:'rgba(18,16,28,.6)',font:{size:10}},
             grid:{display:false},
             border:{color:'transparent'}
           }
@@ -2975,12 +2969,12 @@ function renderProjectCharts(){
           {
             label:'Avance esperado',
             data: espPcts,
-            borderColor:'rgba(255,255,255,.2)',
-            backgroundColor:'rgba(255,255,255,.04)',
+            borderColor:'rgba(0,0,0,.2)',
+            backgroundColor:'rgba(26,72,120,.04)',
             fill:true,
             borderDash:[5,4],
             pointRadius:3,
-            pointBackgroundColor:'rgba(255,255,255,.3)',
+            pointBackgroundColor:'rgba(0,0,0,.25)',
             tension:0.3,
           },
           {
@@ -2991,7 +2985,7 @@ function renderProjectCharts(){
             fill:true,
             pointRadius:8,
             pointBackgroundColor:'rgba(130,120,190,1)',
-            pointBorderColor:'white',
+            pointBorderColor:'#fff',
             pointBorderWidth:2,
             showLine:false,
           }
@@ -3011,15 +3005,15 @@ function renderProjectCharts(){
         },
         scales:{
           x:{
-            ticks:{color:'rgba(255,255,255,.4)',font:{size:9},maxRotation:45},
-            grid:{color:'rgba(255,255,255,.05)'},
-            border:{color:'transparent'}
+            ticks:{color:'rgba(18,16,28,.45)',font:{size:9},maxRotation:45},
+            grid:{color:'rgba(0,0,0,.05)'},
+            border:{color:'rgba(0,0,0,.08)'}
           },
           y:{
             min:0,max:100,
-            ticks:{color:'rgba(255,255,255,.35)',font:{size:9},callback:v=>v+'%'},
-            grid:{color:'rgba(255,255,255,.05)'},
-            border:{color:'transparent'}
+            ticks:{color:'rgba(18,16,28,.45)',font:{size:9},callback:v=>v+'%'},
+            grid:{color:'rgba(0,0,0,.05)'},
+            border:{color:'rgba(0,0,0,.08)'}
           }
         },
         animation:{duration:500}
@@ -3061,7 +3055,7 @@ function renderProjectCharts(){
       type:'doughnut',
       data:{
         labels:pLabels,
-        datasets:[{data:pData,backgroundColor:pColors,borderWidth:2,borderColor:'rgba(10,10,26,.6)',hoverOffset:4}]
+        datasets:[{data:pData,backgroundColor:pColors,borderWidth:2,borderColor:'#f8f4ec',hoverOffset:4}]
       },
       options:{
         cutout:'68%',
