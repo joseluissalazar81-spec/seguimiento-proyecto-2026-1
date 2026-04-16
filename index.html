@@ -850,6 +850,178 @@
       .kpi-val{color:#111!important}
       @page{size:A4 landscape;margin:1.5cm}
     }
+
+    /* ══════════════════════════════════════════════════════════
+       EXECUTIVE HERO — Vista inmediata para directivos
+    ══════════════════════════════════════════════════════════ */
+    .exec-hero {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--borde2);
+      border-radius: var(--radius);
+      padding: 22px 24px 18px;
+      margin-bottom: 14px;
+      backdrop-filter: var(--glass);
+      -webkit-backdrop-filter: var(--glass);
+      position: relative; overflow: hidden;
+    }
+    .exec-hero::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background: linear-gradient(135deg,rgba(99,102,241,.07) 0%,transparent 50%,rgba(6,182,212,.05) 100%);
+    }
+    .exec-hero-title {
+      font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.09em;
+      color:var(--az); margin-bottom:16px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .exec-hero-title::after {
+      content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(99,102,241,.3),transparent);
+    }
+    /* Top row: sem + avance + DEL stats + week */
+    .exec-kpis {
+      display: grid;
+      grid-template-columns: 170px 1fr 220px 140px;
+      gap: 16px; align-items: center;
+      margin-bottom: 20px;
+    }
+    @media(max-width:900px){.exec-kpis{grid-template-columns:1fr 1fr;}}
+    /* Semáforo */
+    .exec-sem {
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      padding:14px 10px; border-radius:var(--radius); border:2px solid; transition:all .3s;
+    }
+    .exec-sem.verde  {background:rgba(52,211,153,.07); border-color:rgba(52,211,153,.35);}
+    .exec-sem.amarillo{background:rgba(251,191,36,.07); border-color:rgba(251,191,36,.35);}
+    .exec-sem.rojo   {background:rgba(248,113,113,.07); border-color:rgba(248,113,113,.35);}
+    .exec-sem-circle {
+      width:72px; height:72px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:30px; border:3px solid; transition:all .3s;
+    }
+    .exec-sem.verde  .exec-sem-circle {background:rgba(52,211,153,.18); border-color:var(--ve); box-shadow:0 0 22px rgba(52,211,153,.35);}
+    .exec-sem.amarillo .exec-sem-circle{background:rgba(251,191,36,.18); border-color:var(--am); box-shadow:0 0 22px rgba(251,191,36,.35);}
+    .exec-sem.rojo   .exec-sem-circle {background:rgba(248,113,113,.18); border-color:var(--ro); box-shadow:0 0 22px rgba(248,113,113,.35);}
+    .exec-sem-label {
+      font-size:15px; font-weight:800; letter-spacing:.02em;
+      text-align:center;
+    }
+    .exec-sem.verde  .exec-sem-label{color:var(--ve);}
+    .exec-sem.amarillo .exec-sem-label{color:var(--am);}
+    .exec-sem.rojo   .exec-sem-label{color:var(--ro);}
+    .exec-sem-sub {font-size:10px; color:var(--text-muted); text-align:center;}
+    /* % Avance central */
+    .exec-avance {display:flex; flex-direction:column; align-items:center; gap:6px;}
+    .exec-avance-num {
+      font-size:62px; font-weight:800; font-family:'DM Mono',monospace; line-height:1;
+      background:linear-gradient(135deg,var(--az),var(--tl2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .exec-avance-lbl {font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em;}
+    .exec-avance-bar {width:160px; height:5px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; margin-top:4px;}
+    .exec-avance-fill {height:100%; border-radius:3px; background:linear-gradient(90deg,var(--az2),var(--tl2)); transition:width .7s cubic-bezier(.4,0,.2,1);}
+    .exec-vs-bar {width:160px; display:flex; flex-direction:column; gap:3px; margin-top:8px;}
+    .exec-vs-row {display:flex; align-items:center; gap:6px;}
+    .exec-vs-lbl {font-size:9px; color:var(--text-muted); width:50px; text-align:right;}
+    .exec-vs-track {flex:1; height:4px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden;}
+    .exec-vs-fill {height:100%; border-radius:2px; transition:width .7s;}
+    .exec-vs-fill.real {background:linear-gradient(90deg,var(--az2),var(--tl2));}
+    .exec-vs-fill.esp  {background:rgba(255,255,255,.25);}
+    .exec-vs-pct {font-size:9px; font-family:'DM Mono',monospace; color:var(--text-muted); width:28px;}
+    /* DEL stats */
+    .exec-del {display:flex; flex-direction:column; gap:10px;}
+    .exec-del-row {display:flex; align-items:center; gap:10px;}
+    .exec-del-num {
+      font-size:32px; font-weight:800; font-family:'DM Mono',monospace;
+      min-width:46px; text-align:right; line-height:1;
+    }
+    .exec-del-num.verde   {color:var(--ve);}
+    .exec-del-num.amarillo{color:var(--am);}
+    .exec-del-num.rojo    {color:var(--ro);}
+    .exec-del-info {display:flex; flex-direction:column;}
+    .exec-del-lbl {font-size:11px; color:var(--text); font-weight:600;}
+    .exec-del-sub {font-size:10px; color:var(--text-muted);}
+    /* Semana */
+    .exec-week {
+      display:flex; flex-direction:column; align-items:center; gap:4px;
+      padding:14px 10px; border-radius:var(--radius);
+      background:var(--az-bg); border:1px solid rgba(129,140,248,.2);
+      text-align:center;
+    }
+    .exec-week-num {font-size:13px; font-weight:800; color:var(--az); letter-spacing:.04em;}
+    .exec-week-big {font-size:38px; font-weight:800; font-family:'DM Mono',monospace; color:var(--az); line-height:1;}
+    .exec-week-lbl {font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em;}
+    .exec-week-date {font-size:10px; color:var(--text-muted); margin-top:2px;}
+
+    /* ── Bloques de 2 semanas (Gantt producción) ── */
+    .exec-gantt-section {border-top:1px solid var(--borde); padding-top:16px;}
+    .exec-gantt-hdr {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .exec-gantt-hdr-title {
+      font-size:10px; font-weight:800; text-transform:uppercase;
+      letter-spacing:.07em; color:var(--az);
+    }
+    .exec-gantt-hdr-sub {font-size:10px; color:var(--text-muted);}
+    .exec-blocks-wrap {position:relative;}
+    .exec-blocks-labels {
+      display:grid; gap:2px; margin-bottom:4px;
+    }
+    .exec-block-cell {
+      border-radius:6px; padding:6px 4px 5px;
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      cursor:default; transition:filter .2s; border:1px solid transparent;
+      min-width:0; overflow:hidden; position:relative;
+    }
+    .exec-block-cell:hover {filter:brightness(1.15);}
+    .exec-block-cell.completo  {background:rgba(52,211,153,.18); border-color:rgba(52,211,153,.35);}
+    .exec-block-cell.atrasado  {background:rgba(248,113,113,.18); border-color:rgba(248,113,113,.35);}
+    .exec-block-cell.actual    {background:rgba(96,165,250,.22);  border-color:rgba(96,165,250,.5); box-shadow:0 0 12px rgba(96,165,250,.25);}
+    .exec-block-cell.futuro    {background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.08);}
+    .exec-block-lbl {font-size:9.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+    .exec-block-cell.completo  .exec-block-lbl{color:var(--ve);}
+    .exec-block-cell.atrasado  .exec-block-lbl{color:var(--ro);}
+    .exec-block-cell.actual    .exec-block-lbl{color:var(--ca);}
+    .exec-block-cell.futuro    .exec-block-lbl{color:var(--text-muted);}
+    .exec-block-fecha {font-size:8.5px; color:var(--text-light); font-family:'DM Mono',monospace;}
+    .exec-block-pct   {font-size:10px; font-weight:700; font-family:'DM Mono',monospace;}
+    .exec-block-cell.completo .exec-block-pct{color:var(--ve);}
+    .exec-block-cell.atrasado .exec-block-pct{color:var(--ro);}
+    .exec-block-cell.actual   .exec-block-pct{color:var(--ca);}
+    .exec-block-cell.futuro   .exec-block-pct{color:var(--text-muted);}
+    .exec-block-pin {
+      position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+      font-size:11px; white-space:nowrap;
+      background:var(--ro); color:white; padding:1px 5px; border-radius:4px;
+      font-size:8.5px; font-weight:800;
+    }
+    .exec-block-today-flag {
+      position:absolute; top:2px; right:2px;
+      font-size:9px; background:rgba(96,165,250,.3); border-radius:4px; padding:1px 3px;
+      color:var(--ca); font-weight:800;
+    }
+    /* Facultades strip */
+    .exec-fac-strip {
+      border-top:1px solid var(--borde); padding-top:14px; margin-top:4px;
+    }
+    .exec-fac-strip-title {
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+      color:var(--text-muted); margin-bottom:8px;
+    }
+    .exec-fac-rows {display:flex; flex-direction:column; gap:5px;}
+    .exec-fac-row {display:flex; align-items:center; gap:8px;}
+    .exec-fac-name {font-size:10.5px; color:var(--text-muted); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .exec-fac-track {flex:1; height:8px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; position:relative;}
+    .exec-fac-fill  {height:100%; border-radius:4px; transition:width .6s;}
+    .exec-fac-pct   {font-size:10.5px; font-family:'DM Mono',monospace; font-weight:700; width:34px; text-align:right;}
+    .exec-fac-count {font-size:9.5px; color:var(--text-muted);}
+    .exec-detalles-toggle {
+      display:inline-flex; align-items:center; gap:5px;
+      background:rgba(255,255,255,.05); border:1px solid var(--borde2);
+      border-radius:8px; padding:5px 12px; font-size:11px; font-weight:600;
+      color:var(--text-muted); cursor:pointer; font-family:inherit;
+      transition:all .18s; margin-top:12px;
+    }
+    .exec-detalles-toggle:hover {background:rgba(255,255,255,.1); color:var(--text);}
   </style>
 </head>
 <body>
@@ -910,7 +1082,93 @@
 <div class="layout">
   <aside id="sidebar"></aside>
   <main>
-    <!-- ── PANEL VISUAL DE ESTADO GENERAL ── -->
+    <!-- ══════════════════════════════════════════════════════
+         EXECUTIVE HERO — visible inmediatamente al cargar
+    ═══════════════════════════════════════════════════════ -->
+    <div class="exec-hero" id="exec-hero">
+      <div class="exec-hero-title">Estado del Proyecto — Actualizado en tiempo real</div>
+
+      <!-- KPIs: semáforo + % avance + DEL stats + semana -->
+      <div class="exec-kpis" id="exec-kpis">
+        <!-- semáforo -->
+        <div class="exec-sem verde" id="exec-sem">
+          <div class="exec-sem-circle" id="exec-sem-circle">⏳</div>
+          <div class="exec-sem-label" id="exec-sem-label">Cargando…</div>
+          <div class="exec-sem-sub"  id="exec-sem-sub">—</div>
+        </div>
+        <!-- % avance central -->
+        <div class="exec-avance">
+          <div class="exec-avance-num" id="exec-avance-num">—%</div>
+          <div class="exec-avance-lbl">Avance real</div>
+          <div class="exec-avance-bar"><div class="exec-avance-fill" id="exec-avance-fill" style="width:0%"></div></div>
+          <div class="exec-vs-bar" id="exec-vs-bar">
+            <div class="exec-vs-row">
+              <span class="exec-vs-lbl">Real</span>
+              <div class="exec-vs-track"><div class="exec-vs-fill real" id="exec-vs-real" style="width:0%"></div></div>
+              <span class="exec-vs-pct" id="exec-vs-real-txt">—%</span>
+            </div>
+            <div class="exec-vs-row">
+              <span class="exec-vs-lbl">Esperado</span>
+              <div class="exec-vs-track"><div class="exec-vs-fill esp" id="exec-vs-esp" style="width:0%"></div></div>
+              <span class="exec-vs-pct" id="exec-vs-esp-txt">—%</span>
+            </div>
+          </div>
+        </div>
+        <!-- DEL stats -->
+        <div class="exec-del" id="exec-del">
+          <div class="exec-del-row">
+            <span class="exec-del-num verde" id="exec-del-ok">—</span>
+            <div class="exec-del-info">
+              <span class="exec-del-lbl">Validadas DEL</span>
+              <span class="exec-del-sub">planificaciones aprobadas</span>
+            </div>
+          </div>
+          <div class="exec-del-row">
+            <span class="exec-del-num amarillo" id="exec-del-rev">—</span>
+            <div class="exec-del-info">
+              <span class="exec-del-lbl">En revisión DEL</span>
+              <span class="exec-del-sub">enviadas o en 2° instancia</span>
+            </div>
+          </div>
+          <div class="exec-del-row">
+            <span class="exec-del-num rojo" id="exec-del-pend">—</span>
+            <div class="exec-del-info">
+              <span class="exec-del-lbl">Sin enviar / Atrasadas</span>
+              <span class="exec-del-sub">en construcción o sin iniciar</span>
+            </div>
+          </div>
+        </div>
+        <!-- Semana actual -->
+        <div class="exec-week" id="exec-week">
+          <div class="exec-week-num">📍 Semana del proyecto</div>
+          <div class="exec-week-big" id="exec-week-big">—</div>
+          <div class="exec-week-lbl">de 18 semanas</div>
+          <div class="exec-week-date" id="exec-week-date">—</div>
+        </div>
+      </div>
+
+      <!-- Gantt de 9 bloques x 2 semanas -->
+      <div class="exec-gantt-section">
+        <div class="exec-gantt-hdr">
+          <span class="exec-gantt-hdr-title">📍 Carta Gantt — 9 bloques de producción (18 semanas)</span>
+          <span class="exec-gantt-hdr-sub" id="exec-gantt-sub">—</span>
+        </div>
+        <div id="exec-blocks"></div>
+      </div>
+
+      <!-- Avance por facultad (strip) -->
+      <div class="exec-fac-strip" id="exec-fac-strip">
+        <div class="exec-fac-strip-title">Avance por Facultad / Programa</div>
+        <div class="exec-fac-rows" id="exec-fac-rows"></div>
+      </div>
+
+      <!-- Botón detalles técnicos -->
+      <button class="exec-detalles-toggle" id="exec-detalles-btn" onclick="toggleDetalles()">
+        ▼ Ver detalles técnicos (métricas, gráficos, tabla)
+      </button>
+    </div>
+
+    <!-- ── PANEL VISUAL DE ESTADO GENERAL (detalles) ── -->
     <div id="overview-panel" style="display:none;margin-bottom:16px">
       <!-- Encabezado del panel -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -1841,6 +2099,8 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     // Semáforo global (necesita DATA_ALL, cargar si hace falta)
     if(!DATA_ALL.length) await loadDashboardData();
     renderGlobalSemaforo();
+    // Executive hero — visible inmediatamente
+    renderExecutiveHero();
     // Guardar snapshot tendencia
     const src2=DATA_ALL.length?DATA_ALL:DATA; const avS2=DATA_ALL.length?AVANCE_ALL:AVANCE;
     let val2=0,ep2=0;
@@ -1854,6 +2114,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     const btn = document.getElementById('ov-refresh-btn');
     if(btn){btn.disabled=true; btn.textContent='Actualizando...';}
     await loadDashboardData();
+    renderExecutiveHero();
     if(overviewVisible) renderOverview();
     if(btn){btn.disabled=false; btn.textContent='🔄 Actualizar datos';}
   });
@@ -1880,6 +2141,7 @@ document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.
     updateTimestamp();
     detectChanges();
     renderGlobalSemaforo();
+    renderExecutiveHero();
     if(currentView==='kanban') renderKanban();
     if(currentView==='fac')    renderFacView();
   }, 5*60*1000);
@@ -2146,24 +2408,200 @@ document.getElementById('mail-copy-btn').addEventListener('click',()=>{
     btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
   });
 });
+// ─── TOGGLE DETALLES TÉCNICOS ─────────────────────────────────────────────────
+let detallesVisible = false;
+function toggleDetalles(){
+  detallesVisible = !detallesVisible;
+  const panel = document.getElementById('overview-panel');
+  panel.style.display = detallesVisible ? '' : 'none';
+  const btn = document.getElementById('exec-detalles-btn');
+  if(btn) btn.textContent = detallesVisible
+    ? '▲ Ocultar detalles técnicos'
+    : '▼ Ver detalles técnicos (métricas, gráficos, tabla)';
+  if(detallesVisible){
+    if(!ovDonutInstance && DATA_ALL.length) renderOverview();
+    injectTrendCard();
+    renderTrendChart();
+  }
+}
+
+// ─── EXECUTIVE HERO ───────────────────────────────────────────────────────────
+function renderExecutiveHero(){
+  const src  = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc= DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  if(!src.length) return;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // ── Conteo DEL states ──
+  let delOk=0, delRev=0, delPend=0;
+  src.forEach(d=>{
+    const planif = d.planif || '';
+    const stepIdx = planifStepIndex(planif);
+    if(stepIdx >= 4) delOk++;         // Validada + Cargada en aula
+    else if(stepIdx >= 2) delRev++;   // Enviada a DEL + DEL 2°
+    else delPend++;                   // No inicia + En construcción
+  });
+  const total = src.length;
+
+  // ── % avance real (ponderado por hitos) ──
+  let validated=0, inProd=0;
+  src.forEach(d=>{
+    const av = avSrc[d.asignatura]||{};
+    const hv = Object.values(av.hitos||{});
+    const allV = hv.length>0 && hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||h==='');
+    if(av.avance>=100||allV) validated++;
+    else if(av.avance>0||hv.some(h=>h&&h!=='No aplica'&&h!=='—'&&h!=='No inicia')) inProd++;
+  });
+  const pctReal = total>0 ? Math.round((validated+(inProd*.5))/total*100) : 0;
+
+  // ── Semana actual del proyecto (basada en GANTT_HITOS deadlines) ──
+  let currentWeek = 0;
+  let currentBlockIdx = -1;
+  GANTT_HITOS.forEach((h,i)=>{
+    if(today >= h.fecha){
+      currentWeek = h.weeksDone;
+      currentBlockIdx = i;
+    }
+  });
+  // Si estamos antes del primer deadline, week = 0-1
+  if(currentBlockIdx === -1) currentWeek = Math.max(0, Math.round((today - GANTT_HITOS[0].fecha + 14*86400000)/86400000/7));
+  // Semana esperada = weeksDone del último bloque pasado / 18 * 100
+  const pctEsperado = Math.round(currentWeek / 18 * 100);
+
+  // ── Semáforo ──
+  const diff = pctReal - pctEsperado;
+  let semClass='rojo', semEmoji='🔴', semLabel='Atrasado', semSub='';
+  if(diff >= 5)   { semClass='verde';   semEmoji='🟢'; semLabel='A tiempo'; }
+  else if(diff >= -15){ semClass='amarillo'; semEmoji='🟡'; semLabel='En riesgo'; }
+  semSub = `Real ${pctReal}% vs esperado ${pctEsperado}%`;
+
+  const semEl = document.getElementById('exec-sem');
+  if(semEl){
+    semEl.className = 'exec-sem '+semClass;
+    document.getElementById('exec-sem-circle').textContent = semEmoji;
+    document.getElementById('exec-sem-label').textContent  = semLabel;
+    document.getElementById('exec-sem-sub').textContent    = semSub;
+  }
+
+  // ── % avance + barras ──
+  const aN = document.getElementById('exec-avance-num');
+  if(aN) aN.textContent = pctReal+'%';
+  const aF = document.getElementById('exec-avance-fill');
+  if(aF) aF.style.width = pctReal+'%';
+  const vR = document.getElementById('exec-vs-real');
+  if(vR) vR.style.width = pctReal+'%';
+  const vE = document.getElementById('exec-vs-esp');
+  if(vE) vE.style.width = pctEsperado+'%';
+  const vRt = document.getElementById('exec-vs-real-txt');
+  if(vRt) vRt.textContent = pctReal+'%';
+  const vEt = document.getElementById('exec-vs-esp-txt');
+  if(vEt) vEt.textContent = pctEsperado+'%';
+
+  // ── DEL stats ──
+  const dOk=document.getElementById('exec-del-ok'), dRv=document.getElementById('exec-del-rev'), dPd=document.getElementById('exec-del-pend');
+  if(dOk) dOk.textContent = delOk;
+  if(dRv) dRv.textContent = delRev;
+  if(dPd) dPd.textContent = delPend;
+
+  // ── Semana ──
+  const wB = document.getElementById('exec-week-big');
+  if(wB) wB.textContent = currentWeek||'<1';
+  // Fecha de hoy formateada
+  const fmtDate = today.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'});
+  const wD = document.getElementById('exec-week-date');
+  if(wD) wD.textContent = fmtDate;
+
+  // ── Gantt de 9 bloques ──
+  const ganttSub = document.getElementById('exec-gantt-sub');
+  const nextH = GANTT_HITOS.filter(h=>h.fecha>=today).sort((a,b)=>a.fecha-b.fecha)[0];
+  if(ganttSub && nextH){
+    const dias = Math.round((nextH.fecha-today)/86400000);
+    ganttSub.textContent = `Próxima entrega: ${nextH.label} — ${dias===0?'HOY':dias===1?'mañana':'en '+dias+' días'}`;
+  }
+
+  const blocksEl = document.getElementById('exec-blocks');
+  if(blocksEl){
+    // Grid de 10 celdas
+    blocksEl.style.cssText = `display:grid;grid-template-columns:repeat(${GANTT_HITOS.length},1fr);gap:4px;margin-bottom:4px`;
+    blocksEl.innerHTML = GANTT_HITOS.map((h,i)=>{
+      // Contar validadas para este hito
+      const validH = src.filter(d=>{const av=avSrc[d.asignatura];return av&&av.hitos&&av.hitos[h.key]==='Validada';}).length;
+      const pctH   = total>0 ? Math.round(validH/total*100) : 0;
+      const passed = today > h.fecha;
+      const isCurr = !passed && (i===0 || today >= GANTT_HITOS[i-1].fecha) ||
+                     (today >= h.fecha && (i===GANTT_HITOS.length-1 || today < GANTT_HITOS[i+1]?.fecha));
+      // Determine actual current block: next upcoming deadline or last passed
+      const isActual = i === currentBlockIdx+1 || (currentBlockIdx===GANTT_HITOS.length-1 && i===currentBlockIdx);
+      let cls = 'futuro';
+      if(passed){
+        cls = pctH >= 60 ? 'completo' : 'atrasado';
+      } else if(isActual) {
+        cls = 'actual';
+      }
+      const fmtD = h.fecha.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit'});
+      const pinHTML = isActual
+        ? `<div class="exec-block-today-flag">📍 HOY</div>`
+        : '';
+      return `<div class="exec-block-cell ${cls}" title="${h.hito} — Entrega: ${fmtD} — ${validH}/${total} validadas (${pctH}%)">
+        ${pinHTML}
+        <div class="exec-block-lbl">${h.label}</div>
+        <div class="exec-block-fecha">${fmtD}</div>
+        <div class="exec-block-pct">${passed?pctH+'%':'—'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Avance por Facultad (strip) ──
+  const facRows = document.getElementById('exec-fac-rows');
+  if(facRows){
+    const facData = FAC_ORDER.filter(f=>src.some(d=>d.facultad===f)).map(fac=>{
+      const items = src.filter(d=>d.facultad===fac);
+      // Avance ponderado por asignatura
+      let sumPct=0;
+      items.forEach(d=>{
+        const av=avSrc[d.asignatura]||{};
+        const hv=Object.values(av.hitos||{});
+        const allV=hv.length>0&&hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||h==='');
+        if(av.avance>=100||allV) sumPct+=100;
+        else sumPct+=av.avance||0;
+      });
+      const pct = items.length>0 ? Math.round(sumPct/items.length) : 0;
+      return {label: FAC_ABBR[fac]||fac, pct, count: items.length};
+    }).sort((a,b)=>b.pct-a.pct);
+
+    facRows.innerHTML = facData.map(f=>{
+      const color = f.pct>=70 ? 'var(--ve)' : f.pct>=40 ? 'var(--am)' : 'var(--ro)';
+      return `<div class="exec-fac-row">
+        <span class="exec-fac-name" title="${f.label}">${f.label}</span>
+        <div class="exec-fac-track"><div class="exec-fac-fill" style="width:${f.pct}%;background:${color}"></div></div>
+        <span class="exec-fac-pct" style="color:${color}">${f.pct}%</span>
+        <span class="exec-fac-count">${f.count} asig.</span>
+      </div>`;
+    }).join('');
+  }
+}
+
 // ─── OVERVIEW PANEL ─────────────────────────────────────────────────────────
 
-// Fechas del proyecto (Gantt real)
-const GANTT_START = new Date(2026,2,16);  // 16 mar 2026
-const GANTT_END   = new Date(2026,5,12);  // 12 jun 2026
+// Fechas del proyecto (CartaGantt real: Mar 2 → Jul 17)
+const GANTT_START = new Date(2026,2,2);   // 2 mar 2026 — inicio CartaGantt
+const GANTT_END   = new Date(2026,6,17);  // 17 jul 2026 — fin CartaGantt (Aulas habilitadas)
 
-// Hitos Gantt con sus fechas límite
+// Bloques de producción: 9 bloques × 2 semanas = 18 semanas
+// (S0 = bloque 0 especial; S1-S2 a S17-S18 = bloques 1-9)
+// weeksDone: cuántas semanas académicas se habrán completado al llegar a la fecha límite
 const GANTT_HITOS = [
-  {label:'S0 Videos B y C',       key:'s0',    fecha: new Date(2026,2,31)},
-  {label:'S1–S2',                  key:'s1s2',  fecha: new Date(2026,3,12)},
-  {label:'S3–S4',                  key:'s3s4',  fecha: new Date(2026,3,19)},
-  {label:'S5–S6',                  key:'s5s6',  fecha: new Date(2026,3,26)},
-  {label:'S7–S8',                  key:'s7s8',  fecha: new Date(2026,4,3)},
-  {label:'S9–S10',                 key:'s9s10', fecha: new Date(2026,4,10)},
-  {label:'S11–S12',                key:'s11s12',fecha: new Date(2026,4,17)},
-  {label:'S13–S14',                key:'s13s14',fecha: new Date(2026,4,24)},
-  {label:'S15–S16',                key:'s15s16',fecha: new Date(2026,4,31)},
-  {label:'S17–S18',                key:'s17s18',fecha: new Date(2026,5,7)},
+  {label:'S0',     key:'s0',    fecha: new Date(2026,2,31), weeksDone:2,  hito:'Videos B y C'},
+  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,3,12), weeksDone:4,  hito:'Primeros recursos'},
+  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,3,19), weeksDone:6,  hito:'Entrega planif. DEL ◆'},
+  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,3,26), weeksDone:8,  hito:'Producción'},
+  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,4,3),  weeksDone:10, hito:'Producción'},
+  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,4,10), weeksDone:12, hito:'Rec. Nat. finaliza ◆'},
+  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,4,17), weeksDone:14, hito:'Producción'},
+  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,4,24), weeksDone:16, hito:'Producción'},
+  {label:'S15–S16',key:'s15s16',fecha: new Date(2026,4,31), weeksDone:17, hito:'Producción'},
+  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,5,7),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
 ];
 
 let ovBarInstance = null, ovDonutInstance = null;
