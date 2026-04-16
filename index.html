@@ -1211,6 +1211,131 @@
     .proj-planif-lbl {flex:1; color:var(--text-muted);}
     .proj-planif-cnt {font-family:'DM Mono',monospace; font-weight:700; color:var(--text);}
 
+    /* ── Vista facultad — estilo portal bolsa ── */
+    .fv-grid{ display:flex; flex-direction:column; gap:16px; padding:20px; }
+    .fv-idx-card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.09);
+      border-radius:10px;
+      overflow:hidden;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+      transition:box-shadow .2s;
+    }
+    .fv-idx-card:hover{ box-shadow:0 4px 16px rgba(0,0,0,.10); }
+
+    /* Cabecera índice */
+    .fv-idx-hdr{
+      display:flex; align-items:center; gap:14px;
+      padding:12px 18px;
+      background:linear-gradient(90deg,#162030 0%,#1d2a3a 100%);
+      cursor:pointer;
+      user-select:none;
+      border-bottom:2px solid var(--gold,#c8a020);
+    }
+    .fv-idx-sem{
+      width:10px; height:10px; border-radius:50%; flex-shrink:0;
+      box-shadow:0 0 6px currentColor;
+    }
+    .fv-idx-sem.verde   { background:#4caf7a; color:#4caf7a; }
+    .fv-idx-sem.amarillo{ background:#d4a820; color:#d4a820; }
+    .fv-idx-sem.rojo    { background:#c04848; color:#c04848; }
+    .fv-idx-title{ font-size:13.5px; font-weight:800; color:#fff; letter-spacing:.02em; flex:1; }
+    .fv-idx-counts{
+      display:flex; gap:16px;
+      font-size:11px; font-family:'DM Mono',monospace;
+    }
+    .fv-idx-count{ display:flex; flex-direction:column; align-items:center; gap:1px; }
+    .fv-idx-count .num{ font-size:16px; font-weight:700; line-height:1; }
+    .fv-idx-count .lbl{ font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; opacity:.65; color:#fff; }
+    .fv-idx-count .num.c-ve { color:#4caf7a; }
+    .fv-idx-count .num.c-am { color:#d4a820; }
+    .fv-idx-count .num.c-ro { color:#e06060; }
+    .fv-idx-count .num.c-gr { color:rgba(255,255,255,.5); }
+    .fv-idx-bar-wrap{
+      width:120px; height:6px; border-radius:3px;
+      background:rgba(255,255,255,.12); display:flex; overflow:hidden; flex-shrink:0;
+    }
+    .fv-idx-bar-seg{ height:100%; transition:width .5s; }
+    .fv-idx-bar-seg.ok  { background:#4caf7a; }
+    .fv-idx-bar-seg.rev { background:#d4a820; }
+    .fv-idx-bar-seg.at  { background:#e06060; }
+    .fv-idx-bar-seg.enT { background:rgba(255,255,255,.2); }
+    .fv-idx-chevron{ color:rgba(255,255,255,.5); transition:transform .25s; }
+    .fv-idx-chevron.open{ transform:rotate(90deg); }
+    .fv-idx-notaext{ font-size:9.5px; color:#d4a820; font-weight:600; }
+
+    /* Tabla de asignaturas tipo ticker */
+    .fv-ticker-wrap{ overflow:hidden; }
+    .fv-ticker-table{
+      width:100%; border-collapse:collapse;
+      font-size:12.5px;
+    }
+    .fv-ticker-table thead tr{
+      background:#f6f2ea;
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .fv-ticker-table thead th{
+      padding:7px 12px;
+      font-size:9.5px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.07em; color:rgba(18,16,28,.45);
+      text-align:left; white-space:nowrap;
+    }
+    .fv-ticker-table tbody tr{
+      border-bottom:1px solid rgba(0,0,0,.05);
+      cursor:pointer;
+      transition:background .12s;
+    }
+    .fv-ticker-table tbody tr:last-child{ border-bottom:none; }
+    .fv-ticker-table tbody tr:hover{ background:rgba(26,72,120,.04); }
+    .fv-ticker-table tbody tr.atrasada-row{ background:rgba(176,48,48,.03); }
+    .fv-ticker-table tbody tr.atrasada-row:hover{ background:rgba(176,48,48,.07); }
+    .fv-ticker-table td{ padding:9px 12px; vertical-align:middle; }
+
+    /* Columna asignatura */
+    .ftk-name{ font-size:12.5px; font-weight:700; color:var(--az); line-height:1.2; }
+    .ftk-doc { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .ftk-alert{ font-size:9px; font-weight:800; color:var(--ro); margin-left:5px; }
+
+    /* Badge de planificación */
+    .ftk-planif{
+      display:inline-flex; align-items:center; gap:4px;
+      padding:3px 8px; border-radius:4px;
+      font-size:10.5px; font-weight:700; white-space:nowrap;
+      border:1px solid transparent;
+    }
+    .ftk-p-none { background:var(--ro-bg);  color:var(--ro);  border-color:rgba(176,48,48,.2); }
+    .ftk-p-const{ background:rgba(168,120,16,.08); color:var(--am); border-color:rgba(168,120,16,.2); }
+    .ftk-p-env  { background:rgba(26,72,120,.08);  color:var(--az); border-color:rgba(26,72,120,.2); }
+    .ftk-p-del2 { background:rgba(24,104,104,.08); color:var(--tl2); border-color:rgba(24,104,104,.2); }
+    .ftk-p-val  { background:var(--ve-bg); color:var(--ve); border-color:rgba(45,122,72,.2); }
+    .ftk-p-car  { background:rgba(45,122,72,.15);  color:var(--ve); border-color:rgba(45,122,72,.3); font-weight:800; }
+    .ftk-p-na   { background:var(--gr-bg); color:var(--gr); border-color:rgba(96,104,112,.15); }
+
+    /* Mini progreso */
+    .ftk-av-wrap{ display:flex; align-items:center; gap:7px; }
+    .ftk-av-bar { flex:1; height:5px; background:rgba(0,0,0,.07); border-radius:3px; overflow:hidden; min-width:50px; }
+    .ftk-av-fill{ height:100%; border-radius:3px; background:var(--az); transition:width .5s; }
+    .ftk-av-pct { font-size:11px; font-weight:700; font-family:'DM Mono',monospace; color:var(--text); min-width:28px; text-align:right; }
+
+    /* Hitos mini */
+    .ftk-hitos{ display:flex; gap:2px; align-items:center; }
+    .ftk-dot{ width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+    .ftk-dot.val { background:var(--ve); }
+    .ftk-dot.env { background:var(--am); }
+    .ftk-dot.con { background:var(--az); }
+    .ftk-dot.nin { background:var(--ro); }
+    .ftk-dot.nap { background:rgba(0,0,0,.12); }
+    .ftk-dot.nd  { background:rgba(0,0,0,.06); border:1px dashed rgba(0,0,0,.15); }
+
+    /* Chips staff */
+    .ftk-staff{ display:flex; flex-direction:column; gap:3px; }
+    .ftk-chip{
+      font-size:9.5px; font-weight:700; padding:1px 5px; border-radius:3px;
+      white-space:nowrap; display:inline-block;
+    }
+    .ftk-chip-jp{ background:rgba(26,72,120,.1); color:var(--az); }
+    .ftk-chip-di{ background:rgba(24,104,104,.1); color:var(--tl2); }
+
     /* ── Overrides tema claro — superficies y tarjetas ── */
     .kpi-card,.kpi-card2,.ov-metric,.kanban-col,.kanban-card,
     .fv-card,.proj-chart-wrap,.exec-hero,
@@ -3669,6 +3794,39 @@ function fvHitosDots(hitos){
   }).join('');
 }
 
+// ── Helpers estilo portal ──────────────────────────────────────────────────────
+function ftkPlanifClass(p){
+  const s = planifStepIndex(p||'');
+  if(!p||p===''||s===0)  return 'ftk-p-none';
+  if(s===1)              return 'ftk-p-const';
+  if(s===2)              return 'ftk-p-env';
+  if(s===3)              return 'ftk-p-del2';
+  if(s===4)              return 'ftk-p-val';
+  if(s>=5)               return 'ftk-p-car';
+  return 'ftk-p-na';
+}
+function ftkPlanifIcon(p){
+  const s = planifStepIndex(p||'');
+  if(!p||s===0) return '○';
+  if(s===1)     return '◐';
+  if(s===2)     return '▶';
+  if(s===3)     return '⟳';
+  if(s===4)     return '✓';
+  if(s>=5)      return '★';
+  return '—';
+}
+function ftkHitosDots(hitos){
+  return Object.entries(hitos||{}).slice(0,10).map(([k,v])=>{
+    let cls='nd';
+    if(v==='Validada'||v==='Realizada') cls='val';
+    else if(v==='Enviada') cls='env';
+    else if(v==='En construcción') cls='con';
+    else if(v==='No inicia') cls='nin';
+    else if(v==='No aplica') cls='nap';
+    return `<div class="ftk-dot ${cls}" title="${k}: ${v||'—'}"></div>`;
+  }).join('');
+}
+
 function renderFacView(){
   const rows = filtered();
   const container = document.getElementById('fac-view');
@@ -3690,83 +3848,82 @@ function renderFacView(){
       else if(today>deadline) atras++;
       else enT++;
     });
-    // Semáforo
-    let semCls='rojo', semE='🔴';
-    if(atras===0&&ok+rev===n){semCls='verde';semE='🟢';}
-    else if(atras===0){semCls='amarillo';semE='🟡';}
-    else if(atras/n>0.5){semCls='rojo';semE='🔴';}
-    else {semCls='amarillo';semE='🟡';}
-    // Widths para barra
+    // Semáforo dot color
+    let semCls='rojo';
+    if(atras===0&&ok+rev===n)      semCls='verde';
+    else if(atras===0)             semCls='amarillo';
+    else if(atras/n>0.5)           semCls='rojo';
+    else                           semCls='amarillo';
+
     const wOk=Math.round(ok/n*100), wRev=Math.round(rev/n*100),
           wAt=Math.round(atras/n*100), wEnT=Math.round(enT/n*100);
-    // Sub-text
-    const parts=[];
-    if(ok>0)    parts.push(`<span class="fv-hdr-lbl ok"><span class="fv-hdr-lbl-dot" style="background:rgba(168,196,160,.75)"></span>${ok} validada${ok>1?'s':''}</span>`);
-    if(rev>0)   parts.push(`<span class="fv-hdr-lbl rev"><span class="fv-hdr-lbl-dot" style="background:rgba(212,184,120,.65)"></span>${rev} en DEL</span>`);
-    if(atras>0) parts.push(`<span class="fv-hdr-lbl at"><span class="fv-hdr-lbl-dot" style="background:rgba(200,160,144,.75)"></span>${atras} atrasada${atras>1?'s':''}</span>`);
-    if(enT>0)   parts.push(`<span class="fv-hdr-lbl enT"><span class="fv-hdr-lbl-dot" style="background:rgba(255,255,255,.18)"></span>${enT} en construcción</span>`);
+
     const notaExt = (fac==='Salud'||fac==='Formación General')
-      ? `<span style="font-size:9.5px;color:var(--az);font-weight:600;margin-left:6px">⏳ Plazo ${deadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</span>`
+      ? `<span class="fv-idx-notaext">⏳ Plazo ${deadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</span>`
       : '';
 
-    const rows_html = items.map(d=>{
+    const ticker_rows = items.map(d=>{
       const idx = DATA.findIndex(x=>x.asignatura===d.asignatura);
-      const av = (AVANCE[d.asignatura]||{}).avance||0;
+      const av  = (AVANCE[d.asignatura]||{}).avance||0;
       const hitos = (AVANCE[d.asignatura]||{}).hitos||{};
-      const isVenc = isHitoVencido(d);
-      const step = planifStepIndex(d.planif||'');
-      const isAt = step<2 && today>deadline;
-      return `<tr class="${isVenc||isAt?'urg':''}" onclick="openPanel(${idx})">
-        <td>
-          <div class="fv-asig-name">${d.asignatura}${isAt?'<span style="margin-left:6px;font-size:9px;color:var(--ro);font-weight:800">⚠ ATRASADA</span>':''}</div>
-          <div class="fv-asig-doc">${d.docente}</div>
+      const step  = planifStepIndex(d.planif||'');
+      const isAt  = step<2 && today>deadline;
+      const avFill = av>=80?'var(--ve)':av>=40?'var(--am)':'var(--ro)';
+      return `<tr class="${isAt?'atrasada-row':''}" onclick="openPanel(${idx})">
+        <td style="min-width:180px">
+          <div class="ftk-name">${d.asignatura}${isAt?`<span class="ftk-alert">⚠ ATRASADA</span>`:''}</div>
+          <div class="ftk-doc">${d.docente}</div>
         </td>
         <td>
-          <span class="fv-chip jp">${d.jp}</span>
-          <span class="fv-chip di" style="margin-left:3px">${d.di}</span>
+          <div class="ftk-staff">
+            <span class="ftk-chip ftk-chip-jp">JP ${d.jp}</span>
+            <span class="ftk-chip ftk-chip-di">DI ${d.di}</span>
+          </div>
         </td>
         <td>
-          <span class="fv-planif ${fvPlanifClass(d.planif)}">${fvPlanifIcon(d.planif)} ${planifLabel(d.planif)}</span>
+          <span class="ftk-planif ${ftkPlanifClass(d.planif)}">${ftkPlanifIcon(d.planif)} ${planifLabel(d.planif)||'No inicia'}</span>
         </td>
         <td>
-          <div class="fv-hitos">${fvHitosDots(hitos)}</div>
+          <div class="ftk-hitos">${ftkHitosDots(hitos)}</div>
         </td>
-        <td>
-          <div class="fv-av-cell">
-            <div class="fv-av-bar"><div class="fv-av-fill" style="width:${av}%"></div></div>
-            <span class="fv-av-pct">${av}%</span>
+        <td style="min-width:110px">
+          <div class="ftk-av-wrap">
+            <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${avFill}"></div></div>
+            <span class="ftk-av-pct">${av}%</span>
           </div>
         </td>
       </tr>`;
     }).join('');
 
-    return `<div class="fv-card">
-      <div class="fv-hdr" onclick="toggleFvGroup(this)">
-        <div class="fv-hdr-sem ${semCls}">${semE}</div>
-        <div class="fv-hdr-info">
-          <div class="fv-hdr-name">${fac}${notaExt}</div>
-          <div class="fv-hdr-sub">${n} asignaturas · ${parts.join(' · ')}</div>
+    return `<div class="fv-idx-card">
+      <div class="fv-idx-hdr" onclick="toggleFvGroup(this)">
+        <div class="fv-idx-sem ${semCls}"></div>
+        <div class="fv-idx-title">${fac.toUpperCase()}${notaExt?'&nbsp;&nbsp;'+notaExt:''}</div>
+        <div class="fv-idx-counts">
+          ${ok>0  ?`<div class="fv-idx-count"><span class="num c-ve">${ok}</span><span class="lbl">Valid.</span></div>`:''}
+          ${rev>0 ?`<div class="fv-idx-count"><span class="num c-am">${rev}</span><span class="lbl">En DEL</span></div>`:''}
+          ${atras>0?`<div class="fv-idx-count"><span class="num c-ro">${atras}</span><span class="lbl">Atras.</span></div>`:''}
+          ${enT>0 ?`<div class="fv-idx-count"><span class="num c-gr">${enT}</span><span class="lbl">Const.</span></div>`:''}
+          <div class="fv-idx-count"><span class="num" style="color:rgba(255,255,255,.6)">${n}</span><span class="lbl">Total</span></div>
         </div>
-        <div class="fv-hdr-bar">
-          <div class="fv-hdr-bar-track">
-            ${wOk >0?`<div class="fv-hdr-bar-seg ok"  style="width:${wOk}%"></div>`:''}
-            ${wRev>0?`<div class="fv-hdr-bar-seg rev" style="width:${wRev}%"></div>`:''}
-            ${wAt >0?`<div class="fv-hdr-bar-seg at"  style="width:${wAt}%"></div>`:''}
-            ${wEnT>0?`<div class="fv-hdr-bar-seg enT" style="width:${wEnT}%"></div>`:''}
-          </div>
+        <div class="fv-idx-bar-wrap">
+          ${wOk >0?`<div class="fv-idx-bar-seg ok"  style="width:${wOk}%"></div>`:''}
+          ${wRev>0?`<div class="fv-idx-bar-seg rev" style="width:${wRev}%"></div>`:''}
+          ${wAt >0?`<div class="fv-idx-bar-seg at"  style="width:${wAt}%"></div>`:''}
+          ${wEnT>0?`<div class="fv-idx-bar-seg enT" style="width:${wEnT}%"></div>`:''}
         </div>
-        <svg class="fv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg class="fv-idx-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="fv-body" style="display:none">
-        <table class="fv-table">
+      <div class="fv-ticker-wrap" style="display:none">
+        <table class="fv-ticker-table">
           <thead><tr>
-            <th style="width:30%">Asignatura / Docente</th>
-            <th>JP · DI</th>
+            <th>Asignatura / Docente</th>
+            <th>Equipo</th>
             <th>Planificación DEL</th>
-            <th>Hitos S0–S17/18</th>
-            <th>Avance</th>
+            <th>Hitos producción</th>
+            <th>% Avance</th>
           </tr></thead>
-          <tbody>${rows_html}</tbody>
+          <tbody>${ticker_rows}</tbody>
         </table>
       </div>
     </div>`;
@@ -3774,10 +3931,10 @@ function renderFacView(){
 }
 function toggleFvGroup(hdr){
   const body = hdr.nextElementSibling;
-  const chev = hdr.querySelector('.fv-chevron');
+  const chev = hdr.querySelector('.fv-idx-chevron');
   const closed = body.style.display === 'none';
   body.style.display = closed ? '' : 'none';
-  chev.classList.toggle('open', closed);
+  if(chev) chev.classList.toggle('open', closed);
 }
 
 // ── 11. MODO PRESENTACIÓN FULLSCREEN ─────────────────────────────────────────
