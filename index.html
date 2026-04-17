@@ -1941,14 +1941,59 @@ const PROD = {
 
 
 // ─── GOOGLE SHEETS EN TIEMPO REAL ───────────────────────────────────────────
-// Usa gid= en lugar de sheet= para ignorar completamente los filtros activos del Excel.
-// gid=1889016436 → hoja "Seguimiento"
-const SHEET_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&gid=1889016436";
+// ─── IDs de hojas Google ───────────────────────────────────────────────────────
+const SHEET_ID    = '14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY';
+const SHEET_GID   = '1889016436';
+const BENCH_ID    = '1DpexuKXjou9g_X35VU1oFwyIsoENRXMX';
+const BENCH_SHEET = 'Ejemplo';
 
-const SHEET_BENCH_CSV = "https://docs.google.com/spreadsheets/d/1DpexuKXjou9g_X35VU1oFwyIsoENRXMX/gviz/tq?tqx=out:csv&sheet=Ejemplo";
+// ─── JSONP loader — sin CORS, funciona desde file://, Vercel, cualquier origen ─
+// Google Sheets gviz siempre llama google.visualization.Query.setResponse(data)
+const _gvizQ = [];
+window.google = window.google || {};
+window.google.visualization = window.google.visualization || {};
+window.google.visualization.Query = window.google.visualization.Query || {};
+window.google.visualization.Query.setResponse = function(resp){
+  const item = _gvizQ.shift();
+  if(item){ clearTimeout(item.t); try{ item.resolve(resp); }catch(e){ item.reject(e); } }
+};
 
-// Dashboard usa la misma hoja con gid — así ignora cualquier filtro activo.
-const SHEET_DASHBOARD_CSV = "https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY/gviz/tq?tqx=out:csv&gid=1889016436";
+function loadGvizSheet(sheetId, param){
+  return new Promise((resolve, reject)=>{
+    const t = setTimeout(()=>{
+      const i = _gvizQ.findIndex(x=>x.reject===reject);
+      if(i>=0) _gvizQ.splice(i,1);
+      reject(new Error('timeout'));
+    }, 12000);
+    _gvizQ.push({resolve, reject, t});
+    const s = document.createElement('script');
+    s.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&${param}&nocache=${Date.now()}`;
+    s.onerror = ()=>{ clearTimeout(t); const i=_gvizQ.findIndex(x=>x.reject===reject); if(i>=0)_gvizQ.splice(i,1); reject(new Error('script error')); };
+    s.onload  = ()=>setTimeout(()=>s.remove(), 500);
+    document.head.appendChild(s);
+  });
+}
+
+function buildDataFromGviz(rows){
+  const data=[], avance={};
+  (rows||[]).forEach(row=>{
+    const r=(row.c||[]).map(c=>(c?.v!=null)?String(c.v).trim():'');
+    if(!r[1])return;
+    const asig=r[1];
+    const rawPct=row.c?.[20]?.v;
+    const pct=typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
+    data.push({facultad:r[0]||'',asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
+      jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
+      reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
+      fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
+    avance[asig]={avance:pct,obs:r[22]||'',hitos:{
+      s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
+      s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
+      s11s12:mapHito(r[16]),s13s14:mapHito(r[17]),s15s16:mapHito(r[18]),
+      s17s18:mapHito(r[19])}};
+  });
+  return {data,avance};
+}
 
 // Parsear CSV respetando comillas y saltos de línea dentro de celdas
 function parseCSV(text){
@@ -2042,56 +2087,39 @@ function setSyncLabel(txt, isError=false){
 
 async function loadSheetData(silent=false){
   const statusEl=document.getElementById('sync-status');
-  if(statusEl)statusEl.closest('header')?.classList?.add('syncing')||statusEl.classList.add('syncing');
-  if(!silent)setSyncLabel('Actualizando...');
+  if(statusEl) statusEl.classList.add('syncing');
+  if(!silent) setSyncLabel('Actualizando...');
   try{
-    const res = await fetch(SHEET_CSV+'&nocache='+Date.now());
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
-    const built= buildData(rows);
-    DATA   = built.data;
-    AVANCE = built.avance;
-    // Guardar caché en memoria
+    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}`);
+    const built = buildDataFromGviz(resp.table?.rows);
+    DATA = built.data; AVANCE = built.avance;
     window._ust_cache = {DATA:[...DATA], AVANCE:{...AVANCE}, ts:Date.now()};
     const now=new Date();
-    const hm=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-    const dm=now.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
-    setSyncLabel(`Actualizado ${hm} · ${dm}`);
+    setSyncLabel(`Actualizado ${now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})} · ${now.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'})}`);
     return true;
   }catch(err){
-    console.warn('Fetch sheet error:',err);
-    // Intentar caché en memoria
-    if(window._ust_cache&&window._ust_cache.DATA){
+    console.warn('loadSheetData error:',err);
+    if(window._ust_cache?.DATA){
       DATA=window._ust_cache.DATA; AVANCE=window._ust_cache.AVANCE;
-      const ago=Math.round((Date.now()-window._ust_cache.ts)/60000);
-      setSyncLabel(`Sin conexión · caché hace ${ago}min`,true);
+      setSyncLabel(`Sin conexión · caché hace ${Math.round((Date.now()-window._ust_cache.ts)/60000)}min`,true);
       return true;
     }
     setSyncLabel('Error al cargar datos',true);
     return false;
   }finally{
-    if(statusEl)statusEl.classList.remove('syncing');
+    if(statusEl) statusEl.classList.remove('syncing');
   }
 }
 
-
-// Carga datos para el overview desde hoja independiente (ignorando filtros del equipo)
 async function loadDashboardData(){
   try{
-    const res = await fetch(SHEET_DASHBOARD_CSV+'&nocache='+Date.now());
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
-    const built = buildData(rows);
-    DATA_ALL   = built.data;
-    AVANCE_ALL = built.avance;
+    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}`);
+    const built = buildDataFromGviz(resp.table?.rows);
+    DATA_ALL = built.data; AVANCE_ALL = built.avance;
     return true;
   }catch(err){
-    // Si no existe la hoja DATA_DASHBOARD, usar DATA completo como fallback
-    console.warn('DATA_DASHBOARD no disponible, usando DATA como fallback:', err.message);
-    DATA_ALL   = [...DATA];
-    AVANCE_ALL = {...AVANCE};
+    console.warn('loadDashboardData error:', err.message);
+    DATA_ALL=[...DATA]; AVANCE_ALL={...AVANCE};
     return false;
   }
 }
@@ -2212,30 +2240,21 @@ let BENCH = {};
 
 async function loadBenchData(){
   try{
-    const res  = await fetch(SHEET_BENCH_CSV+'&nocache='+Date.now());
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
-    // Fila 0 = encabezados, filas 1+ = datos
-    // Col idx: 0=tipo, 1=asignatura, 2=horasTotal, 3=TPE, 4=presencial,
-    //          5=sincronica, 6=asincronica, 7=t1, 8=t2, 9=t3, 10=t4
-    // Cols 23-27 (X-AB) = valorización en pesos → se ignoran al no leerlas
-    for(let i=1; i<rows.length; i++){
-      const r = rows[i];
-      const nombre = (r[1]||'').trim();
-      if(!nombre || nombre==='Asignaturas') continue;
-      const num = v => parseFloat((v||'0').replace(',','.'))||0;
-      BENCH[nombre] = {
-        pres:  Math.round(num(r[4])),      // horas presencial  — entero exacto
-        asin:  Math.round(num(r[6])),      // horas asincrónica — entero exacto
-        t1:    Math.floor(num(r[7])),      // tipo 1 → floor si decimal
-        t2:    Math.floor(num(r[8])),      // tipo 2 → floor si decimal
-        t3:    Math.floor(num(r[9])),      // tipo 3 → floor si decimal
-        t4:    Math.floor(num(r[10])),     // tipo 4 → floor si decimal
+    const resp = await loadGvizSheet(BENCH_ID, `sheet=${encodeURIComponent(BENCH_SHEET)}`);
+    const rows = resp.table?.rows || [];
+    const num = v => parseFloat(String(v||'0').replace(',','.'))||0;
+    rows.forEach(row=>{
+      const r=(row.c||[]).map(c=>(c?.v!=null)?c.v:'');
+      const nombre=String(r[1]||'').trim();
+      if(!nombre || nombre==='Asignaturas') return;
+      BENCH[nombre]={
+        pres: Math.round(num(r[4])), asin: Math.round(num(r[6])),
+        t1:Math.floor(num(r[7])), t2:Math.floor(num(r[8])),
+        t3:Math.floor(num(r[9])), t4:Math.floor(num(r[10])),
       };
-    }
+    });
   }catch(err){
-    console.warn('Bench data no disponible, usando PROD hardcodeado:', err.message);
+    console.warn('Bench data no disponible:', err.message);
   }
 }
 
@@ -2568,12 +2587,10 @@ document.getElementById('search').addEventListener('input',e=>{
 
 // ─── INIT ASÍNCRONO (datos desde Google Sheets) ───
 (async()=>{
-  // Cargar hoja principal Y hoja del dashboard en paralelo
-  const [ok] = await Promise.all([
-    loadSheetData(),
-    loadDashboardData(),
-    loadBenchData(),
-  ]);
+  // JSONP requiere requests secuenciales (1 a la vez)
+  const ok = await loadSheetData();
+  await loadDashboardData();
+  await loadBenchData();
   // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
   requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
 
