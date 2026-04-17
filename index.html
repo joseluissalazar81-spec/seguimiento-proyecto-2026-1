@@ -1631,7 +1631,7 @@
         <!-- Gantt de fases -->
         <div class="proj-gantt-panel">
           <div class="proj-panel-title">Fases del Proyecto — Carta Gantt</div>
-          <div id="gantt-wrap" style="position:relative;height:200px;width:100%">
+          <div id="gantt-wrap" style="position:relative;height:200px;width:100%"><div id="gantt-tt" style="display:none;position:absolute;z-index:50;background:#fff;border:1px solid rgba(59,110,140,.25);border-radius:8px;padding:10px 13px;box-shadow:0 4px 16px rgba(30,45,61,.15);max-width:220px;pointer-events:none"></div>
             <canvas id="projGanttChart"></canvas>
           </div>
         </div>
@@ -2298,11 +2298,20 @@ function renderSidebar(){
     html+=`</div>`;
   }
   document.getElementById('sidebar').innerHTML=html;
+  function applyFilter(fn){
+    const openAsig=selectedIdx!==null&&currentRows[selectedIdx]?currentRows[selectedIdx].asignatura:null;
+    fn();
+    renderSidebar();renderTable();renderKPIs();
+    if(openAsig!==null){
+      const ni=currentRows.findIndex(d=>d.asignatura===openAsig);
+      if(ni>=0) openPanel(ni); else closePanel();
+    }
+  }
   document.querySelectorAll('.filter-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{const{key,val}=btn.dataset;filters[key]=filters[key]===val?null:val;renderSidebar();renderTable();renderKPIs()});
+    btn.addEventListener('click',()=>{const{key,val}=btn.dataset;applyFilter(()=>{filters[key]=filters[key]===val?null:val;})});
   });
   document.querySelectorAll('.clear-all').forEach(btn=>{
-    btn.addEventListener('click',()=>{filters[btn.dataset.ck]=null;renderSidebar();renderTable();renderKPIs()});
+    btn.addEventListener('click',()=>{applyFilter(()=>{filters[btn.dataset.ck]=null;})});
   });
 }
 
@@ -2475,10 +2484,10 @@ function openPanel(idx){
 
   // T1-T4
   const tipos=[
-    {cls:'t1',tipo:'Tipo T1',val:p.t1,desc:'Videos / cápsulas'},
-    {cls:'t2',tipo:'Tipo T2',val:p.t2,desc:'Actividades prácticas'},
-    {cls:'t3',tipo:'Tipo T3',val:p.t3,desc:'Evaluaciones / rúbricas'},
-    {cls:'t4',tipo:'Tipo T4',val:p.t4,desc:'Material complementario'},
+    {cls:'t1',tipo:'Tipo T1',val:p.t1,desc:'Videoclase · Video cápsula · Podcast'},
+    {cls:'t2',tipo:'Tipo T2',val:p.t2,desc:'Genially'},
+    {cls:'t3',tipo:'Tipo T3',val:p.t3,desc:'Guía de aprendizaje · Guía de ejercicios'},
+    {cls:'t4',tipo:'Tipo T4',val:p.t4,desc:'Foro · Quiz · Tarea'},
   ];
   document.getElementById('t-grid').innerHTML=tipos.map(t=>`
     <div class="t-card ${t.cls}">
@@ -2935,13 +2944,13 @@ function renderProjectCharts(){
 
   // Gantt de fases (datos estáticos)
   const FASES = [
-    {label:'Preparación',   days:[0,14],  color:'#5a9e74'},
-    {label:'Kick-off',      days:[14,25], color:'#4a8864'},
-    {label:'Co-diseño',     days:[14,46], color:'#c09448'},
-    {label:'QA Planif.',    days:[49,74], color:'#7a88be'},
-    {label:'Producción',    days:[30,95], color:'#3a6898'},
-    {label:'Validación',    days:[105,130],color:'#3a8888'},
-    {label:'Clonación',     days:[132,138],color:'#b05848'},
+    {label:'Preparación',   days:[0,14],  color:'#5a9e74', desc:'Configuración de aulas virtuales, asignación de equipos y validación inicial de planificaciones didácticas.'},
+    {label:'Kick-off',      days:[14,25], color:'#4a8864', desc:'Reunión inicial con docentes: acuerdos de trabajo, entrega de guías y activación del proceso de co-diseño.'},
+    {label:'Co-diseño',     days:[14,46], color:'#c09448', desc:'Diseño instruccional colaborativo: estructura semanal, definición de actividades y recursos por asignatura.'},
+    {label:'QA Planif.',    days:[49,74], color:'#7a88be', desc:'Revisión y validación de planificaciones didácticas por el equipo DEL. Devolución con observaciones.'},
+    {label:'Producción',    days:[30,95], color:'#3a6898', desc:'Producción de recursos T1–T4: videoclases, Genially, guías de aprendizaje, foros y quizzes.'},
+    {label:'Validación',    days:[105,130],color:'#3a8888', desc:'Validación docente de recursos producidos. Ajustes finales y aprobación para carga en aula.'},
+    {label:'Clonación',     days:[132,138],color:'#b05848', desc:'Clonación de asignaturas al aula definitiva 2026-1 y verificación de acceso estudiantil.'},
   ];
   const pStart = new Date(2026,2,2);
   const today  = new Date(); today.setHours(0,0,0,0);
