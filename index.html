@@ -1632,10 +1632,11 @@
         <!-- Gantt de fases -->
         <div class="proj-gantt-panel">
           <div class="proj-panel-title">Fases del Proyecto — Carta Gantt</div>
-          <div style="position:relative;height:200px;width:100%">
-            <canvas id="projGanttChart" style="display:block;width:100%!important"></canvas>
+          <div id="gantt-wrap" style="position:relative;height:200px;width:100%">
+            <canvas id="projGanttChart"></canvas>
           </div>
         </div>
+
         <!-- Avance real vs esperado -->
         <div class="proj-progress-panel">
           <div class="proj-panel-title">Avance Real vs Esperado (%)</div>
@@ -2925,6 +2926,10 @@ function renderProjectCharts(){
   const ganttCtx = document.getElementById('projGanttChart');
   const progCtx  = document.getElementById('projProgressChart');
   if(!ganttCtx || !progCtx) return;
+
+  // Destruir cualquier chart previo (rastreado o no)
+  const eg = Chart.getChart(ganttCtx); if(eg) eg.destroy(); projGanttInst=null;
+  const ep = Chart.getChart(progCtx);  if(ep) ep.destroy(); projProgressInst=null;
 
   // Gantt de fases (datos estáticos)
   const FASES = [
