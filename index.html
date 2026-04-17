@@ -3691,15 +3691,19 @@ function detectChanges(){
   DATA.forEach(d=>{ snap[d.asignatura]={ planif:d.planif, avance:(AVANCE[d.asignatura]||{}).avance||0 }; });
   const prev = hist._snapshot||{};
   const ts   = new Date().toLocaleString('es-CL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  function isDup(list, campo, antes, despues){
+    // Evitar duplicar la misma transición si ya está como primera entrada
+    return list.length>0 && list[0].campo===campo && list[0].antes===antes && list[0].despues===despues;
+  }
   DATA.forEach(d=>{
     const a  = d.asignatura;
     const p  = prev[a]||{};
     if(!hist[a]) hist[a]=[];
-    if(p.planif && p.planif !== d.planif)
-      hist[a].unshift({ts, campo:'Planificación', antes:p.planif, despues:d.planif});
+    if(p.planif && p.planif !== d.planif && !isDup(hist[a],'Planificación',p.planif,d.planif))
+      hist[a].unshift({ts, campo:'Planificación', antes:p.planif, despues:d.planif, asig:a});
     const avNow = (AVANCE[d.asignatura]||{}).avance||0;
-    if(p.avance!=null && p.avance!==avNow && avNow>0)
-      hist[a].unshift({ts, campo:'Avance', antes:p.avance+'%', despues:avNow+'%'});
+    if(p.avance!=null && p.avance!==avNow && avNow>0 && !isDup(hist[a],'Avance',p.avance+'%',avNow+'%'))
+      hist[a].unshift({ts, campo:'Avance', antes:p.avance+'%', despues:avNow+'%', asig:a});
     if(hist[a].length>10) hist[a]=hist[a].slice(0,10);
   });
   hist._snapshot = snap;
@@ -4075,13 +4079,12 @@ function openHitoModal(idx){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('hito-modal-close')?.addEventListener('click',()=>{
-    document.getElementById('hito-modal-overlay').style.display='none';
-  });
-  document.getElementById('hito-modal-overlay')?.addEventListener('click',(e)=>{
-    if(e.target===document.getElementById('hito-modal-overlay'))
-      document.getElementById('hito-modal-overlay').style.display='none';
-  });
+  // Cierre modal hito
+  const hmo = document.getElementById('hito-modal-overlay');
+  const hmc = document.getElementById('hito-modal-close');
+  if(hmc) hmc.addEventListener('click',()=>{ if(hmo) hmo.style.display='none'; });
+  if(hmo) hmo.addEventListener('click',(e)=>{ if(e.target===hmo) hmo.style.display='none'; });
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&hmo) hmo.style.display='none'; });
 });
 
 // Iniciar gráficos cuando Chart.js y el DOM estén listos
