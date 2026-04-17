@@ -2905,7 +2905,7 @@ function abrirModalCorreo(d, esc){
   document.getElementById('mail-modal').style.display='flex';
 }
 
-// mail-modal está definido después del </script>, usar DOMContentLoaded
+// mail-modal está definido después del bloque script, usar DOMContentLoaded
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('mail-modal-close')?.addEventListener('click',()=>{
     document.getElementById('mail-modal').style.display='none';
