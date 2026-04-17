@@ -1632,8 +1632,8 @@
         <!-- Gantt de fases -->
         <div class="proj-gantt-panel">
           <div class="proj-panel-title">Fases del Proyecto — Carta Gantt</div>
-          <div style="position:relative;height:200px">
-            <canvas id="projGanttChart"></canvas>
+          <div style="position:relative;height:200px;width:100%">
+            <canvas id="projGanttChart" style="display:block;width:100%!important"></canvas>
           </div>
         </div>
         <!-- Avance real vs esperado -->
@@ -2922,278 +2922,100 @@ document.getElementById('mail-copy-btn').addEventListener('click',()=>{
 let projGanttInst=null, projProgressInst=null, projDonutInst=null;
 
 function renderProjectCharts(){
-  try { _renderProjectCharts(); } catch(e){ console.error('renderProjectCharts error:',e); }
-}
-function _renderProjectCharts(){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const src  = DATA_ALL.length ? DATA_ALL : DATA;
-  const total = src.length || 1;
+  const ganttCtx = document.getElementById('projGanttChart');
+  const progCtx  = document.getElementById('projProgressChart');
+  if(!ganttCtx || !progCtx) return;
 
-  // Fechas proyecto
-  const pStart = new Date(2026,2,2);   // Mar 2
-  const pEnd   = new Date(2026,6,17);  // Jul 17
-  const pTotal = Math.round((pEnd-pStart)/86400000);
-  const todayPos = Math.min(pTotal, Math.round((today-pStart)/86400000));
-
-  // Sub-text header
-  const dRestantes = Math.max(0, Math.round((pEnd-today)/86400000));
-  const el = document.getElementById('proj-chart-sub');
-  if(el) el.textContent = `Hoy: ${today.toLocaleDateString('es-CL',{day:'numeric',month:'short',year:'numeric'})} · ${dRestantes} días restantes`;
-
-  // ── 1. GANTT HORIZONTAL — fases del proyecto ──
+  // Gantt de fases (datos estáticos)
   const FASES = [
-    {label:'Preparación Inst.',      inicio:new Date(2026,2,2),  fin:new Date(2026,2,16), color:'#5a9e74'},
-    {label:'Kick-off y Alineación',  inicio:new Date(2026,2,16), fin:new Date(2026,2,27), color:'#4a8864'},
-    {label:'Co-diseño Planif.',      inicio:new Date(2026,2,16), fin:new Date(2026,3,17), color:'#c09448'},
-    {label:'QA Planif. (DEL)',       inicio:new Date(2026,3,20), fin:new Date(2026,4,15), color:'#7a88be'},
-    {label:'Producción Recursos',    inicio:new Date(2026,3,1),  fin:new Date(2026,5,5),  color:'#3a6898'},
-    {label:'Validación PPRD',        inicio:new Date(2026,5,15), fin:new Date(2026,6,10), color:'#3a8888'},
-    {label:'Clonación y Habilitac.', inicio:new Date(2026,6,13), fin:new Date(2026,6,17), color:'#b05848'},
+    {label:'Preparación',   days:[0,14],  color:'#5a9e74'},
+    {label:'Kick-off',      days:[14,25], color:'#4a8864'},
+    {label:'Co-diseño',     days:[14,46], color:'#c09448'},
+    {label:'QA Planif.',    days:[49,74], color:'#7a88be'},
+    {label:'Producción',    days:[30,95], color:'#3a6898'},
+    {label:'Validación',    days:[105,130],color:'#3a8888'},
+    {label:'Clonación',     days:[132,138],color:'#b05848'},
   ];
-
-  // Para barras apiladas: [offset transparente, duración de la fase]
-  const ganttLabels = FASES.map(f=>f.label);
-  const ganttOffset = FASES.map(f=>Math.round((f.inicio-pStart)/86400000));
-  const ganttDur    = FASES.map(f=>Math.round((f.fin-f.inicio)/86400000));
-  const ganttColors = FASES.map(f=>f.color);
-  // Estado de cada fase
-  const ganttBorder = FASES.map(f=>{
-    const actF = today >= f.inicio && today <= f.fin;
-    return actF ? 'rgba(26,72,120,.6)' : 'transparent';
-  });
-
-  // Anotación "Hoy" como barra vertical ficticia
-  const todayLine = FASES.map(()=>todayPos);
-  const todayWidth= FASES.map(()=>1);
+  const pStart = new Date(2026,2,2);
+  const today  = new Date(); today.setHours(0,0,0,0);
+  const todayD = Math.round((today-pStart)/86400000);
 
   if(projGanttInst){ projGanttInst.destroy(); projGanttInst=null; }
-  const ctxG = document.getElementById('projGanttChart')?.getContext('2d');
-  if(ctxG){
-    projGanttInst = new Chart(ctxG,{
-      type:'bar',
-      data:{
-        labels: ganttLabels,
-        datasets:[
-          {
-            label:'Fase',
-            data: ganttOffset,
-            backgroundColor:'transparent',
-            borderWidth:0,
-            borderSkipped:false,
-          },
-          {
-            label:'Duración',
-            data: ganttDur,
-            backgroundColor: ganttColors,
-            borderColor: ganttBorder,
-            borderWidth: 2,
-            borderRadius:4,
-            borderSkipped:false,
-          },
-          {
-            label:'Hoy',
-            data: todayLine,
-            backgroundColor:'rgba(200,160,144,.9)',
-            borderWidth:0,
-            borderRadius:0,
-            barThickness:3,
-            borderSkipped:false,
-          },
-        ]
-      },
-      options:{
-        indexAxis:'y',
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{
-          legend:{display:false},
-          tooltip:{
-            callbacks:{
-              label(ctx){
-                if(ctx.datasetIndex===0) return null;
-                if(ctx.datasetIndex===2) return '📍 Hoy (día '+todayPos+')';
-                const f=FASES[ctx.dataIndex];
-                const ini=f.inicio.toLocaleDateString('es-CL',{day:'numeric',month:'short'});
-                const fin=f.fin.toLocaleDateString('es-CL',{day:'numeric',month:'short'});
-                return `${ini} → ${fin} (${ctx.raw}d)`;
-              }
-            }
-          }
-        },
-        scales:{
-          x:{
-            stacked:true,
-            max: pTotal,
-            ticks:{
-              callback(v){
-                // Mostrar solo meses
-                const d = new Date(pStart.getTime()+v*86400000);
-                if(d.getDate()<=3) return d.toLocaleDateString('es-CL',{month:'short'});
-                return null;
-              },
-              maxTicksLimit:6,
-              color:'rgba(18,16,28,.45)',
-              font:{size:9}
-            },
-            grid:{color:'rgba(0,0,0,.05)'},
-            border:{color:'rgba(0,0,0,.08)'}
-          },
-          y:{
-            stacked:true,
-            ticks:{color:'rgba(18,16,28,.6)',font:{size:10}},
-            grid:{display:false},
-            border:{color:'transparent'}
-          }
-        },
-        animation:{duration:600}
+  projGanttInst = new Chart(ganttCtx, {
+    type:'bar',
+    data:{
+      labels: FASES.map(f=>f.label),
+      datasets:[
+        {data:FASES.map(f=>f.days[0]), backgroundColor:'transparent', borderWidth:0, borderSkipped:false},
+        {data:FASES.map(f=>f.days[1]-f.days[0]), backgroundColor:FASES.map(f=>f.color), borderRadius:4, borderSkipped:false},
+        {data:FASES.map(()=>todayD), backgroundColor:'rgba(200,100,80,.7)', barThickness:2, borderSkipped:false},
+      ]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{stacked:true, ticks:{color:'rgba(18,16,28,.5)',font:{size:9}}, grid:{color:'rgba(0,0,0,.05)'}},
+        y:{stacked:true, ticks:{color:'rgba(18,16,28,.6)',font:{size:10}}, grid:{display:false}}
       }
-    });
-  }
+    }
+  });
 
-  // ── 2. LÍNEA avance real vs esperado ──
-  // Puntos: cada semana de la producción (S0 a S17-S18)
-  const lineLabels = ['Inicio', ...GANTT_HITOS.map(h=>h.label)];
-  const espPcts    = [0, ...GANTT_HITOS.map(h=>Math.round(h.weeksDone/18*100))];
-
-  // Avance real ponderado actual (un solo punto: hoy)
+  // Avance real vs esperado
+  const src = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  const total = src.length || 1;
   let validated=0, inProd=0;
   src.forEach(d=>{
-    const av=(DATA_ALL.length?AVANCE_ALL:AVANCE)[d.asignatura]||{};
-    const hv=Object.values(av.hitos||{});
-    if(av.avance>=100||hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||!h)) validated++;
+    const av = avSrc[d.asignatura]||{};
+    const hv = Object.values(av.hitos||{});
+    if(av.avance>=100 || hv.every(h=>!h||h==='Validada'||h==='No aplica'||h==='—')) validated++;
     else if(av.avance>0) inProd++;
   });
-  const pctReal = Math.round((validated+(inProd*.5))/total*100);
-  // Posición del punto real: índice del último hito vencido
-  const currentHitoIdx = GANTT_HITOS.filter(h=>today>=h.fecha).length;
-  const realData = lineLabels.map((_,i)=>i===currentHitoIdx+1?pctReal:null);
-  // Línea de avance esperado hasta hoy
-  const espActual = espPcts.map((v,i)=>{
-    const hitoDate = i===0 ? pStart : GANTT_HITOS[i-1]?.fecha;
-    return hitoDate && today >= hitoDate ? v : null;
-  });
+  const pctReal = Math.round((validated + inProd*0.5) / total * 100);
+
+  const semLabels = ['Inicio','S0','S1-S2','S3-S4','S5-S6','S7-S8','S9-S10','S11-S12','S13-S14','S15-S16','S17-S18'];
+  const espData   = [0,11,22,33,44,55,66,77,88,94,100];
+  const hitoFechas= [null,new Date(2026,2,31),new Date(2026,3,12),new Date(2026,3,19),new Date(2026,3,26),new Date(2026,4,3),new Date(2026,4,10),new Date(2026,4,17),new Date(2026,4,24),new Date(2026,4,31),new Date(2026,5,7)];
+  const currentIdx = hitoFechas.filter(f=>f&&today>=f).length;
+  const realData = semLabels.map((_,i)=> i===currentIdx ? pctReal : null);
 
   if(projProgressInst){ projProgressInst.destroy(); projProgressInst=null; }
-  const ctxP = document.getElementById('projProgressChart')?.getContext('2d');
-  if(ctxP){
-    projProgressInst = new Chart(ctxP,{
-      type:'line',
-      data:{
-        labels: lineLabels,
-        datasets:[
-          {
-            label:'Avance esperado',
-            data: espPcts,
-            borderColor:'rgba(0,0,0,.2)',
-            backgroundColor:'rgba(26,72,120,.04)',
-            fill:true,
-            borderDash:[5,4],
-            pointRadius:3,
-            pointBackgroundColor:'rgba(0,0,0,.25)',
-            tension:0.3,
-          },
-          {
-            label:'Avance real',
-            data: realData,
-            borderColor:'rgba(130,120,190,.9)',
-            backgroundColor:'rgba(130,120,190,.15)',
-            fill:true,
-            pointRadius:8,
-            pointBackgroundColor:'rgba(130,120,190,1)',
-            pointBorderColor:'#fff',
-            pointBorderWidth:2,
-            showLine:false,
-          }
-        ]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{
-          legend:{display:false},
-          tooltip:{
-            callbacks:{
-              label(ctx){
-                return `${ctx.dataset.label}: ${ctx.raw}%`;
-              }
-            }
-          }
-        },
-        scales:{
-          x:{
-            ticks:{color:'rgba(18,16,28,.45)',font:{size:9},maxRotation:45},
-            grid:{color:'rgba(0,0,0,.05)'},
-            border:{color:'rgba(0,0,0,.08)'}
-          },
-          y:{
-            min:0,max:100,
-            ticks:{color:'rgba(18,16,28,.45)',font:{size:9},callback:v=>v+'%'},
-            grid:{color:'rgba(0,0,0,.05)'},
-            border:{color:'rgba(0,0,0,.08)'}
-          }
-        },
-        animation:{duration:500}
+  projProgressInst = new Chart(progCtx, {
+    type:'line',
+    data:{
+      labels: semLabels,
+      datasets:[
+        {label:'Esperado', data:espData, borderColor:'rgba(0,0,0,.25)', borderDash:[5,4], pointRadius:2, tension:0.3, fill:false},
+        {label:'Real',     data:realData, borderColor:'rgba(130,120,190,1)', backgroundColor:'rgba(130,120,190,.15)', pointRadius:8, pointBackgroundColor:'rgba(130,120,190,1)', pointBorderColor:'#fff', pointBorderWidth:2, showLine:false, fill:false},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'rgba(18,16,28,.5)',font:{size:9}}, grid:{color:'rgba(0,0,0,.05)'}},
+        y:{min:0,max:100, ticks:{color:'rgba(18,16,28,.5)',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(0,0,0,.05)'}}
       }
-    });
-  }
-
-  // ── 3. DONUT estados planificación ──
-  const planifCounts={};
-  src.forEach(d=>{
-    const p=d.planif||'Sin estado';
-    planifCounts[p]=(planifCounts[p]||0)+1;
+    }
   });
-  const PLANIF_COLORS={
-    'Cargada en aula':'rgba(176,184,204,.85)',
-    'Validada':'rgba(168,196,160,.85)',
-    'DEL 2° Instancia':'rgba(144,188,180,.8)',
-    'Enviada a validación DEL':'rgba(154,184,204,.8)',
-    'En construcción':'rgba(212,184,120,.75)',
-    'No inicia':'rgba(107,114,128,.6)',
-    'No aplica':'rgba(107,114,128,.35)',
-  };
-  const pLabels = Object.keys(planifCounts);
-  const pData   = pLabels.map(k=>planifCounts[k]);
-  const pColors = pLabels.map(k=>PLANIF_COLORS[k]||'rgba(255,255,255,.2)');
 
-  // Centro del donut: total enviadas+
-  const enviadas = (planifCounts['Enviada a validación DEL']||0)
-                 + (planifCounts['DEL 2° Instancia']||0)
-                 + (planifCounts['Validada']||0)
-                 + (planifCounts['Cargada en aula']||0);
-  const dcEl = document.getElementById('proj-donut-center');
-  if(dcEl) dcEl.innerHTML = `<div class="proj-donut-big">${enviadas}</div><div class="proj-donut-lbl">enviadas</div>`;
-
+  // Donut planificaciones
+  const planifCounts={};
+  src.forEach(d=>{ const p=d.planif||'Sin estado'; planifCounts[p]=(planifCounts[p]||0)+1; });
+  const PCOLS={'Cargada en aula':'#b0b8cc','Validada':'#90c4a0','DEL 2° Instancia':'#90bbb4','Enviada a validación DEL':'#9ab4cc','En construcción':'#d4b878','No inicia':'#aaa','No aplica':'#ccc'};
+  const pL=Object.keys(planifCounts), pD=pL.map(k=>planifCounts[k]), pC=pL.map(k=>PCOLS[k]||'#ddd');
+  const enviadas=(planifCounts['Enviada a validación DEL']||0)+(planifCounts['DEL 2° Instancia']||0)+(planifCounts['Validada']||0)+(planifCounts['Cargada en aula']||0);
+  const dcEl=document.getElementById('proj-donut-center');
+  if(dcEl) dcEl.innerHTML=`<div class="proj-donut-big">${enviadas}</div><div class="proj-donut-lbl">enviadas</div>`;
+  const legEl=document.getElementById('proj-planif-legend');
+  if(legEl) legEl.innerHTML=pL.map((l,i)=>`<div class="proj-planif-row"><span class="proj-planif-dot" style="background:${pC[i]}"></span><span class="proj-planif-lbl">${l}</span><span class="proj-planif-cnt">${pD[i]}</span></div>`).join('');
   if(projDonutInst){ projDonutInst.destroy(); projDonutInst=null; }
-  const ctxD2 = document.getElementById('projPlanifDonut')?.getContext('2d');
-  if(ctxD2){
-    projDonutInst = new Chart(ctxD2,{
-      type:'doughnut',
-      data:{
-        labels:pLabels,
-        datasets:[{data:pData,backgroundColor:pColors,borderWidth:2,borderColor:'#f8f4ec',hoverOffset:4}]
-      },
-      options:{
-        cutout:'68%',
-        plugins:{
-          legend:{display:false},
-          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}`}}
-        },
-        animation:{duration:400}
-      }
-    });
-  }
+  const ctxD=document.getElementById('projPlanifDonut')?.getContext('2d');
+  if(ctxD) projDonutInst=new Chart(ctxD,{type:'doughnut',data:{labels:pL,datasets:[{data:pD,backgroundColor:pC,borderWidth:2,borderColor:'#f8f4ec'}]},options:{cutout:'68%',plugins:{legend:{display:false}},animation:{duration:400}}});
 
-  // Leyenda planif
-  const legEl = document.getElementById('proj-planif-legend');
-  if(legEl){
-    legEl.innerHTML = pLabels.map((l,i)=>`
-      <div class="proj-planif-row">
-        <span class="proj-planif-dot" style="background:${pColors[i]}"></span>
-        <span class="proj-planif-lbl">${l}</span>
-        <span class="proj-planif-cnt">${pData[i]}</span>
-      </div>`).join('');
-  }
+  const sub=document.getElementById('proj-chart-sub');
+  if(sub){const d=Math.max(0,Math.round((new Date(2026,6,17)-today)/86400000));sub.textContent=`Hoy: ${today.toLocaleDateString('es-CL',{day:'numeric',month:'short',year:'numeric'})} · ${d} días restantes`;}
 }
 
 // ── Plazos de entrega de planificación a DEL por grupo de facultades ──────────
