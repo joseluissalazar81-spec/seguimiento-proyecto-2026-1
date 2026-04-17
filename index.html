@@ -4182,5 +4182,22 @@ document.getElementById('mail-open-btn').addEventListener('click',()=>{
   <!-- Derecha: vacío (balance visual) -->
   <div></div>
 </footer>
+
+<script>
+// Gráficos Gantt/Progreso: datos estáticos, no dependen de Google Sheets.
+// Se inicializan apenas el DOM y Chart.js estén listos, sin esperar red.
+window.addEventListener('load', function(){
+  if(typeof Chart === 'undefined'){
+    console.error('Chart.js no cargó desde ningún CDN');
+    return;
+  }
+  // Pequeño delay para asegurar layout pintado
+  setTimeout(function(){
+    if(!projGanttInst && !projProgressInst){
+      renderProjectCharts();
+    }
+  }, 150);
+});
+</script>
 </body>
 </html>
