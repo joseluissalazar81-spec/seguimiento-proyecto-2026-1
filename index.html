@@ -1101,12 +1101,12 @@
       display:grid; gap:2px; margin-bottom:4px;
     }
     .exec-block-cell {
-      border-radius:6px; padding:6px 4px 5px;
+      border-radius:6px; padding:7px 5px 6px;
       display:flex; flex-direction:column; align-items:center; gap:2px;
-      cursor:default; transition:filter .2s; border:1px solid transparent;
+      cursor:pointer; transition:filter .15s,transform .15s,box-shadow .15s; border:1px solid transparent;
       min-width:0; overflow:hidden; position:relative;
     }
-    .exec-block-cell:hover {filter:brightness(1.15);}
+    .exec-block-cell:hover {filter:brightness(1.2);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.18);}
     .exec-block-cell.completo  {background:rgba(168,196,160,.18); border-color:rgba(168,196,160,.35);}
     .exec-block-cell.atrasado  {background:rgba(200,160,144,.18); border-color:rgba(200,160,144,.35);}
     .exec-block-cell.actual    {background:rgba(154,184,204,.22);  border-color:rgba(154,184,204,.5); box-shadow:0 0 12px rgba(154,184,204,.25);}
@@ -1417,6 +1417,43 @@
     .panel-hdr{ background:linear-gradient(135deg,rgba(26,72,120,.08) 0%,rgba(24,104,104,.05) 100%) !important; border-bottom:1px solid rgba(0,0,0,.08) !important; }
     #sync-status{ color:var(--text-muted) !important; }
     #sync-btn svg{ stroke:var(--text-muted) !important; }
+
+    /* ── MODAL HITO ── */
+    #hito-modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(20,30,45,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center}
+    #hito-modal{background:#fff;border-radius:14px;width:480px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(20,30,45,.35)}
+    .hm-header{background:linear-gradient(135deg,#1e2d3d,#2d5a74);padding:18px 22px 16px;color:#fff}
+    .hm-title{font-size:15px;font-weight:800;margin-bottom:3px}
+    .hm-meta{font-size:11px;opacity:.7;display:flex;gap:12px;align-items:center}
+    .hm-status{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
+    .hm-status.ok{background:rgba(74,140,106,.2);color:#4a8c6a;border:1px solid rgba(74,140,106,.3)}
+    .hm-status.warn{background:rgba(176,48,48,.15);color:#b03030;border:1px solid rgba(176,48,48,.25)}
+    .hm-status.curr{background:rgba(59,110,140,.2);color:#3b6e8c;border:1px solid rgba(59,110,140,.3)}
+    .hm-status.next{background:rgba(96,104,112,.15);color:#606870;border:1px solid rgba(96,104,112,.2)}
+    .hm-body{padding:18px 22px;overflow-y:auto;flex:1}
+    .hm-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .hm-bar-wrap{flex:1;height:10px;background:rgba(59,110,140,.12);border-radius:5px;overflow:hidden}
+    .hm-bar{height:100%;border-radius:5px;transition:width .4s}
+    .hm-pct{font-size:14px;font-weight:800;font-family:"DM Mono",monospace;color:#1e2d3d;min-width:40px;text-align:right}
+    .hm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+    .hm-stat{border-radius:8px;padding:10px 8px;text-align:center;border:1px solid}
+    .hm-stat-n{font-size:20px;font-weight:800;font-family:"DM Mono",monospace}
+    .hm-stat-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(18,16,28,.45);margin-top:2px}
+    .hm-stat.s-val{background:rgba(74,140,106,.08);border-color:rgba(74,140,106,.25)}.hm-stat.s-val .hm-stat-n{color:#3d7a5a}
+    .hm-stat.s-prod{background:rgba(59,110,140,.08);border-color:rgba(59,110,140,.22)}.hm-stat.s-prod .hm-stat-n{color:#3b6e8c}
+    .hm-stat.s-sin{background:rgba(96,104,112,.07);border-color:rgba(96,104,112,.18)}.hm-stat.s-sin .hm-stat-n{color:#606870}
+    .hm-stat.s-otro{background:rgba(212,148,58,.08);border-color:rgba(212,148,58,.22)}.hm-stat.s-otro .hm-stat-n{color:#b07828}
+    .hm-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#3b6e8c;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(59,110,140,.15)}
+    .hm-risk-list{max-height:180px;overflow-y:auto}
+    .hm-risk-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05);gap:8px;font-size:12px}
+    .hm-risk-row:last-child{border-bottom:none}
+    .hm-risk-name{flex:1;font-weight:600;color:#1e2d3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hm-risk-fac{font-size:10px;color:rgba(18,16,28,.45);white-space:nowrap}
+    .hm-risk-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}
+    .hm-risk-badge.en-const{background:rgba(59,110,140,.12);color:#3b6e8c}
+    .hm-risk-badge.sin{background:rgba(96,104,112,.1);color:#606870}
+    .hm-risk-badge.otro{background:rgba(212,148,58,.12);color:#b07828}
+    #hito-modal-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:50%;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;transition:all .2s;flex-shrink:0}
+    #hito-modal-close:hover{background:rgba(255,255,255,.25)}
   </style>
 </head>
 <body>
@@ -3202,9 +3239,10 @@ function renderExecutiveHero(){
       const pinHTML = isActual
         ? `<div class="exec-block-today-flag">📍 HOY</div>`
         : '';
-      return `<div class="exec-block-cell ${cls}" title="${h.hito} — Entrega: ${fmtD} — ${validH}/${total} validadas (${pctH}%)">
+      const blockSem = cls==='completo'?'✅':cls==='atrasado'?'⚠️':cls==='actual'?'🔄':'○';
+      return `<div class="exec-block-cell ${cls}" onclick="openHitoModal(${i})" title="Ver detalle ${h.label}">
         ${pinHTML}
-        <div class="exec-block-lbl">${h.label}</div>
+        <div class="exec-block-lbl">${blockSem} ${h.label}</div>
         <div class="exec-block-fecha">${fmtD}</div>
         <div class="exec-block-pct">${passed?pctH+'%':'—'}</div>
       </div>`;
@@ -3975,6 +4013,77 @@ document.getElementById('mail-open-btn').addEventListener('click',()=>{
   window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
 });
 
+// ── MODAL DETALLE DE HITO ────────────────────────────────────────────────────
+function openHitoModal(idx){
+  const h = GANTT_HITOS[idx];
+  const src   = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  const total = src.length || 1;
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let validadas=0, enConst=0, sinInic=0, otras=0;
+  const pendientes=[];
+  src.forEach(d=>{
+    const av=avSrc[d.asignatura]||{};
+    const est=(av.hitos&&av.hitos[h.key])||'';
+    if(est==='Validada') validadas++;
+    else if(est==='En construcción'){enConst++;pendientes.push({n:d.asignatura,f:d.facultad,e:'En construcción'});}
+    else if(!est||est==='—'||est===''){sinInic++;pendientes.push({n:d.asignatura,f:d.facultad,e:'Sin iniciar'});}
+    else{otras++;pendientes.push({n:d.asignatura,f:d.facultad,e:est});}
+  });
+  const pct=Math.round(validadas/total*100);
+  const passed=today>h.fecha;
+  const isCurr=!passed&&(idx===0||today>=GANTT_HITOS[idx-1].fecha);
+  let statusCls,statusTxt;
+  if(passed&&pct>=70){statusCls='ok';statusTxt='✅ Completado';}
+  else if(passed){statusCls='warn';statusTxt='⚠️ Con retraso';}
+  else if(isCurr){statusCls='curr';statusTxt='🔄 En curso';}
+  else{statusCls='next';statusTxt='⏳ Próximo';}
+
+  const fmt=d=>d.toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('hm-title').textContent=h.label+' · '+h.hito;
+  document.getElementById('hm-date').textContent='Entrega: '+fmt(h.fecha);
+  const sb=document.getElementById('hm-statusbadge');
+  sb.textContent=statusTxt; sb.className='hm-status '+statusCls;
+  const bar=document.getElementById('hm-bar');
+  bar.style.width=pct+'%';
+  bar.style.background=pct>=70?'#4a8c6a':pct>=40?'#d4943a':'#b03030';
+  document.getElementById('hm-pct').textContent=pct+'%';
+  document.getElementById('hm-stats').innerHTML=
+    `<div class="hm-stat s-val"><div class="hm-stat-n">${validadas}</div><div class="hm-stat-l">Validadas</div></div>`+
+    `<div class="hm-stat s-prod"><div class="hm-stat-n">${enConst}</div><div class="hm-stat-l">En const.</div></div>`+
+    `<div class="hm-stat s-sin"><div class="hm-stat-n">${sinInic}</div><div class="hm-stat-l">Sin iniciar</div></div>`+
+    `<div class="hm-stat s-otro"><div class="hm-stat-n">${otras}</div><div class="hm-stat-l">Otro estado</div></div>`;
+
+  const riskSec=document.getElementById('hm-risk-section');
+  const riskList=document.getElementById('hm-risk-list');
+  if(pendientes.length>0){
+    riskSec.style.display='block';
+    document.getElementById('hm-risk-title').textContent=
+      pendientes.length+' asignatura'+(pendientes.length>1?'s':'')+' pendiente'+(pendientes.length>1?'s':'');
+    const clsMap={'En construcción':'en-const','Sin iniciar':'sin'};
+    riskList.innerHTML=pendientes.map(p=>
+      `<div class="hm-risk-row">
+        <div class="hm-risk-name">${p.n}</div>
+        <div class="hm-risk-fac">${p.f}</div>
+        <div class="hm-risk-badge ${clsMap[p.e]||'otro'}">${p.e}</div>
+      </div>`).join('');
+  } else {
+    riskSec.style.display='none';
+  }
+  document.getElementById('hito-modal-overlay').style.display='flex';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('hito-modal-close')?.addEventListener('click',()=>{
+    document.getElementById('hito-modal-overlay').style.display='none';
+  });
+  document.getElementById('hito-modal-overlay')?.addEventListener('click',(e)=>{
+    if(e.target===document.getElementById('hito-modal-overlay'))
+      document.getElementById('hito-modal-overlay').style.display='none';
+  });
+});
+
 // Iniciar gráficos cuando Chart.js y el DOM estén listos
 window.addEventListener('load', function(){
   setTimeout(function(){
@@ -4011,6 +4120,36 @@ window.addEventListener('load', function(){
       <div class="mail-actions">
         <button class="mail-copy-btn" id="mail-copy-btn">Copiar texto</button>
         <button class="mail-open-btn" id="mail-open-btn">Abrir en cliente de correo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL HITO -->
+<div id="hito-modal-overlay">
+  <div id="hito-modal">
+    <div class="hm-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div class="hm-title" id="hm-title">—</div>
+          <div class="hm-meta">
+            <span id="hm-date">—</span>
+            <span id="hm-statusbadge" class="hm-status">—</span>
+          </div>
+        </div>
+        <button id="hito-modal-close">&#x2715;</button>
+      </div>
+    </div>
+    <div class="hm-body">
+      <div class="hm-progress-row">
+        <div class="hm-bar-wrap"><div class="hm-bar" id="hm-bar"></div></div>
+        <div class="hm-pct" id="hm-pct">—</div>
+      </div>
+      <div class="hm-stats" id="hm-stats"></div>
+      <div id="hm-risk-section">
+        <div class="hm-section-title" id="hm-risk-title">Asignaturas pendientes</div>
+        <div class="hm-risk-list" id="hm-risk-list"></div>
       </div>
     </div>
   </div>
