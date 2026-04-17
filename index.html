@@ -2905,18 +2905,21 @@ function abrirModalCorreo(d, esc){
   document.getElementById('mail-modal').style.display='flex';
 }
 
-document.getElementById('mail-modal-close').addEventListener('click',()=>{
-  document.getElementById('mail-modal').style.display='none';
-});
-document.getElementById('mail-modal').addEventListener('click',(e)=>{
-  if(e.target===document.getElementById('mail-modal'))
+// mail-modal está definido después del </script>, usar DOMContentLoaded
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('mail-modal-close')?.addEventListener('click',()=>{
     document.getElementById('mail-modal').style.display='none';
-});
-document.getElementById('mail-copy-btn').addEventListener('click',()=>{
-  const txt = `Para: ${document.getElementById('mail-to').value}\nCC: ${document.getElementById('mail-cc').value}\nAsunto: ${document.getElementById('mail-subject').value}\n\n${document.getElementById('mail-body').value}`;
-  navigator.clipboard.writeText(txt).then(()=>{
-    const btn = document.getElementById('mail-copy-btn');
-    btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
+  });
+  document.getElementById('mail-modal')?.addEventListener('click',(e)=>{
+    if(e.target===document.getElementById('mail-modal'))
+      document.getElementById('mail-modal').style.display='none';
+  });
+  document.getElementById('mail-copy-btn')?.addEventListener('click',()=>{
+    const txt = `Para: ${document.getElementById('mail-to').value}\nCC: ${document.getElementById('mail-cc').value}\nAsunto: ${document.getElementById('mail-subject').value}\n\n${document.getElementById('mail-body').value}`;
+    navigator.clipboard.writeText(txt).then(()=>{
+      const btn = document.getElementById('mail-copy-btn');
+      btn.textContent='¡Copiado!'; setTimeout(()=>btn.textContent='Copiar texto', 2000);
+    });
   });
 });
 // ══ GRÁFICO GENERAL DEL PROYECTO ════════════════════════════════════════════════
@@ -3964,6 +3967,13 @@ document.getElementById('mail-open-btn').addEventListener('click',()=>{
   window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
 });
 
+// Iniciar gráficos cuando Chart.js y el DOM estén listos
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(!projGanttInst && !projProgressInst) renderProjectCharts();
+  }, 200);
+});
+
 </script>
 
 <!-- MODAL CORREO ESCALAMIENTO -->
@@ -4027,21 +4037,5 @@ document.getElementById('mail-open-btn').addEventListener('click',()=>{
   <div></div>
 </footer>
 
-<script>
-// Gráficos Gantt/Progreso: datos estáticos, no dependen de Google Sheets.
-// Se inicializan apenas el DOM y Chart.js estén listos, sin esperar red.
-window.addEventListener('load', function(){
-  if(typeof Chart === 'undefined'){
-    console.error('Chart.js no cargó desde ningún CDN');
-    return;
-  }
-  // Pequeño delay para asegurar layout pintado
-  setTimeout(function(){
-    if(!projGanttInst && !projProgressInst){
-      renderProjectCharts();
-    }
-  }, 150);
-});
-</script>
 </body>
 </html>
