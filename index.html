@@ -292,7 +292,7 @@
     #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:300}
     #panel{
       position:fixed;top:0;right:0;width:500px;height:100vh;
-      background:#ffffff;
+      background:#edf1f6;
       backdrop-filter:blur(20px) saturate(180%);
       -webkit-backdrop-filter:blur(20px) saturate(180%);
       border-left:1px solid var(--borde2);
@@ -304,10 +304,10 @@
     #overlay.open{display:block}
 
     .panel-header{
-      background:linear-gradient(135deg,rgba(130,120,190,.2) 0%,rgba(6,182,212,.12) 100%);
+      background:linear-gradient(135deg,#243b4a 0%,#2d5a74 100%);
       padding:18px 22px 16px;
       flex-shrink:0;position:relative;overflow:hidden;
-      border-bottom:1px solid var(--borde2);
+      border-bottom:1px solid rgba(0,0,0,.15);
     }
     .panel-header::before{
       content:'';position:absolute;right:-60px;top:-60px;
@@ -349,15 +349,16 @@
     /* ── Sección título (panel) ── */
     .ps-title{
       font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-      color:var(--az);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+      color:#2d5a74;margin-bottom:12px;display:flex;align-items:center;gap:8px;
     }
     .ps-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(176,184,204,.3),transparent)}
     .panel-section{
       margin-bottom:24px;
-      background:var(--surface);
-      border:1px solid var(--borde);
+      background:#ffffff;
+      border:1px solid rgba(59,110,140,.18);
       border-radius:var(--radius);
       padding:16px;
+      box-shadow:0 1px 4px rgba(30,45,61,.07);
     }
 
     /* ── DONA ── */
@@ -375,11 +376,11 @@
     .rc:hover{transform:translateY(-2px)}
     .rc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px}
     .rc-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
-    .rc0{background:rgba(176,184,204,.12);border-color:rgba(176,184,204,.25)}.rc0 .rc-val{color:var(--az)}
-    .rc1{background:rgba(168,196,160,.12);border-color:rgba(168,196,160,.25)}.rc1 .rc-val{color:var(--ve)}
-    .rc2{background:rgba(212,184,120,.12);border-color:rgba(212,184,120,.25)}.rc2 .rc-val{color:var(--am)}
-    .rc3{background:rgba(176,168,204,.12);border-color:rgba(176,168,204,.25)}.rc3 .rc-val{color:#c4bcd8}
-    .rc4{background:rgba(144,188,180,.12);border-color:rgba(144,188,180,.25)}.rc4 .rc-val{color:var(--tl2)}
+    .rc0{background:rgba(59,110,140,.10);border-color:rgba(59,110,140,.28)}.rc0 .rc-val{color:var(--az)}
+    .rc1{background:rgba(74,140,106,.11);border-color:rgba(74,140,106,.30)}.rc1 .rc-val{color:var(--ve)}
+    .rc2{background:rgba(212,148,58,.12);border-color:rgba(212,148,58,.30)}.rc2 .rc-val{color:var(--am)}
+    .rc3{background:rgba(130,100,180,.10);border-color:rgba(130,100,180,.28)}.rc3 .rc-val{color:#8264b4}
+    .rc4{background:rgba(74,124,94,.11);border-color:rgba(74,124,94,.30)}.rc4 .rc-val{color:var(--tl2)}
 
     /* ── TABLA HITOS ── */
     .hitos-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -415,13 +416,14 @@
     /* ── DISTRIBUCIÓN HORAS ── */
     .horas-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
     .hora-card{
-      background:var(--surface2);border:1px solid var(--borde);
+      background:#ffffff;border:1px solid rgba(59,110,140,.18);
       border-radius:var(--radius-sm);padding:12px 14px;
+      box-shadow:0 1px 3px rgba(30,45,61,.07);
     }
     .hora-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:2px}
     .hora-val{font-size:22px;font-weight:700;color:var(--az);font-family:'DM Mono',monospace}
     .hora-unit{font-size:12px;color:var(--text-muted);font-weight:400}
-    .horas-bar{height:8px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.06);display:flex}
+    .horas-bar{height:8px;border-radius:4px;overflow:hidden;background:rgba(30,45,61,.10);display:flex}
     .hb-pres{background:var(--grad-purple);transition:width .5s cubic-bezier(.4,0,.2,1)}
     .hb-asyn{background:var(--grad-amber);transition:width .5s cubic-bezier(.4,0,.2,1)}
     .horas-legend{display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--text-muted)}
@@ -2428,7 +2430,7 @@ function openPanel(idx){
   if(donaInstance){donaInstance.destroy();donaInstance=null}
   const donaCtx=document.getElementById('donaChart').getContext('2d');
   const donaData=[p.sc,p.di,p.vd,p.dm,p.qa,p.ter];
-  const donaColors=['#c5d2e8','#90d4a8','#e8c96a','#dbb8f0','#9ecff5','#27A06E'];
+  const donaColors=['#7ba7c4','#5aad82','#d4943a','#9b72cf','#5ba8d4','#2d8a5e'];
   donaInstance=new Chart(donaCtx,{
     type:'doughnut',
     data:{datasets:[{data:donaData,backgroundColor:donaColors,borderWidth:2,borderColor:'#fff',hoverOffset:4}]},
