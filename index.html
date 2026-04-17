@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>if(typeof Chart==='undefined'){document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/scr'+'ipt>');}</script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -2573,6 +2574,9 @@ document.getElementById('search').addEventListener('input',e=>{
     loadDashboardData(),
     loadBenchData(),
   ]);
+  // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
+  requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
+
   if(ok){
     renderFacPills();
     renderTeamPills();
@@ -2589,7 +2593,7 @@ document.getElementById('search').addEventListener('input',e=>{
     renderGlobalSemaforo();
     // Executive hero — visible inmediatamente
     renderExecutiveHero();
-    // Esperar un frame para que el layout esté pintado antes de crear charts
+    // Re-renderizar con datos reales una vez cargados
     requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
     // Guardar snapshot tendencia
     const src2=DATA_ALL.length?DATA_ALL:DATA; const avS2=DATA_ALL.length?AVANCE_ALL:AVANCE;
