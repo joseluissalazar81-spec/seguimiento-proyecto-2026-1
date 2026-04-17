@@ -1454,6 +1454,33 @@
     .hm-risk-badge.otro{background:rgba(212,148,58,.12);color:#b07828}
     #hito-modal-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:50%;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;transition:all .2s;flex-shrink:0}
     #hito-modal-close:hover{background:rgba(255,255,255,.25)}
+
+    /* ── DNE MODAL ── */
+    #dne-modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(20,30,45,.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center}
+    #dne-modal{background:#fff;border-radius:14px;width:600px;max-width:96vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(20,30,45,.3)}
+    .dne-modal-hdr{background:linear-gradient(135deg,#1e2d3d,#2d5a74);padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+    .dne-modal-hdr-title{font-size:14px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+    #dne-modal-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:50%;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0;transition:background .2s}
+    #dne-modal-close:hover{background:rgba(255,255,255,.28)}
+    .dne-modal-body{padding:16px 20px;overflow-y:auto}
+    .dne-table{width:100%;border-collapse:collapse;font-size:12px}
+    .dne-table th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#3b6e8c;padding:7px 10px;border-bottom:2px solid rgba(59,110,140,.15);text-align:left;white-space:nowrap;background:#f8fafc}
+    .dne-table td{padding:9px 10px;border-bottom:1px solid rgba(0,0,0,.05);vertical-align:middle}
+    .dne-table tr:last-child td{border-bottom:none}
+    .dne-table tr:hover td{background:rgba(59,110,140,.04)}
+    .dne-fac-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap}
+    .dne-name{font-weight:600;color:#1e2d3d}
+    .dne-mail-link{color:#3b6e8c;text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:11px}
+    .dne-mail-link:hover{text-decoration:underline}
+    /* DNE card en panel lateral */
+    .dne-card{display:flex;align-items:center;gap:12px;padding:4px 0}
+    .dne-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3b6e8c,#2d5a74);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+    .dne-info{flex:1;min-width:0}
+    .dne-info-name{font-size:12px;font-weight:700;color:#1e2d3d}
+    .dne-info-prog{font-size:10px;color:rgba(18,16,28,.45);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* Header DNE button */
+    #dne-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92);cursor:pointer;font-family:inherit;transition:background .15s}
+    #dne-btn:hover{background:rgba(255,255,255,.2)}
   </style>
 </head>
 <body>
@@ -1463,6 +1490,11 @@
     <div class="logo-text" style="font-size:13px;letter-spacing:.3px">UNIVERSIDAD SANTO TOMÁS</div>
     <div class="logo-sub">Seguimiento Proyecto e-Learning UST 2026-1</div>
   </div>
+  <div class="header-sep"></div>
+  <button id="dne-btn" title="Directores de Escuela — contactos DNE">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Contactos DNE
+  </button>
   <div class="header-sep"></div>
   <button id="overview-toggle" title="Ver panel de estado general" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.92);cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -1846,6 +1878,12 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- DNE -->
+    <div class="panel-section" id="p-dne-section" style="display:none">
+      <div class="ps-title">Director/a de Escuela (DNE)</div>
+      <div id="p-dne-card"></div>
     </div>
 
     <!-- REVISIÓN DEL -->
@@ -2549,6 +2587,7 @@ function openPanel(idx){
 
   // REVISIÓN DEL
   renderDelReview(d);
+  renderDneCard(d.asignatura);
 
   // ESCALAMIENTO
   renderEscalamiento(d);
@@ -2967,6 +3006,64 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
 });
+
+// ── DIRECTORES DE ESCUELA (DNE) ──────────────────────────────────────────────
+const DNE_DATA = [
+  {facultad:'Recursos Naturales',  escuela:'Agronomía',             programa:'Agronomía PCE',                    nombre:'Álvaro Reyes',     mail:'areyes@santotomas.cl'},
+  {facultad:'Ciencias Sociales',   escuela:'Trabajo Social',        programa:'Licenciatura en Trabajo Social',   nombre:'Verónica Rubio',   mail:'vrubioa@santotomas.cl'},
+  {facultad:'Ingeniería',          escuela:'Ingeniería',            programa:'Ingeniería Civil Industrial PCE',  nombre:'Karen Kanzur',     mail:'kkanzua@santotomas.cl'},
+  {facultad:'Ingeniería',          escuela:'Ingeniería',            programa:'Ingeniería Civil en Minas',        nombre:'Karen Kanzur',     mail:'kkanzua@santotomas.cl'},
+  {facultad:'Economía y Negocios', escuela:'Ingeniería Comercial',  programa:'Ingeniería Comercial',             nombre:'Catherine Korn',   mail:'kkorn@santotomas.cl'},
+  {facultad:'Salud',               escuela:'Nutrición y Dietética', programa:'Nutrición',                        nombre:'Jenny Arteaga',    mail:'jarteaga@santotomas.cl'},
+  {facultad:'Salud',               escuela:'Terapia Ocupacional',   programa:'Terapia Ocupacional',              nombre:'Alicia Marcoleta', mail:'amarcoleta@santotomas.cl'},
+  {facultad:'Salud',               escuela:'Kinesiología',          programa:'Kinesiología',                     nombre:'Alexis Espinoza',  mail:'alexisespinozasa@santotomas.cl'},
+];
+const FAC_COLORS = {
+  'Ingeniería':'#3b6e8c','Economía y Negocios':'#b07828','Ciencias Sociales':'#7a5ab4',
+  'Salud':'#4a7c5e','Recursos Naturales':'#5a8c3a','Formación General':'#8c5a3a'
+};
+function initDneModal(){
+  const tbody = document.getElementById('dne-tbody');
+  if(tbody){
+    tbody.innerHTML = DNE_DATA.map(d=>{
+      const col = FAC_COLORS[d.facultad]||'#3b6e8c';
+      return '<tr>'
+        +'<td><span class="dne-fac-chip" style="background:'+col+'18;color:'+col+';border:1px solid '+col+'30">'+d.facultad+'</span></td>'
+        +'<td style="color:rgba(18,16,28,.6);font-size:11px">'+d.escuela+'</td>'
+        +'<td style="color:rgba(18,16,28,.75)">'+d.programa+'</td>'
+        +'<td><span class="dne-name">'+d.nombre+'</span></td>'
+        +'<td><a href="mailto:'+d.mail+'" class="dne-mail-link"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>'+d.mail+'</a></td>'
+        +'</tr>';
+    }).join('');
+  }
+  document.getElementById('dne-btn')?.addEventListener('click',()=>{
+    document.getElementById('dne-modal-overlay').style.display='flex';
+  });
+  const ov=document.getElementById('dne-modal-overlay');
+  document.getElementById('dne-modal-close')?.addEventListener('click',()=>{if(ov)ov.style.display='none';});
+  if(ov) ov.addEventListener('click',(e)=>{if(e.target===ov)ov.style.display='none';});
+}
+function renderDneCard(asignatura){
+  const d=DATA.find(x=>x.asignatura===asignatura);
+  if(!d)return;
+  const section=document.getElementById('p-dne-section');
+  const card=document.getElementById('p-dne-card');
+  if(!section||!card)return;
+  let dne=DNE_DATA.find(x=>x.facultad===d.facultad);
+  if(!dne){section.style.display='none';return;}
+  const initials=dne.nombre.split(' ').slice(0,2).map(w=>w[0]).join('');
+  section.style.display='';
+  card.innerHTML='<div class="dne-card">'
+    +'<div class="dne-av">'+initials+'</div>'
+    +'<div class="dne-info">'
+    +'<div class="dne-info-prog">'+dne.escuela+' · '+dne.programa+'</div>'
+    +'<div class="dne-info-name">'+dne.nombre+'</div>'
+    +'<a href="mailto:'+dne.mail+'" class="dne-mail-link" style="margin-top:3px">'
+    +'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>'
+    +dne.mail+'</a></div></div>';
+}
+document.addEventListener('DOMContentLoaded',initDneModal);
+
 // ══ GRÁFICO GENERAL DEL PROYECTO ════════════════════════════════════════════════
 let projGanttInst=null, projProgressInst=null, projDonutInst=null;
 
@@ -4154,6 +4251,26 @@ window.addEventListener('load', function(){
         <div class="hm-section-title" id="hm-risk-title">Asignaturas pendientes</div>
         <div class="hm-risk-list" id="hm-risk-list"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL DNE -->
+<div id="dne-modal-overlay">
+  <div id="dne-modal">
+    <div class="dne-modal-hdr">
+      <div class="dne-modal-hdr-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Directores de Escuela — Contactos DNE
+      </div>
+      <button id="dne-modal-close">&#x2715;</button>
+    </div>
+    <div class="dne-modal-body">
+      <table class="dne-table">
+        <thead><tr><th>Facultad</th><th>Escuela</th><th>Programa</th><th>DNE</th><th>Correo</th></tr></thead>
+        <tbody id="dne-tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>
