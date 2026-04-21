@@ -2138,10 +2138,18 @@ async function loadSheetCSV(sheetId, gid){
   return rows.slice(1); // omitir fila de encabezados
 }
 
+// Valores que identifican filas de encabezado (no datos reales)
+const CSV_HEADER_R4 = ['jp','jefe de proyecto','jefe proyecto'];
+const CSV_HEADER_R1 = ['asignatura','nombre asignatura','nombre de asignatura'];
+
 function buildDataFromCSV(rows){
   const data=[], avance={};
   (rows||[]).forEach(r=>{
-    if(!r[1]) return;
+    if(!r[1] || !r[1].trim()) return; // fila vacía
+    // Saltar filas de encabezado detectando por contenido
+    const r1l = r[1].toLowerCase().trim();
+    const r4l = (r[4]||'').toLowerCase().trim();
+    if(CSV_HEADER_R4.includes(r4l) || CSV_HEADER_R1.includes(r1l)) return;
     const asig = r[1].trim();
     const rawPct = r[20] ? parseFloat(String(r[20]).replace('%','').replace(',','.')) : 0;
     const pct = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
@@ -2163,6 +2171,8 @@ function buildDataFromGviz(rows){
   (rows||[]).forEach(row=>{
     const r=(row.c||[]).map(c=>(c?.v!=null)?String(c.v).trim():'');
     if(!r[1])return;
+    const r1l=r[1].toLowerCase().trim(), r4l=(r[4]||'').toLowerCase().trim();
+    if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))return;
     const asig=r[1];
     const rawPct=row.c?.[20]?.v;
     const pct=typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
@@ -2213,13 +2223,14 @@ function mapHito(v){
   return v;
 }
 
-// Construir DATA y AVANCE desde filas CSV (fila 0 = headers fusionados, filas 1-43 = datos)
+// Construir DATA y AVANCE desde filas CSV (fila 0 = headers fusionados, filas 1-N = datos)
 function buildData(rows){
   const data=[], avance={};
-  // Filas 1 en adelante son asignaturas
   for(let i=1;i<rows.length;i++){
     const r=rows[i];
     if(!r[1]||r[1].trim()==='')continue; // saltar filas vacías
+    const r1l=r[1].toLowerCase().trim(), r4l=(r[4]||'').toLowerCase().trim();
+    if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))continue;
     const asig   = r[1]||'';
     const pctRaw = (r[20]||'0%').replace('%','').trim();
     const pct    = parseInt(pctRaw)||0;
