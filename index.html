@@ -2210,7 +2210,7 @@ async function loadSheetData(silent=false){
   if(statusEl) statusEl.classList.add('syncing');
   if(!silent) setSyncLabel('Actualizando...');
   try{
-    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}`);
+    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}&range=A:AC`);
     const built = buildDataFromGviz(resp.table?.rows);
     DATA = built.data; AVANCE = built.avance;
     window._ust_cache = {DATA:[...DATA], AVANCE:{...AVANCE}, ts:Date.now()};
@@ -2233,7 +2233,7 @@ async function loadSheetData(silent=false){
 
 async function loadDashboardData(){
   try{
-    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}`);
+    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}&range=A:AC`);
     const built = buildDataFromGviz(resp.table?.rows);
     DATA_ALL = built.data; AVANCE_ALL = built.avance;
     return true;
@@ -4161,6 +4161,7 @@ document.getElementById('mail-open-btn').addEventListener('click',()=>{
 
 // ── MODAL DETALLE DE HITO ────────────────────────────────────────────────────
 function openHitoModal(idx){
+  closePanel();
   const h = GANTT_HITOS[idx];
   const src   = DATA_ALL.length ? DATA_ALL : DATA;
   const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
