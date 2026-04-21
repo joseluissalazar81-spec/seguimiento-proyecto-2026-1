@@ -2067,31 +2067,34 @@ const SHEET_GID   = '1889016436';
 const BENCH_ID    = '1DpexuKXjou9g_X35VU1oFwyIsoENRXMX';
 const BENCH_SHEET = 'Ejemplo';
 
-// ─── JSONP loader — sin CORS, funciona desde file://, Vercel, cualquier origen ─
-// Google Sheets gviz siempre llama google.visualization.Query.setResponse(data)
-const _gvizQ = [];
-window.google = window.google || {};
-window.google.visualization = window.google.visualization || {};
-window.google.visualization.Query = window.google.visualization.Query || {};
-window.google.visualization.Query.setResponse = function(resp){
-  const item = _gvizQ.shift();
-  if(item){ clearTimeout(item.t); try{ item.resolve(resp); }catch(e){ item.reject(e); } }
-};
+// ─── CSV loader — ignora filtros activos de Google Sheets ─────────────────────
+async function loadSheetCSV(sheetId, gid){
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}&nocache=${Date.now()}`;
+  const resp = await fetch(url);
+  if(!resp.ok) throw new Error(`CSV error ${resp.status}`);
+  const text = await resp.text();
+  const rows = parseCSV(text);
+  return rows.slice(1); // omitir fila de encabezados
+}
 
-function loadGvizSheet(sheetId, param){
-  return new Promise((resolve, reject)=>{
-    const t = setTimeout(()=>{
-      const i = _gvizQ.findIndex(x=>x.reject===reject);
-      if(i>=0) _gvizQ.splice(i,1);
-      reject(new Error('timeout'));
-    }, 12000);
-    _gvizQ.push({resolve, reject, t});
-    const s = document.createElement('script');
-    s.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&${param}&nocache=${Date.now()}`;
-    s.onerror = ()=>{ clearTimeout(t); const i=_gvizQ.findIndex(x=>x.reject===reject); if(i>=0)_gvizQ.splice(i,1); reject(new Error('script error')); };
-    s.onload  = ()=>setTimeout(()=>s.remove(), 500);
-    document.head.appendChild(s);
+function buildDataFromCSV(rows){
+  const data=[], avance={};
+  (rows||[]).forEach(r=>{
+    if(!r[1]) return;
+    const asig = r[1].trim();
+    const rawPct = r[20] ? parseFloat(String(r[20]).replace('%','').replace(',','.')) : 0;
+    const pct = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
+    data.push({facultad:r[0]||'',asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
+      jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
+      reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
+      fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
+    avance[asig]={avance:pct,obs:r[22]||'',hitos:{
+      s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
+      s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
+      s11s12:mapHito(r[16]),s13s14:mapHito(r[17]),s15s16:mapHito(r[18]),
+      s17s18:mapHito(r[19])}};
   });
+  return {data,avance};
 }
 
 function buildDataFromGviz(rows){
@@ -2210,8 +2213,8 @@ async function loadSheetData(silent=false){
   if(statusEl) statusEl.classList.add('syncing');
   if(!silent) setSyncLabel('Actualizando...');
   try{
-    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}&range=A:AC`);
-    const built = buildDataFromGviz(resp.table?.rows);
+    const csvRows = await loadSheetCSV(SHEET_ID, SHEET_GID);
+    const built = buildDataFromCSV(csvRows);
     DATA = built.data; AVANCE = built.avance;
     window._ust_cache = {DATA:[...DATA], AVANCE:{...AVANCE}, ts:Date.now()};
     const now=new Date();
@@ -2233,8 +2236,8 @@ async function loadSheetData(silent=false){
 
 async function loadDashboardData(){
   try{
-    const resp = await loadGvizSheet(SHEET_ID, `gid=${SHEET_GID}&range=A:AC`);
-    const built = buildDataFromGviz(resp.table?.rows);
+    const csvRows = await loadSheetCSV(SHEET_ID, SHEET_GID);
+    const built = buildDataFromCSV(csvRows);
     DATA_ALL = built.data; AVANCE_ALL = built.avance;
     return true;
   }catch(err){
