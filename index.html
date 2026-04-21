@@ -1092,6 +1092,27 @@
     .exec-sem.amarillo .exec-sem-label{color:var(--am);}
     .exec-sem.rojo   .exec-sem-label{color:var(--ro);}
     .exec-sem-sub {font-size:10px; color:var(--text-muted); text-align:center;}
+    .exec-sem{cursor:pointer;}
+    .exec-sem-hint{font-size:9px;color:var(--text-muted);text-align:center;margin-top:2px;opacity:.7}
+    /* Panel explicativo riesgo */
+    #sem-explain{
+      position:absolute;z-index:500;
+      background:#1e2d3d;border:1px solid rgba(255,255,255,.18);
+      border-radius:10px;padding:14px 16px;width:280px;
+      box-shadow:0 8px 32px rgba(0,0,0,.5);
+      animation:fadeUp .2s ease both;
+      display:none;
+    }
+    #sem-explain-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .sem-exp-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:12px;line-height:1.45}
+    .sem-exp-item:last-child{margin-bottom:0}
+    .sem-exp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .sem-exp-dot.ro{background:var(--ro)}
+    .sem-exp-dot.am{background:var(--am)}
+    .sem-exp-dot.ve{background:var(--ve)}
+    .sem-exp-text{color:rgba(255,255,255,.85)}
+    .sem-exp-text strong{color:#fff}
+    #sem-explain-close{position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:14px;line-height:1;padding:2px}
     /* % Avance central */
     .exec-avance {display:flex; flex-direction:column; align-items:center; gap:6px;}
     .exec-avance-num {
@@ -1662,10 +1683,16 @@
       <!-- KPIs: semáforo + % avance + DEL stats + semana -->
       <div class="exec-kpis" id="exec-kpis">
         <!-- semáforo -->
-        <div class="exec-sem verde" id="exec-sem">
+        <div class="exec-sem verde" id="exec-sem" onclick="toggleSemExplain()" style="position:relative">
           <div class="exec-sem-circle" id="exec-sem-circle">⏳</div>
           <div class="exec-sem-label" id="exec-sem-label">Cargando…</div>
           <div class="exec-sem-sub"  id="exec-sem-sub">—</div>
+          <div class="exec-sem-hint">Toca para ver el análisis</div>
+          <div id="sem-explain">
+            <button id="sem-explain-close" onclick="event.stopPropagation();document.getElementById('sem-explain').style.display='none'">✕</button>
+            <div id="sem-explain-title">⚠ Análisis de riesgo</div>
+            <div id="sem-explain-body"></div>
+          </div>
         </div>
         <!-- % avance central -->
         <div class="exec-avance">
@@ -3051,6 +3078,18 @@ function borrarDelLocal(asignatura){
   if(idx>=0) openPanel(idx);
 }
 
+// ─── SEMÁFORO EXPLICATIVO ───────────────────────────────────────
+function toggleSemExplain(){
+  const box = document.getElementById('sem-explain');
+  if(!box) return;
+  box.style.display = box.style.display==='none'||!box.style.display ? 'block' : 'none';
+}
+document.addEventListener('click', e=>{
+  const box = document.getElementById('sem-explain');
+  const sem = document.getElementById('exec-sem');
+  if(box && sem && !sem.contains(e.target)) box.style.display='none';
+});
+
 // ─── ESCALAMIENTO ───────────────────────────────────────────────
 const ESCAL_NIVELES = [
   {dias:1,  label:'DI',      desc:'Diseñador instruccional', campo:'di'},
@@ -3508,6 +3547,47 @@ function renderExecutiveHero(){
     document.getElementById('exec-sem-circle').textContent = semEmoji;
     document.getElementById('exec-sem-label').textContent  = semLabel;
     document.getElementById('exec-sem-sub').textContent    = semSub;
+  }
+
+  // Guardar datos para el panel explicativo
+  window._semData = {semClass, diff, diffAjustado, pctReal, pctEsperado, delAtras, delRev, delOk, src, avSrc, today};
+  // Generar cuerpo del panel
+  const body = document.getElementById('sem-explain-body');
+  const titleEl = document.getElementById('sem-explain-title');
+  if(body){
+    const atrasadas = src.filter(d=>{
+      const step = planifStepIndex(d.planif||'');
+      return step < 2 && today > planifDeadline(d.facultad);
+    });
+    const sinIniciar = src.filter(d=>!d.planif||d.planif==='No inicia');
+    const enConst    = src.filter(d=>d.planif==='En construcción'||d.planif==='Pendiente');
+    let items = [];
+    if(semClass==='verde'){
+      items.push({dot:'ve', text:`<strong>El proyecto va a tiempo.</strong> El avance real (${pctReal}%) supera lo esperado (${pctEsperado}%) y no hay plazos vencidos sin enviar.`});
+    } else {
+      if(atrasadas.length){
+        items.push({dot:'ro', text:`<strong>${atrasadas.length} asignatura${atrasadas.length>1?'s':''} con plazo vencido sin enviar a DEL:</strong> ${atrasadas.map(d=>d.asignatura).join(', ')}.`});
+      }
+      if(diff < -5){
+        items.push({dot:'am', text:`<strong>Avance real por debajo del esperado:</strong> ${pctReal}% real vs ${pctEsperado}% esperado (${Math.abs(diff)} puntos de diferencia).`});
+      } else if(diff >= 0){
+        items.push({dot:'am', text:`<strong>Avance general aceptable</strong> (${pctReal}% vs ${pctEsperado}% esperado), pero los plazos vencidos generan penalización en el semáforo.`});
+      }
+      if(enConst.length){
+        items.push({dot:'am', text:`<strong>${enConst.length} asignatura${enConst.length>1?'s':''} aún en construcción</strong> sin enviar planificación a DEL.`});
+      }
+      if(semClass==='rojo'){
+        items.push({dot:'ro', text:`<strong>Estado crítico:</strong> la diferencia ajustada es de ${diffAjustado} puntos. Se requiere acción inmediata.`});
+      }
+    }
+    if(titleEl) titleEl.innerHTML = semClass==='verde'
+      ? '✅ Estado del proyecto'
+      : semClass==='amarillo' ? '⚠ Por qué está en riesgo' : '🔴 Por qué está atrasado';
+    body.innerHTML = items.map(i=>`
+      <div class="sem-exp-item">
+        <span class="sem-exp-dot ${i.dot}"></span>
+        <span class="sem-exp-text">${i.text}</span>
+      </div>`).join('');
   }
 
   // ── % avance + barras ──
