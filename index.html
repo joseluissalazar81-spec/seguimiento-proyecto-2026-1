@@ -669,6 +669,34 @@
     .del-badge.actual2{background:rgba(144,188,180,.15);color:var(--tl2);border:1px solid rgba(144,188,180,.3)}
     .del-badge.actual-ca{background:rgba(154,184,204,.15);color:var(--ca);border:1px solid rgba(154,184,204,.3)}
     .del-badge.hecho{background:rgba(168,196,160,.15);color:var(--ve);border:1px solid rgba(168,196,160,.3)}
+    .del-badge.local{background:rgba(212,184,120,.15);color:var(--am);border:1px solid rgba(212,184,120,.3);font-size:9px}
+
+    /* ── EDITOR DEL LOCAL ── */
+    .del-editor{margin-top:10px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px}
+    .del-editor-row{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+    .del-editor-row:last-of-type{margin-bottom:10px}
+    .del-editor-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)}
+    .del-editor select,.del-editor input[type=date]{
+      width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+      border-radius:6px;padding:6px 8px;font-size:12px;color:var(--text);font-family:inherit;
+      outline:none;cursor:pointer;
+    }
+    .del-editor select:focus,.del-editor input[type=date]:focus{border-color:rgba(176,168,204,.5)}
+    .del-editor select option{background:#1e2d3d;color:var(--text)}
+    .del-editor-actions{display:flex;gap:6px}
+    .del-editor-save{flex:1;background:#786898;border:none;border-radius:6px;padding:7px 0;
+      font-size:12px;font-weight:700;color:white;cursor:pointer;font-family:inherit;
+      transition:background .15s}
+    .del-editor-save:hover{background:#9078b8}
+    .del-editor-clear{background:rgba(200,160,144,.15);border:1px solid rgba(200,160,144,.3);
+      border-radius:6px;padding:7px 10px;font-size:11px;font-weight:600;
+      color:var(--ro);cursor:pointer;font-family:inherit;transition:background .15s}
+    .del-editor-clear:hover{background:rgba(200,160,144,.25)}
+    .del-toggle-edit{display:flex;align-items:center;gap:5px;background:transparent;border:1px solid rgba(255,255,255,.12);
+      border-radius:6px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;
+      margin-top:8px;transition:all .15s}
+    .del-toggle-edit:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+    .del-saved-ok{font-size:11px;color:var(--ve);font-weight:600;padding:4px 0;display:none}
 
     /* ── ENTRADA SUAVE ── */
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -2215,7 +2243,7 @@ async function loadSheetData(silent=false){
   try{
     const csvRows = await loadSheetCSV(SHEET_ID, SHEET_GID);
     const built = buildDataFromCSV(csvRows);
-    DATA = built.data; AVANCE = built.avance;
+    DATA = applyOverrides(built.data); AVANCE = built.avance;
     window._ust_cache = {DATA:[...DATA], AVANCE:{...AVANCE}, ts:Date.now()};
     const now=new Date();
     setSyncLabel(`Actualizado ${now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})} · ${now.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'})}`);
@@ -2238,7 +2266,7 @@ async function loadDashboardData(){
   try{
     const csvRows = await loadSheetCSV(SHEET_ID, SHEET_GID);
     const built = buildDataFromCSV(csvRows);
-    DATA_ALL = built.data; AVANCE_ALL = built.avance;
+    DATA_ALL = applyOverrides(built.data); AVANCE_ALL = built.avance;
     return true;
   }catch(err){
     console.warn('loadDashboardData error:', err.message);
@@ -2790,6 +2818,29 @@ document.getElementById('search').addEventListener('input',e=>{
   }, 5*60*1000);
 })();
 
+// ─── OVERRIDES LOCALES (planif + fechas DEL) ────────────────────
+function getOverrides(){
+  try{ return JSON.parse(localStorage.getItem('ust_planif_overrides')||'{}'); }
+  catch(e){ return {}; }
+}
+function applyOverrides(data){
+  const ov=getOverrides();
+  return data.map(d=>{ const o=ov[d.asignatura]; return o?{...d,...o}:d; });
+}
+function saveOverride(asignatura,fields){
+  const ov=getOverrides();
+  ov[asignatura]={...(ov[asignatura]||{}),...fields};
+  localStorage.setItem('ust_planif_overrides',JSON.stringify(ov));
+}
+function clearOverride(asignatura){
+  const ov=getOverrides();
+  delete ov[asignatura];
+  localStorage.setItem('ust_planif_overrides',JSON.stringify(ov));
+}
+function hasOverride(asignatura){
+  return !!getOverrides()[asignatura];
+}
+
 // ─── REVISIÓN DEL ───────────────────────────────────────────────
 // Flujo planificación: No inicia → En construcción → Enviada a validación DEL → DEL 2° Instancia → Validada → Cargada en aula
 const PLANIF_FLOW = [
@@ -2811,18 +2862,35 @@ function planifStepIndex(planif){
   return 0;
 }
 
-function renderDelReview(d){
-  const section = document.getElementById('p-del-section');
-  const flow    = document.getElementById('p-del-flow');
-  const stepIdx = planifStepIndex(d.planif);
+function toInputDate(str){
+  if(!str) return '';
+  // dd/mm/yyyy → yyyy-mm-dd
+  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return str;
+}
+function fromInputDate(str){
+  if(!str) return '';
+  // yyyy-mm-dd → dd/mm/yyyy
+  const m = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return `${m[3]}/${m[2]}/${m[1]}`;
+  return str;
+}
 
-  // Solo mostrar si hay al menos algún avance en planif
-  if(stepIdx === 0 && !d.envDELfecha && !d.del2fecha){
-    section.style.display = 'none';
-    return;
-  }
+function renderDelReview(d){
+  const section  = document.getElementById('p-del-section');
+  const titleEl  = section.querySelector('.ps-title');
+  const flow     = document.getElementById('p-del-flow');
+  const stepIdx  = planifStepIndex(d.planif);
+  const localOv  = hasOverride(d.asignatura);
+
+  // Mostrar siempre (para permitir editar aunque sea "No inicia")
   section.style.display = '';
 
+  // Badge "local" en el título
+  titleEl.innerHTML = `Revisión DEL${localOv?' <span class="del-badge local">✏ local</span>':''}`;
+
+  // Flujo de pasos
   flow.innerHTML = PLANIF_FLOW.map((step, i) => {
     const done   = i < stepIdx;
     const active = i === stepIdx;
@@ -2835,7 +2903,6 @@ function renderDelReview(d){
       ? `<span class="del-badge ${step.key==='del2'?'actual2':step.key==='cargada'?'actual-ca':'actual'}">ACTUAL</span>`
       : done ? `<span class="del-badge hecho">✓</span>` : '';
 
-    // Fechas por paso
     let dateHtml = '';
     if(step.key==='enviada' && d.envDELfecha){
       dateHtml = `<div class="del-date">Enviado: ${d.envDELfecha}</div>`;
@@ -2853,6 +2920,70 @@ function renderDelReview(d){
       </div>
     </div>`;
   }).join('');
+
+  // Botón para abrir editor
+  flow.insertAdjacentHTML('afterend', `
+    <button class="del-toggle-edit" id="del-edit-toggle" onclick="toggleDelEditor(this,'${d.asignatura.replace(/'/g,"\\'")}')">
+      ✏ Editar estado y fechas
+    </button>
+    <div class="del-editor" id="del-editor-box" style="display:none">
+      <div class="del-editor-row">
+        <div class="del-editor-lbl">Estado planificación</div>
+        <select id="del-ed-planif">
+          ${['No inicia','En construcción','Enviada a validación DEL','DEL 2° Instancia','Validada','Cargada en aula','No aplica']
+            .map(v=>`<option value="${v}"${d.planif===v?' selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="del-editor-row">
+        <div class="del-editor-lbl">Fecha envío a DEL (1° revisión)</div>
+        <input type="date" id="del-ed-env" value="${toInputDate(d.envDELfecha)}">
+      </div>
+      <div class="del-editor-row">
+        <div class="del-editor-lbl">Fecha DEL 2° Instancia</div>
+        <input type="date" id="del-ed-del2" value="${toInputDate(d.del2fecha)}">
+      </div>
+      <div class="del-editor-actions">
+        <button class="del-editor-save" onclick="guardarDelLocal('${d.asignatura.replace(/'/g,"\\'")}')">Guardar local</button>
+        ${localOv?`<button class="del-editor-clear" onclick="borrarDelLocal('${d.asignatura.replace(/'/g,"\\'")}')">Borrar</button>`:''}
+      </div>
+      <div class="del-saved-ok" id="del-saved-ok">✓ Guardado</div>
+    </div>
+  `);
+}
+
+function toggleDelEditor(btn, asig){
+  const box = document.getElementById('del-editor-box');
+  const visible = box.style.display !== 'none';
+  box.style.display = visible ? 'none' : '';
+  btn.textContent = visible ? '✏ Editar estado y fechas' : '▲ Cerrar editor';
+}
+
+function guardarDelLocal(asignatura){
+  const planif      = document.getElementById('del-ed-planif').value;
+  const envDELfecha = fromInputDate(document.getElementById('del-ed-env').value);
+  const del2fecha   = fromInputDate(document.getElementById('del-ed-del2').value);
+  saveOverride(asignatura, {planif, envDELfecha, del2fecha});
+  // Aplicar al array de datos en memoria
+  DATA = applyOverrides(DATA.map(d => d.asignatura===asignatura ? {...d, planif, envDELfecha, del2fecha} : d));
+  currentRows = currentRows.map(d => d.asignatura===asignatura ? {...d, planif, envDELfecha, del2fecha} : d);
+  // Feedback visual
+  const ok = document.getElementById('del-saved-ok');
+  ok.style.display = 'block';
+  setTimeout(()=>ok.style.display='none', 2000);
+  // Re-render KPIs y tabla para reflejar cambio
+  renderKPIs(); renderTable();
+  // Re-abrir panel para actualizar flujo
+  const idx = currentRows.findIndex(d=>d.asignatura===asignatura);
+  if(idx>=0) openPanel(idx);
+}
+
+function borrarDelLocal(asignatura){
+  clearOverride(asignatura);
+  // Recargar datos desde caché y re-aplicar overrides
+  if(window._ust_cache){ DATA=applyOverrides([...window._ust_cache.DATA]); }
+  renderKPIs(); renderTable();
+  const idx = currentRows.findIndex(d=>d.asignatura===asignatura);
+  if(idx>=0) openPanel(idx);
 }
 
 // ─── ESCALAMIENTO ───────────────────────────────────────────────
