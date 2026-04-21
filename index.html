@@ -482,7 +482,29 @@
       border-radius:var(--radius-sm);padding:12px 14px;
       font-size:13px;color:var(--text);line-height:1.6;
     }
+    .obs-box.obs-alerta{
+      background:rgba(200,160,144,.1);
+      border-color:rgba(200,160,144,.35);border-left-color:var(--ro);
+    }
     .obs-empty{font-size:12.5px;color:var(--text-muted);font-style:italic}
+
+    /* ── BANNER BLOQUEO PANEL ── */
+    .panel-bloq{
+      margin:0 0 4px;padding:10px 14px;
+      background:rgba(200,160,144,.12);
+      border:1px solid rgba(200,160,144,.4);border-left:3px solid var(--ro);
+      border-radius:var(--radius-sm);
+      display:flex;align-items:flex-start;gap:8px;
+    }
+    .panel-bloq-icon{font-size:15px;flex-shrink:0;line-height:1.4}
+    .panel-bloq-body{flex:1}
+    .panel-bloq-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ro);margin-bottom:2px}
+    .panel-bloq-text{font-size:12.5px;color:var(--text);line-height:1.5}
+    /* Indicador en tabla */
+    .row-bloq-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ro);margin-left:5px;vertical-align:middle;box-shadow:0 0 4px rgba(200,160,144,.6)}
+    /* Input bloqueante en editor */
+    .del-editor textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--text);font-family:inherit;outline:none;resize:vertical;min-height:52px}
+    .del-editor textarea:focus{border-color:rgba(200,160,144,.5)}
 
     /* ── AVANCE CELL ── */
     .av-cell{display:flex;align-items:center;gap:7px;min-width:90px}
@@ -1896,6 +1918,17 @@
 
   <div class="panel-body">
 
+    <!-- BLOQUEO / ALERTA CRÍTICA -->
+    <div id="p-bloq-section" style="display:none;padding:12px 16px 0">
+      <div class="panel-bloq" id="p-bloq-card">
+        <div class="panel-bloq-icon">🚫</div>
+        <div class="panel-bloq-body">
+          <div class="panel-bloq-title">Bloqueo para construcción</div>
+          <div class="panel-bloq-text" id="p-bloq-text"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- DONA + ESTADO RECURSOS -->
     <div class="panel-section">
       <div class="ps-title">Estado de Recursos</div>
@@ -2556,7 +2589,7 @@ function renderTable(){
     return `
     <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''}">
       <td><span class="chip chip-fac">${d.facultad}</span></td>
-      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}</td>
+      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${planifLabel(d.planif)}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
@@ -2681,10 +2714,26 @@ function openPanel(idx){
       <div><div class="team-role">${t.role}</div><div class="team-name">${t.name}</div></div>
     </div>`).join('');
 
-  // OBS
+  // OBS — detectar keywords de alerta (no responde, sin respuesta)
   const obsEl=document.getElementById('p-obs');
   const obsText=av.obs||d.obs||'';
-  obsEl.innerHTML=obsText?obsText:`<span class="obs-empty">Sin observaciones registradas.</span>`;
+  const OBS_ALERT_KW=['no responde','sin respuesta','no contesta','no ha respondido','no contesta correo','no responde correo'];
+  const obsEsAlerta = OBS_ALERT_KW.some(kw=>obsText.toLowerCase().includes(kw));
+  obsEl.className = 'obs-box' + (obsEsAlerta ? ' obs-alerta' : '');
+  obsEl.innerHTML = obsText
+    ? (obsEsAlerta ? `⚠ ${obsText}` : obsText)
+    : `<span class="obs-empty">Sin observaciones registradas.</span>`;
+
+  // BLOQUEO (override local)
+  const bloqSection = document.getElementById('p-bloq-section');
+  const bloqText    = document.getElementById('p-bloq-text');
+  const ovBloq      = (getOverrides()[d.asignatura]||{}).bloqueante||'';
+  if(ovBloq){
+    bloqText.textContent = ovBloq;
+    bloqSection.style.display = '';
+  } else {
+    bloqSection.style.display = 'none';
+  }
 
   document.getElementById('panel').classList.add('open');
   document.getElementById('overlay').classList.add('open');
@@ -2942,9 +2991,13 @@ function renderDelReview(d){
         <div class="del-editor-lbl">Fecha DEL 2° Instancia</div>
         <input type="date" id="del-ed-del2" value="${toInputDate(d.del2fecha)}">
       </div>
+      <div class="del-editor-row">
+        <div class="del-editor-lbl">🚫 Bloqueo para construcción</div>
+        <textarea id="del-ed-bloq" placeholder="Ej: Sin programa vigente — no puede iniciar construcción">${(getOverrides()[d.asignatura]||{}).bloqueante||''}</textarea>
+      </div>
       <div class="del-editor-actions">
         <button class="del-editor-save" onclick="guardarDelLocal('${d.asignatura.replace(/'/g,"\\'")}')">Guardar local</button>
-        ${localOv?`<button class="del-editor-clear" onclick="borrarDelLocal('${d.asignatura.replace(/'/g,"\\'")}')">Borrar</button>`:''}
+        ${localOv?`<button class="del-editor-clear" onclick="borrarDelLocal('${d.asignatura.replace(/'/g,"\\'")}')">Borrar todo</button>`:''}
       </div>
       <div class="del-saved-ok" id="del-saved-ok">✓ Guardado</div>
     </div>
@@ -2962,10 +3015,11 @@ function guardarDelLocal(asignatura){
   const planif      = document.getElementById('del-ed-planif').value;
   const envDELfecha = fromInputDate(document.getElementById('del-ed-env').value);
   const del2fecha   = fromInputDate(document.getElementById('del-ed-del2').value);
-  saveOverride(asignatura, {planif, envDELfecha, del2fecha});
+  const bloqueante  = (document.getElementById('del-ed-bloq').value||'').trim();
+  saveOverride(asignatura, {planif, envDELfecha, del2fecha, bloqueante});
   // Aplicar al array de datos en memoria
-  DATA = applyOverrides(DATA.map(d => d.asignatura===asignatura ? {...d, planif, envDELfecha, del2fecha} : d));
-  currentRows = currentRows.map(d => d.asignatura===asignatura ? {...d, planif, envDELfecha, del2fecha} : d);
+  DATA = applyOverrides(DATA.map(d => d.asignatura===asignatura ? {...d, planif, envDELfecha, del2fecha, bloqueante} : d));
+  currentRows = currentRows.map(d => d.asignatura===asignatura ? {...d, planif, envDELfecha, del2fecha, bloqueante} : d);
   // Feedback visual
   const ok = document.getElementById('del-saved-ok');
   ok.style.display = 'block';
