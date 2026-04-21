@@ -4742,14 +4742,14 @@ window.addEventListener('load', function(){
 
 
 <!-- MODAL INFORME DNE -->
-<div id="inf-modal-overlay">
+<div id="inf-modal-overlay" style="display:none">
   <div id="inf-modal">
     <div class="inf-hdr">
       <div class="inf-hdr-left">
         <div class="inf-hdr-title">Informe de Avance — e-Learning 2026-1</div>
         <div class="inf-hdr-sub">Genera y envía el reporte al Director/a de Escuela</div>
       </div>
-      <button id="inf-modal-close">&#x2715;</button>
+      <button id="inf-modal-close" onclick="document.getElementById('inf-modal-overlay').style.display='none'">&#x2715;</button>
     </div>
     <div class="inf-body">
       <!-- Selector DNE -->
@@ -4809,7 +4809,7 @@ window.addEventListener('load', function(){
         <tbody id="dne-tbody"></tbody>
       </table>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(59,110,140,.15)">
-        <button id="dne-open-informe" style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,#1e2d3d,#2d5a74);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .18s">
+        <button id="dne-open-informe" onclick="document.getElementById('dne-modal-overlay').style.display='none';document.getElementById('inf-modal-overlay').style.display='flex';" style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,#1e2d3d,#2d5a74);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .18s">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
           Enviar informe a un DNE
         </button>
