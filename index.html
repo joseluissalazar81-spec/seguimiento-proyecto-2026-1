@@ -4430,29 +4430,39 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // ── MODAL INFORME DNE ────────────────────────────────────────────────────────
-function initInformeModal(){
-  const ov = document.getElementById('inf-modal-overlay');
+function abrirModalInforme(){
+  const ov  = document.getElementById('inf-modal-overlay');
   const sel = document.getElementById('inf-dne-select');
   if(!ov||!sel) return;
 
-  // Poblar selector con DNEs únicos
+  // Poblar selector siempre (por si no corrió initInformeModal)
   const unique = DNE_DATA.filter((d,i,a)=>a.findIndex(x=>x.mail===d.mail)===i);
   sel.innerHTML = '<option value="">— Seleccionar Director/a de Escuela —</option>'
     + unique.map((d,i)=>`<option value="${i}">${d.nombre} — ${d.escuela} (${d.facultad})</option>`).join('');
 
+  // Resetear resumen
+  const resumen = document.getElementById('inf-resumen');
+  if(resumen) resumen.style.display='none';
+  const btnMail = document.getElementById('inf-btn-mail');
+  const btnPdf  = document.getElementById('inf-btn-pdf');
+  if(btnMail) btnMail.disabled=true;
+  if(btnPdf)  btnPdf.disabled=true;
+
+  document.getElementById('dne-modal-overlay').style.display='none';
+  ov.style.display='flex';
+}
+
+function initInformeModal(){
+  const ov  = document.getElementById('inf-modal-overlay');
+  const sel = document.getElementById('inf-dne-select');
+  if(!ov||!sel) return;
+
   // Al cambiar selección, regenerar resumen
   sel.addEventListener('change',()=>{ renderInformeResumen(parseInt(sel.value)); });
 
-  // Cerrar
-  document.getElementById('inf-modal-close')?.addEventListener('click',()=>{ ov.style.display='none'; });
+  // Cerrar al hacer clic fuera
   ov.addEventListener('click',(e)=>{ if(e.target===ov) ov.style.display='none'; });
-  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') ov.style.display='none'; });
-
-  // Abrir desde modal DNE
-  document.getElementById('dne-open-informe')?.addEventListener('click',()=>{
-    document.getElementById('dne-modal-overlay').style.display='none';
-    ov.style.display='flex';
-  });
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&ov.style.display==='flex') ov.style.display='none'; });
 
   // Abrir correo
   document.getElementById('inf-btn-mail')?.addEventListener('click',()=>{
@@ -4749,7 +4759,7 @@ window.addEventListener('load', function(){
         <div class="inf-hdr-title">Informe de Avance — e-Learning 2026-1</div>
         <div class="inf-hdr-sub">Genera y envía el reporte al Director/a de Escuela</div>
       </div>
-      <button id="inf-modal-close" onclick="document.getElementById('inf-modal-overlay').style.display='none'">&#x2715;</button>
+      <button id="inf-modal-close" onclick="document.getElementById('inf-modal-overlay').style.display='none';document.getElementById('inf-resumen').style.display='none'">&#x2715;</button>
     </div>
     <div class="inf-body">
       <!-- Selector DNE -->
@@ -4809,7 +4819,7 @@ window.addEventListener('load', function(){
         <tbody id="dne-tbody"></tbody>
       </table>
       <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(59,110,140,.15)">
-        <button id="dne-open-informe" onclick="document.getElementById('dne-modal-overlay').style.display='none';document.getElementById('inf-modal-overlay').style.display='flex';" style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,#1e2d3d,#2d5a74);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .18s">
+        <button id="dne-open-informe" onclick="abrirModalInforme()" style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,#1e2d3d,#2d5a74);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .18s">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
           Enviar informe a un DNE
         </button>
