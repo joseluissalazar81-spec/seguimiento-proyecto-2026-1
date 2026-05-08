@@ -168,6 +168,7 @@
     .kpi-val{font-size:22px;font-weight:800;line-height:1.1;font-family:'DM Mono',monospace}
     .kpi-val.c-az{color:var(--az)}.kpi-val.c-ve{color:var(--ve)}.kpi-val.c-am{color:var(--am)}.kpi-val.c-ro{color:var(--ro)}
     .kpi-name{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+    .kpi-sub{font-size:9px;color:var(--text-muted);opacity:.6;margin-top:1px;line-height:1.3}
 
     /* ── FAC BAR ── */
     .fac-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
@@ -192,11 +193,10 @@
     }
     .fac-card:hover::before{opacity:1}
     .fac-card.active{
-      border-color:rgba(176,184,204,.5);
       background:rgba(176,184,204,.12);
       box-shadow:0 0 20px rgba(176,184,204,.15),0 4px 16px rgba(0,0,0,.3);
     }
-    .fac-card.active .fac-name{color:var(--az)}
+    .fac-card.active .fac-name{color:inherit}
     .fac-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
     .fac-name{font-size:10.5px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;line-height:1.2;flex:1;margin-right:6px}
     .fac-count{font-size:17px;font-weight:700;font-family:'DM Mono',monospace;color:var(--az);flex-shrink:0}
@@ -278,6 +278,7 @@
     .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
     .dot-r{background:var(--ro);box-shadow:0 0 6px rgba(200,160,144,.5)}
     .dot-y{background:var(--am);box-shadow:0 0 6px rgba(212,184,120,.5)}
+    .dot-at{background:var(--ro);box-shadow:0 0 6px rgba(200,80,80,.5)}
     .dot-g{background:var(--ve);box-shadow:0 0 6px rgba(168,196,160,.5)}
     .dot-x{background:var(--gr)}
     .dot-d{background:#b0a8c8;box-shadow:0 0 6px rgba(176,168,204,.5)}
@@ -441,6 +442,7 @@
     .t2{background:rgba(154,184,204,.12);border-color:rgba(154,184,204,.25)}.t2 .t-val{color:var(--ca)}
     .t3{background:rgba(212,184,120,.12);border-color:rgba(212,184,120,.25)}.t3 .t-val{color:var(--am)}
     .t4{background:rgba(176,168,204,.12);border-color:rgba(176,168,204,.25)}.t4 .t-val{color:#c4bcd8}
+    .t-kw{font-size:9px;color:var(--text-light);margin-top:5px;line-height:1.4;word-break:break-word}
 
     /* ── EQUIPO ── */
     .team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -940,6 +942,7 @@
     .fv-planif.p-del2 {background:rgba(144,188,180,.12); color:var(--tl2);border:1px solid rgba(144,188,180,.25)}
     .fv-planif.p-env  {background:rgba(154,184,204,.12); color:var(--ca); border:1px solid rgba(154,184,204,.25)}
     .fv-planif.p-const{background:rgba(212,184,120,.08); color:var(--am); border:1px solid rgba(212,184,120,.18)}
+    .fv-planif.p-at   {background:rgba(200,80,80,.10);  color:var(--ro); border:1px solid rgba(200,80,80,.25); font-weight:700}
     .fv-planif.p-none {background:rgba(255,255,255,.04);color:var(--text-muted);border:1px solid var(--borde)}
     .fv-planif.p-na   {background:rgba(107,114,128,.08);color:var(--gr); border:1px solid rgba(107,114,128,.2)}
     .fv-planif.p-car  {background:rgba(176,184,204,.12); color:#c4bcd8;   border:1px solid rgba(176,184,204,.25)}
@@ -1427,6 +1430,7 @@
     }
     .ftk-p-none { background:var(--ro-bg);  color:var(--ro);  border-color:rgba(176,48,48,.2); }
     .ftk-p-const{ background:rgba(168,120,16,.08); color:var(--am); border-color:rgba(168,120,16,.2); }
+    .ftk-p-at   { background:rgba(200,80,80,.10);  color:var(--ro); border-color:rgba(200,80,80,.3); font-weight:700; }
     .ftk-p-env  { background:rgba(26,72,120,.08);  color:var(--az); border-color:rgba(26,72,120,.2); }
     .ftk-p-del2 { background:rgba(24,104,104,.08); color:var(--tl2); border-color:rgba(24,104,104,.2); }
     .ftk-p-val  { background:var(--ve-bg); color:var(--ve); border-color:rgba(45,122,72,.2); }
@@ -1736,10 +1740,10 @@
             </div>
           </div>
           <div class="exec-del-row">
-            <span class="exec-del-num" style="color:var(--gr)" id="exec-del-ok2">—</span>
+            <span class="exec-del-num" style="color:var(--az)" id="exec-del-ok2">—</span>
             <div class="exec-del-info">
-              <span class="exec-del-lbl" style="color:var(--text-muted)">En construcción</span>
-              <span class="exec-del-sub" id="exec-del-ok2-sub">dentro del plazo</span>
+              <span class="exec-del-lbl" style="color:var(--az)">Ajustes según Escala</span>
+              <span class="exec-del-sub">en proceso de ajuste DEL</span>
             </div>
           </div>
         </div>
@@ -1945,6 +1949,42 @@
 
   <div class="panel-body">
 
+    <!-- AULA VIRTUAL MOODLE -->
+    <div id="p-moodle-wrap" style="display:none;padding:12px 16px 0">
+      <div class="panel-section" style="margin:0;background:#f0f6ff;border:1px solid #c8ddf0;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--az)" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <span style="font-size:12px;font-weight:600;color:var(--az)">Accesos rápidos</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a id="p-moodle-link" href="#" target="_blank" rel="noopener"
+             style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+                    color:#fff;background:var(--az);border-radius:20px;padding:5px 14px;
+                    text-decoration:none;transition:opacity .2s"
+             onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Aula Moodle
+          </a>
+          <a id="p-seg-link" href="#" target="_blank" rel="noopener"
+             style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+                    color:#fff;background:var(--ve);border-radius:20px;padding:5px 14px;
+                    text-decoration:none;transition:opacity .2s"
+             onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Seguimiento
+          </a>
+          <a id="p-prog-link" href="#" target="_blank" rel="noopener"
+             style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:600;
+                    color:#fff;background:#7c3aed;border-radius:20px;padding:5px 14px;
+                    text-decoration:none;transition:opacity .2s"
+             onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Programa
+          </a>
+        </div>
+      </div>
+    </div>
+
     <!-- BLOQUEO / ALERTA CRÍTICA -->
     <div id="p-bloq-section" style="display:none;padding:12px 16px 0">
       <div class="panel-bloq" id="p-bloq-card">
@@ -2102,49 +2142,245 @@ function hitoBadge(estado){
 }
 
 // ─── DATA ───
+// ── Links Moodle PPRD por asignatura ─────────────────────────────────────────
+// "Finanzas Corporativas": AMI-V0582 → Ingeniería, AMI-V0636 → Economía y Negocios
+const MOODLE_URLS = {
+  'Análisis de Datos':                        'https://aulasvirtuales.santotomas.cl/course/view.php?id=765973',
+  'Contabilidad Financiera':                  'https://aulasvirtuales.santotomas.cl/course/view.php?id=765974',
+  'Políticas Públicas e Innovación':          'https://aulasvirtuales.santotomas.cl/course/view.php?id=765975',
+  'Derecho Comercial y Laboral':              'https://aulasvirtuales.santotomas.cl/course/view.php?id=765976',
+  'Finanzas Corporativas|Ingeniería':         'https://aulasvirtuales.santotomas.cl/course/view.php?id=765977',
+  'Finanzas Corporativas|Economía y Negocios':'https://aulasvirtuales.santotomas.cl/course/view.php?id=765978',
+  'Finanzas Corporativas|Ingeniería y Negocios':'https://aulasvirtuales.santotomas.cl/course/view.php?id=765977',
+  'Plan de Negocios':                         'https://aulasvirtuales.santotomas.cl/course/view.php?id=765979',
+  'Mercado de Capitales':                     'https://aulasvirtuales.santotomas.cl/course/view.php?id=765980',
+  'Simulación de Negocios':                   'https://aulasvirtuales.santotomas.cl/course/view.php?id=765981',
+  'Narrativa Digital':                        'https://aulasvirtuales.santotomas.cl/course/view.php?id=765982',
+  'Microeconomía':                            'https://aulasvirtuales.santotomas.cl/course/view.php?id=765983',
+  'Interculturalidad Pueblos Indígenas':      'https://aulasvirtuales.santotomas.cl/course/view.php?id=765984',
+  'Inglés Cultura POP':                       'https://aulasvirtuales.santotomas.cl/course/view.php?id=765985',
+  'Inglés Avanzado I':                        'https://aulasvirtuales.santotomas.cl/course/view.php?id=765986',
+  'Análisis de Datos Cualitativos':           'https://aulasvirtuales.santotomas.cl/course/view.php?id=765987',
+  'Análisis de Datos Cuantitativos':          'https://aulasvirtuales.santotomas.cl/course/view.php?id=765988',
+  'Ingeniería Térmica':                       'https://aulasvirtuales.santotomas.cl/course/view.php?id=765989',
+  'Gestión Incertidumbre y Simulación':       'https://aulasvirtuales.santotomas.cl/course/view.php?id=765990',
+  'Inteligencia de Negocios':                 'https://aulasvirtuales.santotomas.cl/course/view.php?id=765991',
+  'Electivo I: Energías Renovables':          'https://aulasvirtuales.santotomas.cl/course/view.php?id=765992',
+  'Electivo I: Op. Humanitarias':             'https://aulasvirtuales.santotomas.cl/course/view.php?id=765993',
+  'Regresión y Pronóstico de Datos':          'https://aulasvirtuales.santotomas.cl/course/view.php?id=765994',
+  'Proyecto de Título':                       'https://aulasvirtuales.santotomas.cl/course/view.php?id=765995',
+  'Pronóstico de Datos e IA':                 'https://aulasvirtuales.santotomas.cl/course/view.php?id=765996',
+  'Electivo III: Op. Humanitarias':           'https://aulasvirtuales.santotomas.cl/course/view.php?id=765997',
+  'Electivo III: Modelo Neg. Residuos':       'https://aulasvirtuales.santotomas.cl/course/view.php?id=765998',
+  'Evaluación de Proyectos':                  'https://aulasvirtuales.santotomas.cl/course/view.php?id=765999',
+  'Sist. Prod. Cultivos Sostenibles':         'https://aulasvirtuales.santotomas.cl/course/view.php?id=766000',
+  'Sist. Prod. Frutales Sostenibles':         'https://aulasvirtuales.santotomas.cl/course/view.php?id=766003',
+  'Trabajo de Título':                        'https://aulasvirtuales.santotomas.cl/course/view.php?id=766004',
+  'Calidad e Inocuidad Alimentaria':          'https://aulasvirtuales.santotomas.cl/course/view.php?id=766005',
+  'Electivo I: Tecnologías Excavación':       'https://aulasvirtuales.santotomas.cl/course/view.php?id=766006',
+  'Electivo III: IA y Tecnologías 4.0':       'https://aulasvirtuales.santotomas.cl/course/view.php?id=766008',
+  'Gestión de Operaciones Mineras':           'https://aulasvirtuales.santotomas.cl/course/view.php?id=766009',
+  'Taller Emprendimiento en Minería':         'https://aulasvirtuales.santotomas.cl/course/view.php?id=766010',
+  'FP: Neuroadaptación y Ambliopía':          'https://aulasvirtuales.santotomas.cl/course/view.php?id=766011',
+  'FP: Bases Gestión en Imagenología':        'https://aulasvirtuales.santotomas.cl/course/view.php?id=766012',
+  'FP: Herramientas y Atributos Calidad I':   'https://aulasvirtuales.santotomas.cl/course/view.php?id=766013',
+  'FP: Bioinformática':                       'https://aulasvirtuales.santotomas.cl/course/view.php?id=766014',
+  'FP: Componentes Bioactivos en Alimentos':  'https://aulasvirtuales.santotomas.cl/course/view.php?id=766015',
+  'FP: Bases Comportamiento Alimentario':     'https://aulasvirtuales.santotomas.cl/course/view.php?id=766016',
+  'FP: Mercado I+D+i I':                      'https://aulasvirtuales.santotomas.cl/course/view.php?id=766019',
+  'FP: Factores Fisiológicos y Psicológicos del Ejercicio': 'https://aulasvirtuales.santotomas.cl/course/view.php?id=769012',
+  'Electivo FP: Factores fisiológicos y psicológicos del ejercicio': 'https://aulasvirtuales.santotomas.cl/course/view.php?id=769012',
+};
+function getMoodleUrl(asignatura, facultad){
+  return MOODLE_URLS[asignatura+'|'+facultad] || MOODLE_URLS[asignatura] || null;
+}
+
+// ── Programas de asignatura (PDFs) ───────────────────────────────────────────
+const PROGRAMA_URLS = {
+  'Análisis de Datos':                        '/reportes/programas/flat/analisis-datos.pdf',
+  'Contabilidad Financiera':                  '/reportes/programas/flat/contabilidad-financiera.pdf',
+  'Políticas Públicas e Innovación':          '/reportes/programas/flat/politicas-publicas.pdf',
+  'Derecho Comercial y Laboral':              '/reportes/programas/flat/derecho-comercial-laboral.pdf',
+  'Finanzas Corporativas|Ingeniería':         '/reportes/programas/flat/finanzas-corporativas-ing.pdf',
+  'Finanzas Corporativas|Economía y Negocios':'/reportes/programas/flat/finanzas-corporativas-eco.pdf',
+  'Finanzas Corporativas|Ingeniería y Negocios':'/reportes/programas/flat/finanzas-corporativas-ing.pdf',
+  'Plan de Negocios':                         '/reportes/programas/flat/plan-de-negocios.pdf',
+  'Mercado de Capitales':                     '/reportes/programas/flat/mercado-de-capitales.pdf',
+  'Simulación de Negocios':                   '/reportes/programas/flat/simulacion-de-negocios.pdf',
+  'Microeconomía':                            '/reportes/programas/flat/microeconomia.pdf',
+  'Interculturalidad Pueblos Indígenas':      '/reportes/programas/flat/interculturalidad-pueblos-indigenas.pdf',
+  'Inglés Avanzado I':                        '/reportes/programas/flat/ingles-avanzado-i.pdf',
+  'Análisis de Datos Cualitativos':           '/reportes/programas/flat/analisis-datos-cualitativos.pdf',
+  'Análisis de Datos Cuantitativos':          '/reportes/programas/flat/analisis-datos-cuantitativos.pdf',
+  'Ingeniería Térmica':                       '/reportes/programas/flat/ingenieria-termica.pdf',
+  'Gestión Incertidumbre y Simulación':       '/reportes/programas/flat/gestion-incertidumbre-simulacion.pdf',
+  'Inteligencia de Negocios':                 '/reportes/programas/flat/inteligencia-de-negocios.pdf',
+  'Electivo I: Energías Renovables':          '/reportes/programas/flat/electivo-i-energias-renovables.pdf',
+  'Electivo I: Op. Humanitarias':             '/reportes/programas/flat/electivo-i-op-humanitarias.pdf',
+  'Regresión y Pronóstico de Datos':          '/reportes/programas/flat/regresion-pronostico-datos.pdf',
+  'Proyecto de Título':                       '/reportes/programas/flat/proyecto-de-titulo.pdf',
+  'Pronóstico de Datos e IA':                 '/reportes/programas/flat/pronostico-datos-ia.pdf',
+  'Electivo III: Op. Humanitarias':           '/reportes/programas/flat/electivo-iii-op-humanitarias.pdf',
+  'Electivo III: Modelo Neg. Residuos':       '/reportes/programas/flat/electivo-iii-modelo-neg-residuos.pdf',
+  'Trabajo de Título':                        '/reportes/programas/flat/trabajo-de-titulo.pdf',
+  'Evaluación de Proyectos':                  '/reportes/programas/flat/evaluacion-de-proyectos.pdf',
+  'Sist. Prod. Cultivos Sostenibles':         '/reportes/programas/flat/sist-prod-cultivos.pdf',
+  'Sist. Prod. Frutales Sostenibles':         '/reportes/programas/flat/sist-prod-frutales.pdf',
+  'Electivo I: Tecnologías Excavación':       '/reportes/programas/flat/electivo-i-tec-excavacion.pdf',
+  'Electivo III: IA y Tecnologías 4.0':       '/reportes/programas/flat/electivo-iii-ia-tec-40.pdf',
+  'Gestión de Operaciones Mineras':           '/reportes/programas/flat/gestion-operaciones-mineras.pdf',
+  'Taller Emprendimiento en Minería':         '/reportes/programas/flat/taller-emprendimiento-mineria.pdf',
+  'Taller de Pronóstico IA':                  '/reportes/programas/flat/taller-pronostico-ia.pdf',
+};
+function getProgramaUrl(asignatura, facultad){
+  return PROGRAMA_URLS[asignatura+'|'+facultad] || PROGRAMA_URLS[asignatura] || null;
+}
+
+// ── Seguimiento DI — URLs por DI (fallback) ───────────────────────────────────
+const DI_SEG_URLS = {
+  'Andreina':         'https://docs.google.com/spreadsheets/d/1mvc5S3viFNOQr3e8oXHKPT5gQHiA0rS5AsXObR83IYA/edit?usp=drive_link',
+  'Adrelina':         'https://docs.google.com/spreadsheets/d/1mvc5S3viFNOQr3e8oXHKPT5gQHiA0rS5AsXObR83IYA/edit?usp=drive_link',
+  'Natalia':          'https://docs.google.com/spreadsheets/d/1RIQ5zJ3tv6qiUJQYeBeDu_-fG9BUmdxxog68GzAku10/edit?usp=drive_link',
+  'José Luis':        'https://docs.google.com/spreadsheets/d/1cWGEka3pfO1mJD64IsP-hwbh5bCIy44H8Y9YgalA6jg/edit?usp=drive_link',
+  'Noelia':           'https://docs.google.com/spreadsheets/d/1bd8AhhYo0MEuakMQQWeFmyYeWDKTz6FjY-X5BBNDFQ8/edit?usp=drive_link',
+  'Noelia Escalona':  'https://docs.google.com/spreadsheets/d/1bd8AhhYo0MEuakMQQWeFmyYeWDKTz6FjY-X5BBNDFQ8/edit?usp=drive_link',
+  'Magdalena Quezada':'https://docs.google.com/spreadsheets/d/1bd8AhhYo0MEuakMQQWeFmyYeWDKTz6FjY-X5BBNDFQ8/edit?usp=drive_link',
+  'Cristián':         'https://docs.google.com/spreadsheets/d/1MzcRjzWPa6PDCkZdTdOGpyMeUJTXtUGMNg3tkIORWiE/edit?usp=drive_link',
+  'Brenda':           'https://docs.google.com/spreadsheets/d/1-olfhgLaRjo0rT8P9wyCiJ_yPD98RWoL3-bD6J7ofTs/edit?usp=drive_link',
+  'Brenda Bastías':   'https://docs.google.com/spreadsheets/d/1-olfhgLaRjo0rT8P9wyCiJ_yPD98RWoL3-bD6J7ofTs/edit?usp=drive_link',
+};
+
+// ── Seguimiento DI — mapa fijo por asignatura (fuente autorizada) ─────────────
+const _JL  = DI_SEG_URLS['José Luis'];
+const _JL2 = 'https://docs.google.com/spreadsheets/d/133qfGdFmRzBxuTOZ6pWB1T3nTli2C1Ugg2xJtKFRrfM/edit?usp=drive_link';
+const _JL3 = 'https://docs.google.com/spreadsheets/d/1rnHRTp8r_emmiOxYffbnUK8xMs-gkJZCWVYGN0Qhd_Q/edit?usp=drive_link';
+const _NA2 = 'https://docs.google.com/spreadsheets/d/1L43dz5b1_QbAbc1pJSmAzHYoZUGQCmAsksVmhsA-FPc/edit?usp=drive_link';
+const _BR2 = 'https://docs.google.com/spreadsheets/d/1pZA-Q3WA1ddsNruZQS94fEhncKZUl9ZAJlDSTDZBbls/edit?usp=drive_link';
+const _BR  = DI_SEG_URLS['Brenda Bastías'];
+const _MQ  = DI_SEG_URLS['Magdalena Quezada'];
+const _NE  = DI_SEG_URLS['Noelia Escalona'];
+const _AN  = DI_SEG_URLS['Andreina'];
+const _CR  = DI_SEG_URLS['Cristián'];
+const _NA  = DI_SEG_URLS['Natalia'];
+
+const SUBJECT_SEG_URLS = {
+  // ── José Luis ──────────────────────────────────────────────────
+  'Inteligencia de Negocios':                _JL,
+  'Electivo I: Energías Renovables':         _JL,
+  'Electivo III: Modelo Neg. Residuos':      _JL,
+  'Evaluación de Proyectos':                 _JL,
+  'Sist. Prod. Cultivos Sostenibles':        _JL,
+  'Sist. Prod. Frutales Sostenibles':        _JL2,
+  'Trabajo de Título':                       _JL2,
+  'Calidad e Inocuidad Alimentaria':         _JL2,
+  'Mercado de Capitales':                    _JL2,
+  'Análisis de Datos':                       _JL2,
+  'Finanzas Corporativas|Economía y Negocios': _JL3,
+  'Finanzas Corporativas|Ingeniería y Negocios': _JL3,
+  'Políticas Públicas e Innovación':         _JL3,
+  // ── Brenda Bastías ─────────────────────────────────────────────
+  'Electivo I: Op. Humanitarias':            _BR2,
+  'Inglés Avanzado I':                       _BR2,
+  'Derecho Comercial y Laboral':             _BR2,
+  'Interculturalidad Pueblos Indígenas':     _BR2,
+  'Inglés Cultura POP':                      _BR2,
+  'FP: Herramientas y Atributos Calidad I':  _BR,
+  'FP: Bioinformática':                      _BR,
+  'Electivo FP: Herramientas y atributos calidad I': _BR,
+  'Electivo FP: Bioinformática':             _BR,
+  // ── Magdalena Quezada ──────────────────────────────────────────
+  'FP: Componentes Bioactivos en Alimentos': _MQ,
+  'FP: Bases Comportamiento Alimentario':    _MQ,
+  'FP: Mercado I+D+i I':                     _MQ,
+  'Narrativa Digital':                       _MQ,
+  'Electivo FP: Componentes Bioactivos en Alimentos': _MQ,
+  'Electivo FP: Bases Comportamiento Alimentario':    _MQ,
+  'Electivo FP: Mercado I+D+i I':            _MQ,
+  // ── Noelia Escalona ────────────────────────────────────────────
+  'FP: Factores Fisiológicos y Psicológicos del Ejercicio': _NE,
+  'Electivo FP: Factores fisiológicos y psicológicos del ejercicio': _NE,
+  // ── Andreina ───────────────────────────────────────────────────
+  'Ingeniería Térmica':                      _AN,
+  'Regresión y Pronóstico de Datos':         _AN,
+  'Pronóstico de Datos e IA':                _AN,
+  'Electivo III: Op. Humanitarias':          _AN,
+  'Análisis de Datos Cuantitativos':         _AN,
+  // ── Cristián ───────────────────────────────────────────────────
+  'Gestión Incertidumbre y Simulación':      _CR,
+  'Finanzas Corporativas|Ingeniería':        _CR,
+  'Proyecto de Título':                      _CR,
+  'Plan de Negocios':                        _CR,
+  'Contabilidad Financiera':                 _CR,
+  'Microeconomía':                           _CR,
+  // ── Natalia ────────────────────────────────────────────────────
+  'Simulación de Negocios':                  _NA,
+  'Análisis de Datos Cualitativos':          _NA,
+  'Electivo I: Tecnologías Excavación':      _NA,
+  'Electivo III: IA y Tecnologías 4.0':      _NA,
+  'Gestión de Operaciones Mineras':          _NA,
+  'Taller Emprendimiento en Minería':        _NA,
+  'FP: Neuroadaptación y Ambliopía':         _NA2,
+  'FP: Bases Gestión en Imagenología':       _NA2,
+  'Electivo FP: Neuroadaptación y ambliopía':        _NA2,
+  'Electivo FP: Bases Gestión en Imagenología':      _NA2,
+};
+
+function getSegUrl(asignatura, facultad, di){
+  // Primero: mapa fijo por asignatura (ignora campo DI del sheet)
+  const bySubject = SUBJECT_SEG_URLS[asignatura+'|'+facultad] || SUBJECT_SEG_URLS[asignatura];
+  if(bySubject) return bySubject;
+  // Fallback: buscar por nombre DI
+  if(di){
+    const diKey=Object.keys(DI_SEG_URLS).find(k=>di.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(di.toLowerCase()));
+    if(diKey) return DI_SEG_URLS[diKey];
+  }
+  return null;
+}
+
 const PROD = {
-  "Ingeniería Térmica":                         {sc:63,di:59,vd:4,dm:0,qa:0,ter:0,pres:64,asin:72,t1:0,t2:0,t3:0,t4:19},
-  "Gestión Incertidumbre y Simulación":         {sc:55,di:10,vd:2,dm:0,qa:0,ter:0,pres:40,asin:56,t1:8,t2:4,t3:2,t4:6},
-  "Finanzas Corporativas":                      {sc:48,di:8, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:6,t2:3,t3:2,t4:5},
-  "Inteligencia de Negocios":                   {sc:52,di:12,vd:3,dm:0,qa:0,ter:0,pres:36,asin:60,t1:7,t2:5,t3:2,t4:6},
-  "Electivo I: Energías Renovables":            {sc:38,di:5, vd:0,dm:0,qa:0,ter:0,pres:28,asin:44,t1:4,t2:2,t3:1,t4:4},
-  "Electivo I: Op. Humanitarias":               {sc:42,di:0, vd:0,dm:0,qa:0,ter:0,pres:24,asin:40,t1:3,t2:2,t3:1,t4:3},
-  "Regresión y Pronóstico de Datos":            {sc:58,di:14,vd:2,dm:0,qa:0,ter:0,pres:40,asin:64,t1:8,t2:4,t3:2,t4:5},
-  "Proyecto de Título":                         {sc:30,di:6, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
-  "Pronóstico de Datos e IA":                   {sc:60,di:18,vd:3,dm:0,qa:0,ter:0,pres:44,asin:68,t1:9,t2:5,t3:2,t4:6},
-  "Electivo III: Op. Humanitarias":             {sc:40,di:0, vd:0,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:4},
-  "Electivo III: Modelo Neg. Residuos":         {sc:36,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:36,t1:3,t2:2,t3:1,t4:3},
-  "Electivo I: Tecnologías Excavación":         {sc:44,di:8, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:5,t2:3,t3:1,t4:4},
-  "Electivo III: IA y Tecnologías 4.0":         {sc:50,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:52,t1:6,t2:3,t3:2,t4:5},
-  "Gestión de Operaciones Mineras":             {sc:46,di:6, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:5,t2:3,t3:1,t4:4},
-  "Taller Emprendimiento en Minería":           {sc:34,di:4, vd:0,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
-  "Plan de Negocios":                           {sc:45,di:8, vd:2,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:2,t4:4},
-  "Simulación de Negocios":                     {sc:50,di:10,vd:2,dm:0,qa:0,ter:0,pres:32,asin:52,t1:6,t2:4,t3:2,t4:5},
-  "Mercado de Capitales":                       {sc:60,di:0, vd:0,dm:0,qa:0,ter:0,pres:40,asin:60,t1:8,t2:4,t3:2,t4:6},
-  "Análisis de Datos":                          {sc:55,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:56,t1:7,t2:4,t3:2,t4:5},
-  "Inglés Avanzado I":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
-  "Políticas Públicas e Innovación":            {sc:52,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:52,t1:6,t2:3,t3:2,t4:5},
-  "Contabilidad Financiera":                    {sc:48,di:8, vd:2,dm:0,qa:0,ter:0,pres:32,asin:48,t1:6,t2:3,t3:2,t4:4},
-  "Microeconomía":                              {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
-  "Derecho Comercial y Laboral":                {sc:38,di:4, vd:1,dm:0,qa:0,ter:0,pres:24,asin:36,t1:4,t2:2,t3:1,t4:3},
-  "Evaluación de Proyectos":                    {sc:46,di:8, vd:2,dm:0,qa:0,ter:0,pres:32,asin:48,t1:5,t2:3,t3:2,t4:4},
-  "Sist. Prod. Cultivos Sostenibles":           {sc:42,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:4,t2:3,t3:1,t4:4},
-  "Sist. Prod. Frutales Sostenibles":           {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
-  "Trabajo de Título":                          {sc:28,di:4, vd:0,dm:0,qa:0,ter:0,pres:16,asin:28,t1:2,t2:1,t3:1,t4:2},
-  "Calidad e Inocuidad Alimentaria":            {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
-  "Análisis de Datos Cualitativos":             {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
-  "Análisis de Datos Cuantitativos":            {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
-  "FP: Neuroadaptación y Ambliopía":            {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
-  "FP: Bases Gestión en Imagenología":          {sc:40,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
-  "FP: Herramientas y Atributos Calidad I":     {sc:38,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:36,t1:4,t2:2,t3:1,t4:3},
-  "FP: Bioinformática":                         {sc:50,di:6, vd:1,dm:0,qa:0,ter:0,pres:32,asin:52,t1:6,t2:3,t3:2,t4:5},
-  "FP: Componentes Bioactivos en Alimentos":    {sc:46,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:48,t1:5,t2:3,t3:1,t4:4},
-  "FP: Bases Comportamiento Alimentario":       {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:5,t2:3,t3:1,t4:4},
-  "FP: Mercado I+D+i I":                        {sc:42,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:44,t1:4,t2:3,t3:1,t4:4},
-  "FP: Factores Fisiológicos y Psicológicos del Ejercicio":{sc:48,di:4,vd:0,dm:0,qa:0,ter:0,pres:28,asin:48,t1:5,t2:2,t3:1,t4:4},
-  "Interculturalidad Pueblos Indígenas":        {sc:38,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:3,t2:2,t3:1,t4:3},
-  "Inglés Cultura POP":                         {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:32,t1:3,t2:2,t3:1,t4:3},
-  "Narrativa Digital":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:4,t2:2,t3:1,t4:3},
+  "Ingeniería Térmica":                         {sc:63,di:59,vd:4,dm:0,qa:0,ter:0,pres:64,asin:72,t1:0, t2:0, t3:19,t4:8},
+  "Gestión Incertidumbre y Simulación":         {sc:55,di:10,vd:2,dm:0,qa:0,ter:0,pres:40,asin:56,t1:0, t2:0, t3:19,t4:12},
+  "Finanzas Corporativas":                      {sc:48,di:8, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:8, t2:16,t3:10,t4:8},
+  "Finanzas Corporativas||sergio álvarez":      {sc:32,di:6, vd:1,dm:0,qa:0,ter:0,pres:36,asin:36,t1:8, t2:16,t3:19,t4:12},
+  "Inteligencia de Negocios":                   {sc:52,di:12,vd:3,dm:0,qa:0,ter:0,pres:36,asin:60,t1:0, t2:0, t3:19,t4:9},
+  "Electivo I: Energías Renovables":            {sc:38,di:5, vd:0,dm:0,qa:0,ter:0,pres:28,asin:44,t1:0, t2:0, t3:19,t4:9},
+  "Electivo I: Op. Humanitarias":               {sc:42,di:0, vd:0,dm:0,qa:0,ter:0,pres:24,asin:40,t1:0, t2:0, t3:19,t4:8},
+  "Regresión y Pronóstico de Datos":            {sc:58,di:14,vd:2,dm:0,qa:0,ter:0,pres:40,asin:64,t1:12,t2:24,t3:10,t4:7},
+  "Proyecto de Título":                         {sc:30,di:6, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:0, t2:0, t3:10,t4:15},
+  "Pronóstico de Datos e IA":                   {sc:60,di:18,vd:3,dm:0,qa:0,ter:0,pres:44,asin:68,t1:0, t2:0, t3:19,t4:8},
+  "Electivo III: Op. Humanitarias":             {sc:40,di:0, vd:0,dm:0,qa:0,ter:0,pres:28,asin:40,t1:0, t2:0, t3:19,t4:8},
+  "Electivo III: Modelo Neg. Residuos":         {sc:36,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:36,t1:0, t2:0, t3:19,t4:8},
+  "Electivo I: Tecnologías Excavación":         {sc:44,di:8, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:8, t2:16,t3:10,t4:8},
+  "Electivo III: IA y Tecnologías 4.0":         {sc:50,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:52,t1:8, t2:16,t3:10,t4:8},
+  "Gestión de Operaciones Mineras":             {sc:46,di:6, vd:1,dm:0,qa:0,ter:0,pres:32,asin:48,t1:0, t2:0, t3:19,t4:12},
+  "Taller Emprendimiento en Minería":           {sc:34,di:4, vd:0,dm:0,qa:0,ter:0,pres:20,asin:36,t1:8, t2:16,t3:0, t4:8},
+  "Plan de Negocios":                           {sc:45,di:8, vd:2,dm:0,qa:0,ter:0,pres:28,asin:44,t1:0, t2:0, t3:7, t4:15},
+  "Simulación de Negocios":                     {sc:50,di:10,vd:2,dm:0,qa:0,ter:0,pres:32,asin:52,t1:0, t2:0, t3:10,t4:8},
+  "Mercado de Capitales":                       {sc:60,di:0, vd:0,dm:0,qa:0,ter:0,pres:40,asin:60,t1:8, t2:16,t3:10,t4:12},
+  "Análisis de Datos":                          {sc:55,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:56,t1:0, t2:0, t3:10,t4:8},
+  "Inglés Avanzado I":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:8, t2:16,t3:10,t4:8},
+  "Políticas Públicas e Innovación":            {sc:52,di:0, vd:0,dm:0,qa:0,ter:0,pres:36,asin:52,t1:8, t2:16,t3:10,t4:8},
+  "Contabilidad Financiera":                    {sc:48,di:8, vd:2,dm:0,qa:0,ter:0,pres:32,asin:48,t1:8, t2:16,t3:10,t4:12},
+  "Microeconomía":                              {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:8, t2:16,t3:10,t4:12},
+  "Derecho Comercial y Laboral":                {sc:38,di:4, vd:1,dm:0,qa:0,ter:0,pres:24,asin:36,t1:8, t2:16,t3:10,t4:8},
+  "Evaluación de Proyectos":                    {sc:46,di:8, vd:2,dm:0,qa:0,ter:0,pres:32,asin:48,t1:3, t2:6,  t3:10,t4:8},
+  "Sist. Prod. Cultivos Sostenibles":           {sc:42,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:3, t2:6,  t3:14,t4:8},
+  "Sist. Prod. Frutales Sostenibles":           {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:3, t2:6,  t3:14,t4:8},
+  "Trabajo de Título":                          {sc:28,di:4, vd:0,dm:0,qa:0,ter:0,pres:16,asin:28,t1:0, t2:0, t3:10,t4:11},
+  "Calidad e Inocuidad Alimentaria":            {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:2, t2:4,  t3:15,t4:8},
+  "Análisis de Datos Cualitativos":             {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:4, t2:8,  t3:19,t4:7},
+  "Análisis de Datos Cuantitativos":            {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:4, t2:8,  t3:19,t4:13},
+  "Electivo FP: Neuroadaptación y ambliopía":              {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Bases Gestión en Imagenología":            {sc:40,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:40,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Herramientas y atributos calidad I":       {sc:38,di:4, vd:0,dm:0,qa:0,ter:0,pres:24,asin:36,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Bioinformática":                           {sc:50,di:6, vd:1,dm:0,qa:0,ter:0,pres:32,asin:52,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Componentes Bioactivos en Alimentos":      {sc:46,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:48,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Bases Comportamiento Alimentario":         {sc:44,di:6, vd:1,dm:0,qa:0,ter:0,pres:28,asin:44,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Mercado I+D+i I":                         {sc:42,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:44,t1:0, t2:0, t3:19,t4:8},
+  "Electivo FP: Factores fisiológicos y psicológicos del ejercicio":{sc:48,di:4,vd:0,dm:0,qa:0,ter:0,pres:28,asin:48,t1:0,t2:0,t3:19,t4:8},
+  "Interculturalidad Pueblos Indígenas":        {sc:38,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:36,t1:4, t2:8,  t3:15,t4:8},
+  "Inglés Cultura POP":                         {sc:36,di:4, vd:1,dm:0,qa:0,ter:0,pres:20,asin:32,t1:8, t2:16,t3:10,t4:8},
+  "Narrativa digital":                          {sc:40,di:6, vd:1,dm:0,qa:0,ter:0,pres:24,asin:40,t1:8, t2:16,t3:10,t4:8},
 };
 
 
@@ -2152,8 +2388,12 @@ const PROD = {
 // ─── IDs de hojas Google ───────────────────────────────────────────────────────
 const SHEET_ID    = '14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY';
 const SHEET_GID   = '1889016436';
-const BENCH_ID    = '1DpexuKXjou9g_X35VU1oFwyIsoENRXMX';
-const BENCH_SHEET = 'Ejemplo';
+// Hojas de reuniones — fuente de verdad para T1-T4 por asignatura
+const REUNION_SHEETS = [
+  {id:'1GW_58PzGzHDyToteBhUbNBAYUgEPLaW_cw_5BF21nr0', gid:'1278480875'},
+  {id:'1vmOZTWMjt5NVPQiU6UsuTL78RNUJCmkP',           gid:'1166243288'},
+  {id:'117Wfv_H-epo-vcS-sqLY1vM3A6Oa2C6C',           gid:'1736645418'},
+];
 
 // ─── CSV loader — ignora filtros activos de Google Sheets ─────────────────────
 async function loadSheetCSV(sheetId, gid){
@@ -2180,7 +2420,7 @@ function buildDataFromCSV(rows){
     const asig = r[1].trim();
     const rawPct = r[20] ? parseFloat(String(r[20]).replace('%','').replace(',','.')) : 0;
     const pct = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
-    data.push({facultad:r[0]||'',asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
+    data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
       fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
@@ -2203,7 +2443,7 @@ function buildDataFromGviz(rows){
     const asig=r[1];
     const rawPct=row.c?.[20]?.v;
     const pct=typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
-    data.push({facultad:r[0]||'',asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
+    data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
       fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
@@ -2314,7 +2554,7 @@ async function loadSheetData(silent=false){
   try{
     const csvRows = await loadSheetCSV(SHEET_ID, SHEET_GID);
     const built = buildDataFromCSV(csvRows);
-    DATA = applyOverrides(built.data); AVANCE = built.avance;
+    DATA = applyOverrides(applyDgAssign(built.data)); AVANCE = built.avance;
     window._ust_cache = {DATA:[...DATA], AVANCE:{...AVANCE}, ts:Date.now()};
     const now=new Date();
     setSyncLabel(`Actualizado ${now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})} · ${now.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'})}`);
@@ -2337,7 +2577,7 @@ async function loadDashboardData(){
   try{
     const csvRows = await loadSheetCSV(SHEET_ID, SHEET_GID);
     const built = buildDataFromCSV(csvRows);
-    DATA_ALL = applyOverrides(built.data); AVANCE_ALL = built.avance;
+    DATA_ALL = applyOverrides(applyDgAssign(built.data)); AVANCE_ALL = built.avance;
     return true;
   }catch(err){
     console.warn('loadDashboardData error:', err.message);
@@ -2433,7 +2673,15 @@ function filtered(){
   });
 }
 function rbClass(r){if(r==='Realizada')return'rb rb-r';if(r==='Agendada')return'rb rb-a';if(r==='Sin respuesta')return'rb rb-s';return'rb rb-n'}
-function dotClass(p){
+// Devuelve true si la planificación está atrasada (En construcción / No inicia con plazo vencido)
+function isAtrasada(d){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const step = planifStepIndex(d.planif||'');
+  return step < 2 && today > planifDeadline(d.facultad);
+}
+
+function dotClass(p, d){
+  if(d && isAtrasada(d)) return 'at';
   if(!p||p==='No inicia'||p==='No enviada')return 'r';
   if(p==='En construcción'||p==='Pendiente')return 'y';
   if(p==='No aplica')return 'x';
@@ -2445,7 +2693,8 @@ function dotClass(p){
 }
 
 // Etiqueta corta para columna planif en tabla
-function planifLabel(p){
+function planifLabel(p, d){
+  if(d && isAtrasada(d)) return '⚠ Atrasada';
   if(!p||p==='No inicia')return 'No inicia';
   if(p==='En construcción')return 'En construcción';
   if(p==='No aplica')return 'No aplica';
@@ -2456,42 +2705,62 @@ function planifLabel(p){
   return p;
 }
 
-// BENCH: datos reales desde hoja "Ejemplo" (se carga al iniciar)
-// Sólo columnas pedagógicas B–K. Columnas X–AB (pesos) NO se leen.
-let BENCH = {};
+// REUNION_T: T1-T4 reales por asignatura, cargados desde las hojas de reuniones
+// Clave principal: asig_norm  (minúsculas, sin espacios extra)
+// Clave compuesta: asig_norm + '||' + docente_norm  (para asignaturas duplicadas)
+let REUNION_T = {};
 
-async function loadBenchData(){
-  try{
-    const resp = await loadGvizSheet(BENCH_ID, `sheet=${encodeURIComponent(BENCH_SHEET)}`);
-    const rows = resp.table?.rows || [];
-    const num = v => parseFloat(String(v||'0').replace(',','.'))||0;
-    rows.forEach(row=>{
-      const r=(row.c||[]).map(c=>(c?.v!=null)?c.v:'');
-      const nombre=String(r[1]||'').trim();
-      if(!nombre || nombre==='Asignaturas') return;
-      BENCH[nombre]={
-        pres: Math.round(num(r[4])), asin: Math.round(num(r[6])),
-        t1:Math.floor(num(r[11])), t2:Math.floor(num(r[12])),
-        t3:Math.floor(num(r[13])), t4:Math.floor(num(r[14])),
-      };
-    });
-  }catch(err){
-    console.warn('Bench data no disponible:', err.message);
+function _norm(s){ return String(s||'').trim().toLowerCase().split('\n')[0].trim(); }
+
+async function loadReunionData(){
+  for(const s of REUNION_SHEETS){
+    try{
+      // loadSheetCSV ya salta la primera fila (título fusionado) → buscar header por contenido
+      const rows = await loadSheetCSV(s.id, s.gid);
+      if(!rows.length) continue;
+      // Buscar la fila que contiene "Asignatura" como encabezado
+      const hdrIdx = rows.findIndex(r=>r.some(c=>c.trim()==='Asignatura'));
+      if(hdrIdx<0) continue;
+      const hdr = rows[hdrIdx];
+      const iAsig = hdr.findIndex(h=>h.trim()==='Asignatura');
+      const iDoc  = hdr.findIndex(h=>/^docente/i.test(h.trim()));
+      const iT1   = hdr.findIndex(h=>h.trim()==='T1');
+      const iT2   = hdr.findIndex(h=>h.trim()==='T2');
+      const iT3   = hdr.findIndex(h=>h.trim()==='T3');
+      const iT4   = hdr.findIndex(h=>h.trim()==='T4');
+      if(iAsig<0 || iT1<0) continue;
+      rows.slice(hdrIdx+1).forEach(r=>{
+        const asig = (r[iAsig]||'').trim();
+        if(!asig || /^DI:/i.test(asig)) return;
+        const doc = iDoc>=0 ? _norm(r[iDoc]) : '';
+        const vals = {
+          t1: parseInt(r[iT1])||0, t2: parseInt(r[iT2])||0,
+          t3: parseInt(r[iT3])||0, t4: parseInt(r[iT4])||0,
+        };
+        const k = _norm(asig);
+        REUNION_T[k] = vals;
+        if(doc) REUNION_T[k+'||'+doc] = vals;
+      });
+    }catch(err){
+      console.warn('Reunion sheet error:', err.message);
+    }
   }
 }
 
-function getProd(asig){
-  // Prioridad: BENCH (datos reales del sheet) → PROD (fallback hardcodeado)
-  const b = BENCH[asig];
-  const p = PROD[asig] || {sc:40,di:5,vd:1,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:3};
-  if(b){
-    // Tomar sc/di/vd/dm/qa/ter del PROD (estados de producción),
-    // pero horas y tipos de recursos del BENCH (datos reales del sheet)
+function getProd(asig, docente){
+  // 1. REUNION_T: fuente real (hojas de reuniones) — clave compuesta tiene prioridad
+  const kA = _norm(asig);
+  const kD = docente ? kA+'||'+_norm(docente) : '';
+  const r = (kD && REUNION_T[kD]) || REUNION_T[kA];
+  // 2. PROD: fallback con clave compuesta normalizada o sólo asig
+  const pKey = (docente && PROD[asig+'||'+_norm(docente)]) ? asig+'||'+_norm(docente) : asig;
+  const p = PROD[pKey] || {sc:40,di:5,vd:1,dm:0,qa:0,ter:0,pres:28,asin:40,t1:4,t2:2,t3:1,t4:3};
+  if(r){
     return {
-      sc:   p.sc,  di:  p.di,  vd:  p.vd,
-      dm:   p.dm,  qa:  p.qa,  ter: p.ter,
-      pres: b.pres, asin: b.asin,
-      t1: b.t1, t2: b.t2, t3: b.t3, t4: b.t4,
+      sc: p.sc, di: p.di, vd: p.vd,
+      dm: p.dm, qa: p.qa, ter: p.ter,
+      pres: p.pres, asin: p.asin,
+      t1: r.t1, t2: r.t2, t3: r.t3, t4: r.t4,
     };
   }
   return p;
@@ -2538,14 +2807,13 @@ function renderSidebar(){
 }
 
 // ─── FAC BAR ───
-const FAC_ORDER=["Ingeniería","Economía y Negocios","Ciencias Sociales","Formación General","Salud","Recursos Naturales"];
+const FAC_ORDER=["Ingeniería y Negocios","Ciencias Sociales y Educación","Formación General","Salud","Recursos Naturales y Medicina Veterinaria"];
 const FAC_ABBR={
-  "Ciencias Sociales":"CC. Sociales",
-  "Economía y Negocios":"Econ. y Neg.",
+  "Ingeniería y Negocios":"Ing. y Neg.",
+  "Ciencias Sociales y Educación":"CC. Soc. y Ed.",
   "Formación General":"Form. General",
-  "Ingeniería":"Ingeniería",
-  "Recursos Naturales":"Rec. Naturales",
-  "Salud":"Salud"
+  "Salud":"Salud",
+  "Recursos Naturales y Medicina Veterinaria":"Rec. Nat. y MV"
 };
 
 function renderFacBar(){
@@ -2564,12 +2832,14 @@ function renderFacBar(){
     const info=byFac[fac];
     const pct=Math.round(info.validadas/info.total*100);
     const isActive=filters.facultad===fac;
-    return `<div class="fac-card${isActive?' active':''}" data-fac="${fac}">
+    const col = FAC_COLORS[fac]||'#3b6e8c';
+    const activeBg = isActive ? `background:${col}22;border-color:${col};box-shadow:0 0 0 1px ${col}40,0 4px 16px rgba(0,0,0,.3);` : '';
+    return `<div class="fac-card${isActive?' active':''}" data-fac="${fac}" style="border-left:3px solid ${col};${activeBg}">
       <div class="fac-top">
-        <div class="fac-name">${FAC_ABBR[fac]||fac}</div>
+        <div class="fac-name" style="color:${col}">${FAC_ABBR[fac]||fac}</div>
         <div class="fac-count">${info.total}</div>
       </div>
-      <div class="fac-prog-wrap"><div class="fac-prog" style="width:${pct}%"></div></div>
+      <div class="fac-prog-wrap"><div class="fac-prog" style="width:${pct}%;background:${col}"></div></div>
       <div class="fac-sub">
         <span class="fac-ok">${info.validadas} S0 validadas</span>
         <span class="fac-pend">${pct}%</span>
@@ -2588,7 +2858,25 @@ function renderFacBar(){
 // ─── KPIs ───
 function renderKPIs(){
   const rows=filtered();
-  const t=rows.length,r=rows.filter(d=>d.reunion==='Realizada').length,a=rows.filter(d=>d.reunion==='Agendada').length,s=rows.filter(d=>d.reunion==='Sin respuesta').length;
+  const t=rows.length;
+  const r=rows.filter(d=>d.reunion==='Realizada').length;
+  const a=rows.filter(d=>d.reunion==='Agendada').length;
+  const s=rows.filter(d=>d.reunion==='Sin respuesta').length;
+
+  // Planificación DEL — misma lógica que resumen por facultad
+  const today = new Date(); today.setHours(0,0,0,0);
+  let ok=0, rev=0, atras=0, escala=0;
+  rows.forEach(d=>{
+    const p = (d.planif||'').trim();
+    const step = planifStepIndex(p);
+    const deadline = planifDeadline(d.facultad);
+    if(step >= 4)                        ok++;
+    else if(step >= 2)                   rev++;
+    else if(p === 'Ajustes según Escala') escala++;
+    else if(today > deadline)            atras++;
+    else                                 atras++;
+  });
+
   document.getElementById('kpi-bar').innerHTML=`
     <div class="kpi k-az">
       <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
@@ -2596,15 +2884,19 @@ function renderKPIs(){
     </div>
     <div class="kpi k-ve">
       <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-      <div class="kpi-info"><div class="kpi-val c-ve">${r}</div><div class="kpi-name">Reuniones realizadas</div></div>
+      <div class="kpi-info"><div class="kpi-val c-ve">${ok}</div><div class="kpi-name">Validadas DEL</div><div class="kpi-sub">planificaciones aprobadas</div></div>
     </div>
     <div class="kpi k-am">
-      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-      <div class="kpi-info"><div class="kpi-val c-am">${a}</div><div class="kpi-name">Agendadas</div></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val c-am">${rev}</div><div class="kpi-name">En revisión DEL</div><div class="kpi-sub">enviadas o en 2° instancia</div></div>
     </div>
     <div class="kpi k-ro">
-      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-      <div class="kpi-info"><div class="kpi-val c-ro">${s}</div><div class="kpi-name">Sin respuesta</div></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val c-ro">${atras}</div><div class="kpi-name">Atrasadas</div><div class="kpi-sub">plazo vencido, sin enviar</div></div>
+    </div>
+    <div class="kpi" style="border-color:rgba(59,110,140,.25)">
+      <div class="kpi-icon" style="color:var(--az)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val" style="color:var(--az)">${escala}</div><div class="kpi-name" style="color:var(--az)">Ajustes según Escala</div><div class="kpi-sub">en proceso de ajuste DEL</div></div>
     </div>`;
   document.getElementById('header-count').textContent=t;
 }
@@ -2629,7 +2921,7 @@ function renderTable(){
       <td><span class="chip chip-fac">${d.facultad}</span></td>
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
-      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif)}"></span>${planifLabel(d.planif)}</span></td>
+      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${planifLabel(d.planif,d)}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
@@ -2641,17 +2933,46 @@ function renderTable(){
 function openPanel(idx){
   selectedIdx=idx;
   const d=currentRows[idx];
-  const p=getProd(d.asignatura);
+  const p=getProd(d.asignatura, d.docente);
   const av=AVANCE[d.asignatura]||{avance:0,obs:'',hitos:{}};
   const total=p.sc+p.di+p.vd+p.dm+p.qa+p.ter;
   const avPct=av.avance||0;
 
-  document.querySelectorAll('#tbody tr').forEach((tr,i)=>tr.classList.toggle('selected',i===idx));
+  const facCol = FAC_COLORS[d.facultad] || '#2d5a74';
+  document.querySelectorAll('#tbody tr').forEach((tr,i)=>{
+    tr.classList.toggle('selected',i===idx);
+    if(i===idx) tr.style.boxShadow=`inset 3px 0 0 ${facCol}`;
+    else tr.style.boxShadow='';
+  });
 
-  // Header
-  document.getElementById('p-fac').textContent=d.facultad;
+  // Header con color de facultad
+  const panelHeader = document.querySelector('.panel-header');
+  if(panelHeader){
+    panelHeader.style.background=`linear-gradient(135deg, ${facCol}dd 0%, ${facCol}99 100%)`;
+    panelHeader.style.borderBottom=`2px solid ${facCol}`;
+  }
+
+  // Tag de facultad con color
+  const facTag = document.getElementById('p-fac');
+  facTag.textContent=d.facultad;
+  facTag.style.background=`${facCol}30`;
+  facTag.style.borderColor=`${facCol}60`;
+  facTag.style.color='white';
+
   document.getElementById('p-title').textContent=d.asignatura;
   document.getElementById('p-avance').textContent=`Avance ${avPct}%`;
+  // Link Moodle
+  const moodleUrl=getMoodleUrl(d.asignatura,d.facultad);
+  const segUrl=getSegUrl(d.asignatura,d.facultad,d.di);
+  const progUrl=getProgramaUrl(d.asignatura,d.facultad);
+  const moodleWrap=document.getElementById('p-moodle-wrap');
+  const moodleLink=document.getElementById('p-moodle-link');
+  const segLink=document.getElementById('p-seg-link');
+  const progLink=document.getElementById('p-prog-link');
+  if(moodleUrl||segUrl||progUrl){moodleWrap.style.display='block';}else{moodleWrap.style.display='none';}
+  if(moodleUrl){moodleLink.href=moodleUrl;moodleLink.style.display='inline-flex';}else{moodleLink.style.display='none';}
+  if(segLink){if(segUrl){segLink.href=segUrl;segLink.style.display='inline-flex';}else{segLink.style.display='none';}}
+  if(progLink){if(progUrl){progLink.href=progUrl;progLink.style.display='inline-flex';}else{progLink.style.display='none';}}
   document.getElementById('p-chips').innerHTML=`
     <span class="pchip">JP: ${d.jp}</span>
     <span class="pchip">DI: ${d.di}</span>
@@ -2706,16 +3027,17 @@ function openPanel(idx){
 
   // T1-T4
   const tipos=[
-    {cls:'t1',tipo:'Tipo T1',val:p.t1,desc:'Videoclase · Video cápsula · Podcast'},
-    {cls:'t2',tipo:'Tipo T2',val:p.t2,desc:'Genially'},
-    {cls:'t3',tipo:'Tipo T3',val:p.t3,desc:'Guía de aprendizaje · Guía de ejercicios'},
-    {cls:'t4',tipo:'Tipo T4',val:p.t4,desc:'Foro · Quiz · Tarea'},
+    {cls:'t1',tipo:'Tipo 1',val:p.t1,desc:'Audiovisuales e interactivos breves',kw:'Videoclase · Cápsula · Podcast · H5P · Genially · Infografía interactiva'},
+    {cls:'t2',tipo:'Tipo 2',val:p.t2,desc:'Actividades prácticas y evaluativas',kw:'Tarea · Foro · Quiz · Lectura · Mapa · Glosario · Resumen · Apunte · Infografía · Control formativo'},
+    {cls:'t3',tipo:'Tipo 3',val:p.t3,desc:'Materiales sesiones sincrónicas',kw:'Presentación · Facilitación · Dinámica · Ejercicio'},
+    {cls:'t4',tipo:'Tipo 4',val:p.t4,desc:'Actividades TPE',kw:'Link · Reflexión · Diagnóstico · Actividades'},
   ];
   document.getElementById('t-grid').innerHTML=tipos.map(t=>`
     <div class="t-card ${t.cls}">
       <div class="t-label">${t.tipo}</div>
       <div class="t-val">${t.val}</div>
       <div class="t-desc">${t.desc}</div>
+      <div class="t-kw">${t.kw}</div>
     </div>`).join('');
 
   // DOCENTE
@@ -2838,7 +3160,7 @@ document.getElementById('search').addEventListener('input',e=>{
   // JSONP requiere requests secuenciales (1 a la vez)
   const ok = await loadSheetData();
   await loadDashboardData();
-  await loadBenchData();
+  await loadReunionData();
   // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
   requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
 
@@ -2905,6 +3227,24 @@ document.getElementById('search').addEventListener('input',e=>{
   }, 5*60*1000);
 })();
 
+// ─── DG ASIGNACIONES FIJAS (FP sin DG en hoja de cálculo) ───────
+const DG_ASSIGN = {
+  'Electivo FP: Neuroadaptación y ambliopía':             'Jenny',
+  'Electivo FP: Bases Gestión en Imagenología':           'Jenny',
+  'Electivo FP: Herramientas y atributos calidad I':      'Jenny',
+  'Electivo FP: Bioinformática':                          'Jenny',
+  'Electivo FP: Componentes Bioactivos en Alimentos':     'Jenny',
+  'Electivo FP: Bases Comportamiento Alimentario':        'Giovanni',
+  'Electivo FP: Mercado I+D+i I':                        'Giovanni',
+  'Electivo FP: Factores fisiológicos y psicológicos del ejercicio': 'Giovanni',
+};
+function applyDgAssign(data){
+  return data.map(d=>{
+    if(!d.dg && DG_ASSIGN[d.asignatura]) return {...d, dg: DG_ASSIGN[d.asignatura]};
+    return d;
+  });
+}
+
 // ─── OVERRIDES LOCALES (planif + fechas DEL) ────────────────────
 function getOverrides(){
   try{ return JSON.parse(localStorage.getItem('ust_planif_overrides')||'{}'); }
@@ -2942,6 +3282,7 @@ const PLANIF_FLOW = [
 function planifStepIndex(planif){
   if(!planif||planif==='No inicia'||planif==='No enviada')return 0;
   if(planif==='En construcción'||planif==='Pendiente')return 1;
+  if(planif==='Ajustes según Escala')return 1.5;
   if(planif==='Enviada a validación DEL')return 2;
   if(planif==='DEL 2° Instancia')return 3;
   if(planif==='Validada')return 4;
@@ -2976,6 +3317,17 @@ function renderDelReview(d){
 
   // Badge "local" en el título
   titleEl.innerHTML = `Revisión DEL${localOv?' <span class="del-badge local">✏ local</span>':''}`;
+
+  // Banner de atrasada
+  const atBanner = section.querySelector('.del-atras-banner');
+  if(atBanner) atBanner.remove();
+  if(isAtrasada(d)){
+    const banner = document.createElement('div');
+    banner.className = 'del-atras-banner';
+    banner.style.cssText = 'background:rgba(200,80,80,.1);border:1px solid rgba(200,80,80,.3);border-radius:6px;padding:6px 10px;font-size:11px;color:var(--ro);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px';
+    banner.innerHTML = '⚠ Atrasada — plazo vencido sin enviar a DEL';
+    flow.parentNode.insertBefore(banner, flow);
+  }
 
   // Flujo de pasos
   flow.innerHTML = PLANIF_FLOW.map((step, i) => {
@@ -3072,7 +3424,7 @@ function guardarDelLocal(asignatura){
 function borrarDelLocal(asignatura){
   clearOverride(asignatura);
   // Recargar datos desde caché y re-aplicar overrides
-  if(window._ust_cache){ DATA=applyOverrides([...window._ust_cache.DATA]); }
+  if(window._ust_cache){ DATA=applyOverrides(applyDgAssign([...window._ust_cache.DATA])); }
   renderKPIs(); renderTable();
   const idx = currentRows.findIndex(d=>d.asignatura===asignatura);
   if(idx>=0) openPanel(idx);
@@ -3292,18 +3644,21 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ── DIRECTORES DE ESCUELA (DNE) ──────────────────────────────────────────────
 const DNE_DATA = [
-  {facultad:'Recursos Naturales',  escuela:'Agronomía',             programa:'Agronomía PCE',                    nombre:'Álvaro Reyes',     mail:'areyes@santotomas.cl'},
-  {facultad:'Ciencias Sociales',   escuela:'Trabajo Social',        programa:'Licenciatura en Trabajo Social',   nombre:'Verónica Rubio',   mail:'vrubioa@santotomas.cl'},
-  {facultad:'Ingeniería',          escuela:'Ingeniería',            programa:'Ingeniería Civil Industrial PCE',  nombre:'Karen Kanzur',     mail:'kkanzua@santotomas.cl'},
-  {facultad:'Ingeniería',          escuela:'Ingeniería',            programa:'Ingeniería Civil en Minas',        nombre:'Karen Kanzur',     mail:'kkanzua@santotomas.cl'},
-  {facultad:'Economía y Negocios', escuela:'Ingeniería Comercial',  programa:'Ingeniería Comercial',             nombre:'Catherine Korn',   mail:'kkorn@santotomas.cl'},
+  {facultad:'Recursos Naturales y Medicina Veterinaria', escuela:'Agronomía',             programa:'Agronomía PCE',                    nombre:'Álvaro Reyes',     mail:'areyes@santotomas.cl'},
+  {facultad:'Ciencias Sociales y Educación',            escuela:'Trabajo Social',        programa:'Licenciatura en Trabajo Social',   nombre:'Verónica Rubio',   mail:'vrubioa@santotomas.cl'},
+  {facultad:'Ingeniería y Negocios',                    escuela:'Ingeniería',            programa:'Ingeniería Civil Industrial PCE',  nombre:'Karen Kanzur',     mail:'kkanzua@santotomas.cl'},
+  {facultad:'Ingeniería y Negocios',                    escuela:'Ingeniería',            programa:'Ingeniería Civil en Minas',        nombre:'Karen Kanzur',     mail:'kkanzua@santotomas.cl'},
+  {facultad:'Ingeniería y Negocios',                    escuela:'Ingeniería Comercial',  programa:'Ingeniería Comercial',             nombre:'Catherine Korn',   mail:'kkorn@santotomas.cl'},
   {facultad:'Salud',               escuela:'Nutrición y Dietética', programa:'Nutrición',                        nombre:'Jenny Arteaga',    mail:'jarteaga@santotomas.cl'},
   {facultad:'Salud',               escuela:'Terapia Ocupacional',   programa:'Terapia Ocupacional',              nombre:'Alicia Marcoleta', mail:'amarcoleta@santotomas.cl'},
   {facultad:'Salud',               escuela:'Kinesiología',          programa:'Kinesiología',                     nombre:'Alexis Espinoza',  mail:'alexisespinozasa@santotomas.cl'},
 ];
 const FAC_COLORS = {
-  'Ingeniería':'#3b6e8c','Economía y Negocios':'#b07828','Ciencias Sociales':'#7a5ab4',
-  'Salud':'#4a7c5e','Recursos Naturales':'#5a8c3a','Formación General':'#8c5a3a'
+  'Ingeniería y Negocios':                    '#6F7A73',
+  'Ciencias Sociales y Educación':            '#9F83B3',
+  'Salud':                                    '#A4CCBF',
+  'Recursos Naturales y Medicina Veterinaria':'#97BB5B',
+  'Formación General':                        '#97BB5B'
 };
 function initDneModal(){
   const tbody = document.getElementById('dne-tbody');
@@ -3488,19 +3843,18 @@ function renderExecutiveHero(){
   const today = new Date(); today.setHours(0,0,0,0);
 
   // ── Conteo DEL states (con plazos diferenciados por facultad) ──
-  let delOk=0, delRev=0, delAtras=0, delEnTiempo=0;
+  let delOk=0, delRev=0, delAtras=0, delEscala=0;
   src.forEach(d=>{
-    const planif  = d.planif || '';
+    const planif  = (d.planif || '').trim();
     const stepIdx = planifStepIndex(planif);
     if(stepIdx >= 4){
-      delOk++;                                     // Validada + Cargada en aula
+      delOk++;                                         // Validada + Cargada en aula
     } else if(stepIdx >= 2){
-      delRev++;                                    // Enviada a DEL + DEL 2°
+      delRev++;                                        // Enviada a DEL + DEL 2°
+    } else if(planif === 'Ajustes según Escala'){
+      delEscala++;                                     // Ajustes según Escala
     } else {
-      // Sin enviar: verificar si el plazo de su facultad ya venció
-      const deadline = planifDeadline(d.facultad);
-      if(today > deadline) delAtras++;             // Plazo vencido — atrasada
-      else                 delEnTiempo++;          // Aún dentro del plazo
+      delAtras++;                                      // En construcción / No inicia — sin enviar
     }
   });
   const delPend = delAtras; // alias para compatibilidad
@@ -3610,16 +3964,7 @@ function renderExecutiveHero(){
   if(dOk)  dOk.textContent  = delOk;
   if(dRv)  dRv.textContent  = delRev;
   if(dPd)  dPd.textContent  = delAtras;
-  if(dOk2) dOk2.textContent = delEnTiempo;
-  // Sub-label dinámico con próximo plazo
-  const subEl = document.getElementById('exec-del-ok2-sub');
-  if(subEl){
-    const extDeadline = PLANIF_DEADLINES['Salud'];
-    const diasExt = Math.round((extDeadline - today) / 86400000);
-    subEl.textContent = diasExt > 0
-      ? `Salud y Form. General — plazo ${extDeadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})} (${diasExt}d)`
-      : `plazo extendido vencido`;
-  }
+  if(dOk2) dOk2.textContent = delEscala;
 
   // ── Semana ──
   const wB = document.getElementById('exec-week-big');
@@ -4194,7 +4539,8 @@ function renderKanban(){
 }
 
 // ── 10. VISTA POR FACULTAD ────────────────────────────────────────────────────
-function fvPlanifClass(p){
+function fvPlanifClass(p, d){
+  if(d && isAtrasada(d))                     return 'p-at';
   if(!p||p==='No inicia'||p==='No enviada') return 'p-none';
   if(p==='En construcción'||p==='Pendiente') return 'p-const';
   if(p==='Enviada a validación DEL')          return 'p-env';
@@ -4204,7 +4550,8 @@ function fvPlanifClass(p){
   if(p==='No aplica')                        return 'p-na';
   return 'p-none';
 }
-function fvPlanifIcon(p){
+function fvPlanifIcon(p, d){
+  if(d && isAtrasada(d))                     return '⚠';
   if(!p||p==='No inicia'||p==='No enviada') return '○';
   if(p==='En construcción'||p==='Pendiente') return '◐';
   if(p==='Enviada a validación DEL')          return '→';
@@ -4296,7 +4643,7 @@ function renderFacView(){
       : '';
 
     const ticker_rows = items.map(d=>{
-      const idx = DATA.findIndex(x=>x.asignatura===d.asignatura);
+      const idx = currentRows.findIndex(x=>x.asignatura===d.asignatura&&x.docente===d.docente);
       const av  = (AVANCE[d.asignatura]||{}).avance||0;
       const hitos = (AVANCE[d.asignatura]||{}).hitos||{};
       const step  = planifStepIndex(d.planif||'');
@@ -4314,7 +4661,7 @@ function renderFacView(){
           </div>
         </td>
         <td>
-          <span class="ftk-planif ${ftkPlanifClass(d.planif)}">${ftkPlanifIcon(d.planif)} ${planifLabel(d.planif)||'No inicia'}</span>
+          <span class="ftk-planif ${isAt?'ftk-p-at':ftkPlanifClass(d.planif)}">${isAt?'⚠':''}${isAt?'':ftkPlanifIcon(d.planif)+' '}${isAt?'Atrasada':planifLabel(d.planif)||'No inicia'}</span>
         </td>
         <td>
           <div class="ftk-hitos">${ftkHitosDots(hitos)}</div>
