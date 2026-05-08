@@ -2674,10 +2674,11 @@ function filtered(){
 }
 function rbClass(r){if(r==='Realizada')return'rb rb-r';if(r==='Agendada')return'rb rb-a';if(r==='Sin respuesta')return'rb rb-s';return'rb rb-n'}
 // Devuelve true si la planificación está atrasada (En construcción / No inicia con plazo vencido)
+// "Ajustes según Escala" (step=1.5) queda excluido — ya pasó primera validación
 function isAtrasada(d){
   const today = new Date(); today.setHours(0,0,0,0);
   const step = planifStepIndex(d.planif||'');
-  return step < 2 && today > planifDeadline(d.facultad);
+  return step < 1.5 && today > planifDeadline(d.facultad);
 }
 
 function dotClass(p, d){
