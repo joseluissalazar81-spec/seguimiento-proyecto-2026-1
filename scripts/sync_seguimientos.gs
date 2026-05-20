@@ -7,10 +7,16 @@
  * 3. Ejecutar → sincronizarDashboard → autoriza el acceso
  * 4. Para actualización automática: ícono reloj → Añadir activador → sincronizarDashboard → cada hora
  *
+ * ESTADOS DE RECURSOS (5 estados):
+ *   Enviada a DEL → columna F
+ *   En validación docente → columna G
+ *   Validado → columna H
+ *   En implementación → columna I
+ *   Cargado al aula → columna J
+ *
  * PUBLICAR PARA VERCEL:
  * 1. Archivo → Compartir → Publicar en la web
  * 2. Hoja: "DASHBOARD" → formato: Valores separados por comas (.csv) → Publicar
- * 3. Copia la URL generada — la necesitarás para el dashboard Vercel
  */
 
 // ─── ID del Dashboard (fuente de verdad) ─────────────────────────────────────
@@ -30,18 +36,30 @@ const SEGUIMIENTO_IDS = [
   { id: '1L43dz5b1_QbAbc1pJSmAzHYoZUGQCmAsksVmhsA-FPc', di: 'Natalia 2'   },
 ];
 
-// Clasificación de estados → columna del Dashboard
-// Columnas Dashboard (0-indexado): JP=0 DI=1 Asignatura=2 Total=3
-//   SinComenzar=4 EnProdDI=5 ValidadoDocente=6 EnProdDM=7 QA=8 Terminado=9
-//   %Avance=10 BarraProgreso=11
+// ─── Clasificación de estados → categoría ─────────────────────────────────────
+// Columnas Dashboard: F=enviadaDEL  G=enValidacion  H=validado  I=enImplementacion  J=cargadoAula
 const CLASIFICAR_ESTADO = (estado) => {
-  const e = (estado || '').toLowerCase().trim();
-  if (e === '' || e === 'sin comenzar')                          return 'sinComenzar';
-  if (e.includes('en producción di') || e === 'borrador')       return 'enProdDI';
-  if (e.includes('validado') || e === 'terminado')              return 'validadoDocente';
-  if (e.includes('en producción dm'))                           return 'enProdDM';
-  if (e.includes('implementación') || e.includes('implementacion') || e.includes('en implementación')) return 'qa';
-  if (e === 'qa' || e === 'completado')                         return 'terminado';
+  const e = (estado || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+
+  // Cargado al aula (terminado)
+  if (e.includes('cargado al aula') || e.includes('cargado en aula')) return 'cargadoAula';
+
+  // En implementación
+  if (e.includes('en implementacion') || e.includes('implementacion') || e === 'implementado') return 'enImplementacion';
+
+  // Validado (aprobado por docente)
+  if (e === 'validado' || e === 'aprobado') return 'validado';
+
+  // En validación docente
+  if (e.includes('en validacion') || e.includes('validacion docente') || e.includes('revision docente') || e.includes('en revision')) return 'enValidacion';
+
+  // Enviada a DEL (incluye ajustes, planificaciones, borrador, enviado)
+  if (e.includes('enviada a del') || e.includes('enviado a del') ||
+      e.includes('ajuste') || e.includes('planificacion') || e.includes('plan ') ||
+      e.includes('borrador') || e.includes('en produccion di') || e.includes('en prod di') ||
+      e === 'enviado' || e === 'enviada') return 'enviadaDEL';
+
+  // Sin comenzar (vacío, sin comenzar, no inicia, etc.)
   return 'sinComenzar';
 };
 
@@ -50,7 +68,7 @@ function sincronizarDashboard() {
   const ui = SpreadsheetApp.getUi();
 
   // 1. Leer todos los seguimientos DI y construir mapa: asignatura → conteos
-  const mapaAsig = {}; // key: normalizado → { sinComenzar, enProdDI, validadoDocente, enProdDM, qa, terminado }
+  const mapaAsig = {};
 
   SEGUIMIENTO_IDS.forEach(entry => {
     try {
@@ -63,7 +81,6 @@ function sincronizarDashboard() {
         if (!mapaAsig[key]) {
           mapaAsig[key] = { nombre: resultado.asignatura, ...resultado.conteos };
         } else {
-          // Merge: sumar conteos de ambas entradas (si el DI tiene la asig en 2 archivos)
           Object.keys(resultado.conteos).forEach(k => {
             mapaAsig[key][k] = (mapaAsig[key][k] || 0) + resultado.conteos[k];
           });
@@ -75,12 +92,12 @@ function sincronizarDashboard() {
     }
   });
 
-  // 2. Abrir Dashboard y actualizar filas
+  // 2. Abrir Dashboard y actualizar encabezados + filas
   const dashboard = SpreadsheetApp.openById(DASHBOARD_ID);
   const sheet = dashboard.getSheets()[0];
   const data = sheet.getDataRange().getValues();
 
-  // Encontrar fila de encabezados (tiene "JP", "DI", "Asignatura")
+  // Encontrar fila de encabezados
   let headerRow = -1;
   for (let i = 0; i < data.length; i++) {
     const fila = data[i].join(' ').toLowerCase();
@@ -95,46 +112,61 @@ function sincronizarDashboard() {
     return;
   }
 
+  // Actualizar encabezados de columnas F-J con los nuevos nombres
+  const filaEncabezado = headerRow + 1;
+  sheet.getRange(filaEncabezado, 5).setValue('Sin Comenzar');
+  sheet.getRange(filaEncabezado, 6).setValue('Enviada a DEL');
+  sheet.getRange(filaEncabezado, 7).setValue('En Validación Docente');
+  sheet.getRange(filaEncabezado, 8).setValue('Validado');
+  sheet.getRange(filaEncabezado, 9).setValue('En Implementación');
+  sheet.getRange(filaEncabezado, 10).setValue('Cargado al Aula');
+  sheet.getRange(filaEncabezado, 11).setValue('% Avance');
+  sheet.getRange(filaEncabezado, 12).setValue('Barra');
+
   let actualizadas = 0;
   let noEncontradas = [];
 
   for (let i = headerRow + 1; i < data.length; i++) {
     const row = data[i];
-    const asignaturaRaw = String(row[2] || '').trim(); // Columna C = Asignatura
+    const asignaturaRaw = String(row[2] || '').trim();
     if (!asignaturaRaw) continue;
 
     const key = normalizar(asignaturaRaw);
-    let datos = mapaAsig[key] || buscarCoinidenciaParcial(mapaAsig, key);
+    let datos = mapaAsig[key] || buscarCoincidenciaParcial(mapaAsig, key);
 
     if (!datos) {
       noEncontradas.push(asignaturaRaw);
       continue;
     }
 
-    const { sinComenzar, enProdDI, validadoDocente, enProdDM, qa, terminado } = datos;
-    const total = sinComenzar + enProdDI + validadoDocente + enProdDM + qa + terminado;
-    const avancePct = total > 0 ? Math.round(((terminado + qa) / total) * 100) : 0;
+    const { sinComenzar, enviadaDEL, enValidacion, validado, enImplementacion, cargadoAula } = datos;
+    const total = sinComenzar + enviadaDEL + enValidacion + validado + enImplementacion + cargadoAula;
+
+    // %Avance ponderado por etapa
+    const avancePct = total > 0 ? Math.round(
+      (cargadoAula * 1.0 + enImplementacion * 0.7 + validado * 0.4 + enValidacion * 0.15 + enviadaDEL * 0.05) / total * 100
+    ) : 0;
+
     const barra = generarBarra(avancePct);
 
-    // Escribir columnas D a L (índices 3..10)
     const fila = i + 1;
-    sheet.getRange(fila, 4).setValue(total);           // D: Total Recursos
-    sheet.getRange(fila, 5).setValue(sinComenzar);     // E: Sin Comenzar
-    sheet.getRange(fila, 6).setValue(enProdDI);        // F: En Prod. DI
-    sheet.getRange(fila, 7).setValue(validadoDocente); // G: Validado Docente
-    sheet.getRange(fila, 8).setValue(enProdDM);        // H: En Prod. DM
-    sheet.getRange(fila, 9).setValue(qa);              // I: QA/Implementación
-    sheet.getRange(fila, 10).setValue(terminado);      // J: Terminado
-    sheet.getRange(fila, 11).setValue(avancePct + '%');// K: % Avance
-    sheet.getRange(fila, 12).setValue(barra);          // L: Barra
+    sheet.getRange(fila, 4).setValue(total);
+    sheet.getRange(fila, 5).setValue(sinComenzar);
+    sheet.getRange(fila, 6).setValue(enviadaDEL);
+    sheet.getRange(fila, 7).setValue(enValidacion);
+    sheet.getRange(fila, 8).setValue(validado);
+    sheet.getRange(fila, 9).setValue(enImplementacion);
+    sheet.getRange(fila, 10).setValue(cargadoAula);
+    sheet.getRange(fila, 11).setValue(avancePct + '%');
+    sheet.getRange(fila, 12).setValue(barra);
 
     actualizadas++;
   }
 
-  // Actualizar timestamp en fila 1
+  // Actualizar timestamp
   const encabezadoActual = String(sheet.getRange(1, 1).getValue());
   const sinFecha = encabezadoActual.replace(/·\s*Actualizado.*?(?=·|$)/g, '');
-  sheet.getRange(1, 1).setValue(sinFecha.trim() + ' · Actualizado ' + Utilities.formatDate(new Date(), 'America/Santiago', 'dd MMM yyyy'));
+  sheet.getRange(1, 1).setValue(sinFecha.trim() + ' · Actualizado ' + Utilities.formatDate(new Date(), 'America/Santiago', 'dd MMM yyyy HH:mm'));
 
   const msg = `Dashboard actualizado.\n✓ ${actualizadas} asignaturas\n✗ Sin coincidencia: ${noEncontradas.length}${noEncontradas.length > 0 ? '\n' + noEncontradas.join('\n') : ''}`;
   Logger.log(msg);
@@ -176,12 +208,11 @@ function contarRecursosHoja(sheet) {
   }
   if (headerIdx === -1 || estadoCol === -1) return null;
 
-  // Contar por categoría
-  const conteos = { sinComenzar: 0, enProdDI: 0, validadoDocente: 0, enProdDM: 0, qa: 0, terminado: 0 };
+  // Contar por los 5 nuevos estados
+  const conteos = { sinComenzar: 0, enviadaDEL: 0, enValidacion: 0, validado: 0, enImplementacion: 0, cargadoAula: 0 };
 
   for (let i = headerIdx + 1; i < data.length; i++) {
     const row = data[i];
-    // Solo filas con semana válida (S0, S1, S2, ...)
     const semana = String(row[semanaCol] || '').trim();
     if (!semana.match(/^S\d+$/i)) continue;
 
@@ -212,7 +243,7 @@ function normalizar(nombre) {
     .trim();
 }
 
-function buscarCoinidenciaParcial(mapa, key) {
+function buscarCoincidenciaParcial(mapa, key) {
   const palabras = key.split(' ').slice(0, 4).join(' ');
   for (const [k, v] of Object.entries(mapa)) {
     if (k.includes(palabras) || palabras.includes(k.split(' ').slice(0, 4).join(' '))) return v;
