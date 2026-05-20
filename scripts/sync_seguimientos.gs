@@ -172,11 +172,12 @@ function sincronizarDashboard() {
 }
 
 // ─── Contar recursos por estado en una hoja DI ───────────────────────────────
+// El estado se infiere desde los links/fechas completados, no del campo "Estado"
 function contarRecursosHoja(sheet) {
   const data = sheet.getDataRange().getValues();
   if (data.length < 5) return null;
 
-  // Buscar nombre de asignatura
+  // Buscar nombre de asignatura (celda que empieza con "Asignatura:")
   let asignatura = null;
   for (let i = 0; i < Math.min(8, data.length); i++) {
     for (let j = 0; j < data[i].length; j++) {
@@ -193,32 +194,48 @@ function contarRecursosHoja(sheet) {
   }
   if (!asignatura) return null;
 
-  // Encontrar columna "Estado"
-  let headerIdx = -1, estadoCol = -1, semanaCol = -1;
-  for (let i = 0; i < Math.min(15, data.length); i++) {
-    let hasSemana = false, hasEstado = false;
-    for (let j = 0; j < data[i].length; j++) {
-      const h = String(data[i][j] || '').toLowerCase().trim();
-      if (h === 'semana') { semanaCol = j; hasSemana = true; }
-      if (h === 'estado') { estadoCol = j; hasEstado = true; }
-    }
-    if (hasSemana && hasEstado) { headerIdx = i; break; }
-  }
-  if (headerIdx === -1 || estadoCol === -1) return null;
+  // Encontrar fila de encabezados buscando columnas clave
+  let headerIdx = -1;
+  let cols = { semana: -1, linkBorrador: -1, linkValidado: -1, linkDM: -1, linkImpl: -1, cargadoMoodle: -1 };
 
-  // Contar por los 5 estados de recursos
+  for (let i = 0; i < Math.min(15, data.length); i++) {
+    const fila = data[i].map(c => String(c || '').toLowerCase().replace(/\s+/g, ' ').trim());
+    // La fila de encabezado tiene "semana" e "id recurso"
+    if (!fila.some(c => c === 'semana') || !fila.some(c => c.includes('id recurso') || c === 'id')) continue;
+
+    fila.forEach((h, j) => {
+      if (h === 'semana')                                         cols.semana        = j;
+      if (h.includes('link recurso') && h.includes('borrador'))  cols.linkBorrador  = j;
+      if (h.includes('link recurso') && h.includes('validado'))  cols.linkValidado  = j;
+      if (h.includes('link') && h.includes('producto dm'))       cols.linkDM        = j;
+      if (h.includes('link') && h.includes('producto impl'))     cols.linkImpl      = j;
+      if (h.includes('cargado'))                                  cols.cargadoMoodle = j;
+    });
+    headerIdx = i;
+    break;
+  }
+  if (headerIdx === -1 || cols.semana === -1) return null;
+
+  // Contar por estado inferido desde links completados
   const conteos = { sinComenzar: 0, borrador: 0, validado: 0, dm: 0, implementacion: 0, cargadoAula: 0 };
 
   for (let i = headerIdx + 1; i < data.length; i++) {
     const row = data[i];
-    const semana = String(row[semanaCol] || '').trim();
+    const semana = String(row[cols.semana] || '').trim();
     if (!semana.match(/^S\d+$/i)) continue;
 
-    const estado = String(row[estadoCol] || '').trim();
-    if (!estado) continue;
+    const tieneImpl     = cols.linkImpl      >= 0 && String(row[cols.linkImpl]      || '').trim().length > 5;
+    const tieneDM       = cols.linkDM        >= 0 && String(row[cols.linkDM]        || '').trim().length > 5;
+    const tieneValidado = cols.linkValidado  >= 0 && String(row[cols.linkValidado]  || '').trim().length > 5;
+    const tieneBorrador = cols.linkBorrador  >= 0 && String(row[cols.linkBorrador]  || '').trim().length > 5;
+    const cargado       = cols.cargadoMoodle >= 0 && String(row[cols.cargadoMoodle] || '').trim().toLowerCase() === 'sí';
 
-    const cat = CLASIFICAR_ESTADO(estado);
-    conteos[cat]++;
+    if (cargado)          conteos.cargadoAula++;
+    else if (tieneImpl)   conteos.implementacion++;
+    else if (tieneDM)     conteos.dm++;
+    else if (tieneValidado) conteos.validado++;
+    else if (tieneBorrador) conteos.borrador++;
+    else                  conteos.sinComenzar++;
   }
 
   return { asignatura, conteos };
