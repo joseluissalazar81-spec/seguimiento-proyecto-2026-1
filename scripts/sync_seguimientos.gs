@@ -1,15 +1,20 @@
 /**
- * UST 2026-1 — Sincronización automática: DI Seguimientos → Planilla Maestra
+ * UST 2026-1 — Sincronización automática: DI Seguimientos → Dashboard
  *
  * INSTRUCCIONES:
- * 1. Abre la planilla maestra: https://docs.google.com/spreadsheets/d/14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY
- * 2. Ve a Extensiones → Apps Script
- * 3. Pega este script completo (reemplaza todo el contenido)
- * 4. Guarda (Ctrl+S)
- * 5. Haz clic en "Ejecutar" → sincronizarSeguimientos
- * 6. Autoriza el acceso cuando te lo pida
- * 7. Para que se actualice solo: haz clic en "Activadores" (ícono reloj) → Añadir activador → syncSeguimientos → cada hora
+ * 1. Abre el Dashboard: https://docs.google.com/spreadsheets/d/1NBGFr8UhU5trHSuS87ie1rE9U3rKjapTAQ3oKUq3xn4
+ * 2. Extensiones → Apps Script → pega este script → Guarda
+ * 3. Ejecutar → sincronizarDashboard → autoriza el acceso
+ * 4. Para actualización automática: ícono reloj → Añadir activador → sincronizarDashboard → cada hora
+ *
+ * PUBLICAR PARA VERCEL:
+ * 1. Archivo → Compartir → Publicar en la web
+ * 2. Hoja: "DASHBOARD" → formato: Valores separados por comas (.csv) → Publicar
+ * 3. Copia la URL generada — la necesitarás para el dashboard Vercel
  */
+
+// ─── ID del Dashboard (fuente de verdad) ─────────────────────────────────────
+const DASHBOARD_ID = '1NBGFr8UhU5trHSuS87ie1rE9U3rKjapTAQ3oKUq3xn4';
 
 // ─── IDs de planillas de seguimiento por DI ───────────────────────────────────
 const SEGUIMIENTO_IDS = [
@@ -25,182 +30,130 @@ const SEGUIMIENTO_IDS = [
   { id: '1L43dz5b1_QbAbc1pJSmAzHYoZUGQCmAsksVmhsA-FPc', di: 'Natalia 2'   },
 ];
 
-// Orden de etapas (mayor = más avanzado)
-const ETAPA = {
-  'sin comenzar':      0,
-  'en producción di':  1,
-  'borrador':          1,
-  'en producción dm':  2,
-  'validado docente':  3,
-  'terminado':         3,
-  'implementación':    4,
-  'en implementación': 4,
-  'qa':                5,
-  'completado':        5,
-};
-
-// Semanas del Gantt → semanas individuales del seguimiento
-const SEMANAS_GANTT = {
-  'S0':     ['S0'],
-  'S1-S2':  ['S1','S2'],
-  'S3-S4':  ['S3','S4'],
-  'S5-S6':  ['S5','S6'],
-  'S7-S8':  ['S7','S8'],
-  'S9-S10': ['S9','S10'],
-  'S11-S12':['S11','S12'],
-  'S13-S14':['S13','S14'],
-  'S15-S16':['S15','S16'],
-  'S17-S18':['S17','S18'],
-};
-
-// Columnas en la planilla maestra (índice 0)
-// Fila de encabezado: Facultad(0) Asignatura(1) Docente(2) Fmt(3) JP(4) DI(5) DG(6) Impl(7)
-//   Reunión(8) Planif(9) S0(10) S1-S2(11) S3-S4(12) S5-S6(13) S7-S8(14)
-//   S9-S10(15) S11-S12(16) S13-S14(17) S15-S16(18) S17-S18(19) %Avance(20) Estado(21)
-const COL = {
-  ASIGNATURA:  1,
-  REUNION:     8,
-  PLANIF:      9,
-  S0:          10,
-  'S1-S2':     11,
-  'S3-S4':     12,
-  'S5-S6':     13,
-  'S7-S8':     14,
-  'S9-S10':    15,
-  'S11-S12':   16,
-  'S13-S14':   17,
-  'S15-S16':   18,
-  'S17-S18':   19,
-  AVANCE:      20,
-  ESTADO:      21,
+// Clasificación de estados → columna del Dashboard
+// Columnas Dashboard (0-indexado): JP=0 DI=1 Asignatura=2 Total=3
+//   SinComenzar=4 EnProdDI=5 ValidadoDocente=6 EnProdDM=7 QA=8 Terminado=9
+//   %Avance=10 BarraProgreso=11
+const CLASIFICAR_ESTADO = (estado) => {
+  const e = (estado || '').toLowerCase().trim();
+  if (e === '' || e === 'sin comenzar')                          return 'sinComenzar';
+  if (e.includes('en producción di') || e === 'borrador')       return 'enProdDI';
+  if (e.includes('validado') || e === 'terminado')              return 'validadoDocente';
+  if (e.includes('en producción dm'))                           return 'enProdDM';
+  if (e.includes('implementación') || e.includes('implementacion') || e.includes('en implementación')) return 'qa';
+  if (e === 'qa' || e === 'completado')                         return 'terminado';
+  return 'sinComenzar';
 };
 
 // ─── Función principal ─────────────────────────────────────────────────────────
-function sincronizarSeguimientos() {
+function sincronizarDashboard() {
   const ui = SpreadsheetApp.getUi();
-  const master = SpreadsheetApp.getActiveSpreadsheet();
 
-  // Buscar la hoja con gid=1889016436
-  const masterSheet = getSheetByGid(master, 1889016436) || master.getSheets()[0];
-
-  Logger.log('Usando hoja maestra: ' + masterSheet.getName());
-
-  // 1. Leer todas las planillas de seguimiento y construir mapa asignatura→estado por semana
-  const mapaAsig = {}; // key: nombre normalizado → { ganttStates, reunionRealizada, planifEstado }
+  // 1. Leer todos los seguimientos DI y construir mapa: asignatura → conteos
+  const mapaAsig = {}; // key: normalizado → { sinComenzar, enProdDI, validadoDocente, enProdDM, qa, terminado }
 
   SEGUIMIENTO_IDS.forEach(entry => {
     try {
       const ss = SpreadsheetApp.openById(entry.id);
-      const sheets = ss.getSheets();
+      ss.getSheets().forEach(sheet => {
+        const resultado = contarRecursosHoja(sheet);
+        if (!resultado) return;
 
-      sheets.forEach(sheet => {
-        const info = parsearHojaSeguimiento(sheet);
-        if (!info) return;
-
-        const key = normalizar(info.asignatura);
+        const key = normalizar(resultado.asignatura);
         if (!mapaAsig[key]) {
-          mapaAsig[key] = {
-            nombre: info.asignatura,
-            semanas: info.semanas,
-            planifEstado: info.planifEstado,
-          };
+          mapaAsig[key] = { nombre: resultado.asignatura, ...resultado.conteos };
         } else {
-          // Merge semanas si hay duplicados
-          Object.entries(info.semanas).forEach(([s, stats]) => {
-            if (!mapaAsig[key].semanas[s]) {
-              mapaAsig[key].semanas[s] = stats;
-            }
+          // Merge: sumar conteos de ambas entradas (si el DI tiene la asig en 2 archivos)
+          Object.keys(resultado.conteos).forEach(k => {
+            mapaAsig[key][k] = (mapaAsig[key][k] || 0) + resultado.conteos[k];
           });
         }
-
-        Logger.log('✓ Procesada: ' + info.asignatura + ' (DI: ' + entry.di + ')');
+        Logger.log('✓ ' + resultado.asignatura + ' (' + entry.di + ')');
       });
     } catch (e) {
-      Logger.log('✗ Error leyendo ' + entry.id + ' [' + entry.di + ']: ' + e.message);
+      Logger.log('✗ ' + entry.id + ' [' + entry.di + ']: ' + e.message);
     }
   });
 
-  // 2. Actualizar planilla maestra
-  const masterData = masterSheet.getDataRange().getValues();
-  let headerRowIdx = encontrarFilaEncabezado(masterData);
+  // 2. Abrir Dashboard y actualizar filas
+  const dashboard = SpreadsheetApp.openById(DASHBOARD_ID);
+  const sheet = dashboard.getSheets()[0];
+  const data = sheet.getDataRange().getValues();
 
-  if (headerRowIdx === -1) {
-    ui.alert('No se encontró la fila de encabezados en la planilla maestra.');
+  // Encontrar fila de encabezados (tiene "JP", "DI", "Asignatura")
+  let headerRow = -1;
+  for (let i = 0; i < data.length; i++) {
+    const fila = data[i].join(' ').toLowerCase();
+    if (fila.includes('asignatura') && (fila.includes(' jp') || fila.includes('jp '))) {
+      headerRow = i;
+      break;
+    }
+  }
+
+  if (headerRow === -1) {
+    ui.alert('No se encontró la fila de encabezados en el Dashboard.');
     return;
   }
 
   let actualizadas = 0;
   let noEncontradas = [];
 
-  for (let i = headerRowIdx + 1; i < masterData.length; i++) {
-    const row = masterData[i];
-    const asignaturaRaw = String(row[COL.ASIGNATURA] || '').trim();
-    if (!asignaturaRaw || asignaturaRaw === '') continue;
+  for (let i = headerRow + 1; i < data.length; i++) {
+    const row = data[i];
+    const asignaturaRaw = String(row[2] || '').trim(); // Columna C = Asignatura
+    if (!asignaturaRaw) continue;
 
-    // Buscar en el mapa (coincidencia exacta, luego parcial)
     const key = normalizar(asignaturaRaw);
-    let diData = mapaAsig[key];
+    let datos = mapaAsig[key] || buscarCoinidenciaParcial(mapaAsig, key);
 
-    if (!diData) {
-      // Intentar coincidencia parcial
-      diData = buscarCoinidenciaParcial(mapaAsig, key);
-    }
-
-    if (!diData) {
+    if (!datos) {
       noEncontradas.push(asignaturaRaw);
       continue;
     }
 
-    // Calcular estado por semana del Gantt
-    let semanasDone = 0;
-    let semanasConDatos = 0;
+    const { sinComenzar, enProdDI, validadoDocente, enProdDM, qa, terminado } = datos;
+    const total = sinComenzar + enProdDI + validadoDocente + enProdDM + qa + terminado;
+    const avancePct = total > 0 ? Math.round(((terminado + qa) / total) * 100) : 0;
+    const barra = generarBarra(avancePct);
 
-    Object.entries(SEMANAS_GANTT).forEach(([ganttKey, semanasIndiv]) => {
-      const colIdx = COL[ganttKey];
-      if (!colIdx) return;
-
-      const estado = calcularEstadoGantt(diData.semanas, semanasIndiv);
-      masterSheet.getRange(i + 1, colIdx + 1).setValue(estado);
-
-      if (estado !== 'No inicia') semanasConDatos++;
-      if (estado === 'Validada' || estado === 'Implementado') semanasDone++;
-    });
-
-    // % Avance
-    const totalSemanas = Object.keys(SEMANAS_GANTT).length;
-    const pct = semanasConDatos > 0 ? Math.round((semanasDone / totalSemanas) * 100) + '%' : '0%';
-    masterSheet.getRange(i + 1, COL.AVANCE + 1).setValue(pct);
-
-    // Estado planif (si está disponible)
-    if (diData.planifEstado && diData.planifEstado !== '') {
-      masterSheet.getRange(i + 1, COL.PLANIF + 1).setValue(diData.planifEstado);
-    }
+    // Escribir columnas D a L (índices 3..10)
+    const fila = i + 1;
+    sheet.getRange(fila, 4).setValue(total);           // D: Total Recursos
+    sheet.getRange(fila, 5).setValue(sinComenzar);     // E: Sin Comenzar
+    sheet.getRange(fila, 6).setValue(enProdDI);        // F: En Prod. DI
+    sheet.getRange(fila, 7).setValue(validadoDocente); // G: Validado Docente
+    sheet.getRange(fila, 8).setValue(enProdDM);        // H: En Prod. DM
+    sheet.getRange(fila, 9).setValue(qa);              // I: QA/Implementación
+    sheet.getRange(fila, 10).setValue(terminado);      // J: Terminado
+    sheet.getRange(fila, 11).setValue(avancePct + '%');// K: % Avance
+    sheet.getRange(fila, 12).setValue(barra);          // L: Barra
 
     actualizadas++;
   }
 
-  // Timestamp de última actualización en celda A1 (o similar)
-  masterSheet.getRange(1, 1).setNote('Última actualización automática: ' + new Date().toLocaleString('es-CL'));
+  // Actualizar timestamp en fila 1
+  const encabezadoActual = String(sheet.getRange(1, 1).getValue());
+  const sinFecha = encabezadoActual.replace(/·\s*Actualizado.*?(?=·|$)/g, '');
+  sheet.getRange(1, 1).setValue(sinFecha.trim() + ' · Actualizado ' + Utilities.formatDate(new Date(), 'America/Santiago', 'dd MMM yyyy'));
 
-  const msg = `Sincronización completa.\n\n✓ Asignaturas actualizadas: ${actualizadas}\n✗ No encontradas: ${noEncontradas.length}\n${noEncontradas.length > 0 ? '\nSin coincidencia:\n' + noEncontradas.join('\n') : ''}`;
+  const msg = `Dashboard actualizado.\n✓ ${actualizadas} asignaturas\n✗ Sin coincidencia: ${noEncontradas.length}${noEncontradas.length > 0 ? '\n' + noEncontradas.join('\n') : ''}`;
   Logger.log(msg);
   ui.alert(msg);
 }
 
-// ─── Parsear una hoja de seguimiento DI ────────────────────────────────────────
-function parsearHojaSeguimiento(sheet) {
+// ─── Contar recursos por estado en una hoja DI ───────────────────────────────
+function contarRecursosHoja(sheet) {
   const data = sheet.getDataRange().getValues();
   if (data.length < 5) return null;
 
-  // Buscar nombre de asignatura en las primeras 8 filas
+  // Buscar nombre de asignatura
   let asignatura = null;
   for (let i = 0; i < Math.min(8, data.length); i++) {
     for (let j = 0; j < data[i].length; j++) {
       const cell = String(data[i][j] || '');
       if (cell.match(/^asignatura\s*:/i)) {
         asignatura = cell.replace(/^asignatura\s*:\s*/i, '').trim();
-        // Remover notas adicionales después de coma
-        if (asignatura.indexOf(',') > 0 && asignatura.length > 50) {
+        if (asignatura.includes(',') && asignatura.length > 50) {
           asignatura = asignatura.split(',')[0].trim();
         }
         break;
@@ -208,155 +161,65 @@ function parsearHojaSeguimiento(sheet) {
     }
     if (asignatura) break;
   }
+  if (!asignatura) return null;
 
-  if (!asignatura || asignatura === '') return null;
-
-  // Buscar fila de encabezados de columnas (tiene "Semana" y "Estado")
-  let headerIdx = -1;
-  let semanaCol = -1, estadoCol = -1, moodleCol = -1;
-
+  // Encontrar columna "Estado"
+  let headerIdx = -1, estadoCol = -1, semanaCol = -1;
   for (let i = 0; i < Math.min(15, data.length); i++) {
-    const row = data[i];
-    let foundSemana = false, foundEstado = false;
-    for (let j = 0; j < row.length; j++) {
-      const h = String(row[j] || '').toLowerCase().trim();
-      if (h === 'semana') { semanaCol = j; foundSemana = true; }
-      if (h === 'estado') { estadoCol = j; foundEstado = true; }
-      if (h.includes('cargado') || (h.includes('moodle') && h.includes('en'))) moodleCol = j;
+    let hasSemana = false, hasEstado = false;
+    for (let j = 0; j < data[i].length; j++) {
+      const h = String(data[i][j] || '').toLowerCase().trim();
+      if (h === 'semana') { semanaCol = j; hasSemana = true; }
+      if (h === 'estado') { estadoCol = j; hasEstado = true; }
     }
-    if (foundSemana && foundEstado) { headerIdx = i; break; }
+    if (hasSemana && hasEstado) { headerIdx = i; break; }
   }
+  if (headerIdx === -1 || estadoCol === -1) return null;
 
-  if (headerIdx === -1 || semanaCol === -1 || estadoCol === -1) return null;
-
-  // Leer recursos y agrupar por semana
-  const semanas = {}; // { S0: { total, validados, impl, moodle } }
-  let planifEstado = '';
+  // Contar por categoría
+  const conteos = { sinComenzar: 0, enProdDI: 0, validadoDocente: 0, enProdDM: 0, qa: 0, terminado: 0 };
 
   for (let i = headerIdx + 1; i < data.length; i++) {
     const row = data[i];
-    const semanaRaw = String(row[semanaCol] || '').trim();
-    const estadoRaw = String(row[estadoCol] || '').trim().toLowerCase();
+    // Solo filas con semana válida (S0, S1, S2, ...)
+    const semana = String(row[semanaCol] || '').trim();
+    if (!semana.match(/^S\d+$/i)) continue;
 
-    if (!semanaRaw.match(/^S\d+$/i)) continue;
-    const semana = semanaRaw.toUpperCase();
+    const estado = String(row[estadoCol] || '').trim();
+    if (!estado) continue;
 
-    // Estado normalizado
-    const etapa = obtenerEtapa(estadoRaw);
-
-    if (!semanas[semana]) {
-      semanas[semana] = { total: 0, minEtapa: 99, maxEtapa: 0, moodle: 0 };
-    }
-
-    semanas[semana].total++;
-    semanas[semana].minEtapa = Math.min(semanas[semana].minEtapa, etapa);
-    semanas[semana].maxEtapa = Math.max(semanas[semana].maxEtapa, etapa);
-
-    if (moodleCol >= 0) {
-      const m = String(row[moodleCol] || '').toLowerCase().trim();
-      if (m === 'sí' || m === 'si' || m === 'yes' || m === 's') semanas[semana].moodle++;
-    }
-
-    // Detectar estado de planificación (recurso S0_Plan)
-    const idCol = semanaCol + 2;
-    if (idCol < row.length) {
-      const id = String(row[idCol] || '').toLowerCase();
-      if (id.includes('plan') && semana === 'S0') {
-        planifEstado = etapaATextoMaestro(etapa);
-      }
-    }
+    const cat = CLASIFICAR_ESTADO(estado);
+    conteos[cat]++;
   }
 
-  return { asignatura, semanas, planifEstado };
-}
-
-// ─── Calcular estado para un grupo de semanas del Gantt ────────────────────────
-function calcularEstadoGantt(semanas, semanasIndiv) {
-  let totalRecursos = 0;
-  let minEtapa = 99;
-  let maxEtapa = 0;
-  let totalMoodle = 0;
-
-  semanasIndiv.forEach(s => {
-    const stats = semanas[s];
-    if (!stats || stats.total === 0) return;
-    totalRecursos += stats.total;
-    minEtapa = Math.min(minEtapa, stats.minEtapa);
-    maxEtapa = Math.max(maxEtapa, stats.maxEtapa);
-    totalMoodle += stats.moodle;
-  });
-
-  if (totalRecursos === 0) return 'No inicia';
-
-  // Todos implementados (en Moodle)
-  if (totalMoodle >= totalRecursos) return 'Implementado';
-
-  // Todos al menos validados por docente
-  if (minEtapa >= ETAPA['validado docente']) return 'Validada';
-
-  // Alguno está en producción o más avanzado
-  if (maxEtapa >= ETAPA['en producción di']) return 'En construcción';
-
-  return 'No inicia';
+  return { asignatura, conteos };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function obtenerEtapa(estado) {
-  const lower = estado.toLowerCase().trim();
-  if (ETAPA[lower] !== undefined) return ETAPA[lower];
-
-  // Búsqueda parcial
-  for (const [key, val] of Object.entries(ETAPA)) {
-    if (lower.includes(key)) return val;
-  }
-  return 0;
-}
-
-function etapaATextoMaestro(etapa) {
-  if (etapa >= ETAPA['implementación']) return 'Validada';
-  if (etapa >= ETAPA['validado docente']) return 'Validada';
-  if (etapa >= ETAPA['en producción di']) return 'En construcción';
-  return 'Enviada a validación DEL';
+function generarBarra(pct) {
+  const llenos = Math.round(pct / 5);
+  const vacios = 20 - llenos;
+  return '█'.repeat(llenos) + '░'.repeat(vacios) + '  ' + pct + '%';
 }
 
 function normalizar(nombre) {
   return String(nombre)
     .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '') // quitar acentos
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 function buscarCoinidenciaParcial(mapa, key) {
-  // Intentar con primeras 4 palabras
   const palabras = key.split(' ').slice(0, 4).join(' ');
   for (const [k, v] of Object.entries(mapa)) {
-    if (k.includes(palabras) || palabras.includes(k.split(' ').slice(0, 4).join(' '))) {
-      return v;
-    }
+    if (k.includes(palabras) || palabras.includes(k.split(' ').slice(0, 4).join(' '))) return v;
   }
-
-  // Intentar con 3 palabras
   const palabras3 = key.split(' ').slice(0, 3).join(' ');
   for (const [k, v] of Object.entries(mapa)) {
     if (k.startsWith(palabras3)) return v;
   }
-
   return null;
-}
-
-function encontrarFilaEncabezado(data) {
-  for (let i = 0; i < data.length; i++) {
-    const row = data[i];
-    const fila = row.join(' ').toLowerCase();
-    if (fila.includes('asignatura') && fila.includes('facultad')) return i;
-  }
-  return -1;
-}
-
-function getSheetByGid(spreadsheet, gid) {
-  const sheets = spreadsheet.getSheets();
-  return sheets.find(s => s.getSheetId() === gid) || null;
 }
