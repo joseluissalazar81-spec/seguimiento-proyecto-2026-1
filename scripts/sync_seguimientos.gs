@@ -8,11 +8,11 @@
  * 4. Para actualización automática: ícono reloj → Añadir activador → sincronizarDashboard → cada hora
  *
  * ESTADOS DE RECURSOS (5 estados):
- *   Enviada a DEL → columna F
- *   En validación docente → columna G
- *   Validado → columna H
- *   En implementación → columna I
- *   Cargado al aula → columna J
+ *   Borrador → columna F
+ *   Validado → columna G
+ *   DM → columna H
+ *   Implementación → columna I
+ *   Cargado en Aula → columna J
  *
  * PUBLICAR PARA VERCEL:
  * 1. Archivo → Compartir → Publicar en la web
@@ -37,29 +37,27 @@ const SEGUIMIENTO_IDS = [
 ];
 
 // ─── Clasificación de estados → categoría ─────────────────────────────────────
-// Columnas Dashboard: F=enviadaDEL  G=enValidacion  H=validado  I=enImplementacion  J=cargadoAula
+// Columnas Dashboard: F=borrador  G=validado  H=dm  I=implementacion  J=cargadoAula
 const CLASIFICAR_ESTADO = (estado) => {
   const e = (estado || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 
-  // Cargado al aula (terminado)
-  if (e.includes('cargado al aula') || e.includes('cargado en aula')) return 'cargadoAula';
+  // Cargado en Aula (terminado)
+  if (e.includes('cargado en aula') || e.includes('cargado al aula') || e === 'cargado') return 'cargadoAula';
 
-  // En implementación
-  if (e.includes('en implementacion') || e.includes('implementacion') || e === 'implementado') return 'enImplementacion';
+  // Implementación
+  if (e.includes('implementacion') || e === 'impl' || e === 'implementado') return 'implementacion';
+
+  // DM (en producción multimedia)
+  if (e === 'dm' || e.includes('en produccion dm') || e.includes('en prod dm') || e.includes('produccion dm')) return 'dm';
 
   // Validado (aprobado por docente)
-  if (e === 'validado' || e === 'aprobado') return 'validado';
+  if (e === 'validado' || e === 'aprobado' || e.includes('validado docente')) return 'validado';
 
-  // En validación docente
-  if (e.includes('en validacion') || e.includes('validacion docente') || e.includes('revision docente') || e.includes('en revision')) return 'enValidacion';
+  // Borrador (en elaboración por DI, enviado a revisión, ajustes)
+  if (e === 'borrador' || e.includes('en produccion di') || e.includes('en prod di') ||
+      e.includes('ajuste') || e.includes('en elaboracion') || e.includes('revision')) return 'borrador';
 
-  // Enviada a DEL (incluye ajustes, planificaciones, borrador, enviado)
-  if (e.includes('enviada a del') || e.includes('enviado a del') ||
-      e.includes('ajuste') || e.includes('planificacion') || e.includes('plan ') ||
-      e.includes('borrador') || e.includes('en produccion di') || e.includes('en prod di') ||
-      e === 'enviado' || e === 'enviada') return 'enviadaDEL';
-
-  // Sin comenzar (vacío, sin comenzar, no inicia, etc.)
+  // Sin comenzar
   return 'sinComenzar';
 };
 
@@ -112,14 +110,14 @@ function sincronizarDashboard() {
     return;
   }
 
-  // Actualizar encabezados de columnas F-J con los nuevos nombres
+  // Actualizar encabezados de columnas E-L con los nuevos nombres
   const filaEncabezado = headerRow + 1;
   sheet.getRange(filaEncabezado, 5).setValue('Sin Comenzar');
-  sheet.getRange(filaEncabezado, 6).setValue('Enviada a DEL');
-  sheet.getRange(filaEncabezado, 7).setValue('En Validación Docente');
-  sheet.getRange(filaEncabezado, 8).setValue('Validado');
-  sheet.getRange(filaEncabezado, 9).setValue('En Implementación');
-  sheet.getRange(filaEncabezado, 10).setValue('Cargado al Aula');
+  sheet.getRange(filaEncabezado, 6).setValue('Borrador');
+  sheet.getRange(filaEncabezado, 7).setValue('Validado');
+  sheet.getRange(filaEncabezado, 8).setValue('DM');
+  sheet.getRange(filaEncabezado, 9).setValue('Implementación');
+  sheet.getRange(filaEncabezado, 10).setValue('Cargado en Aula');
   sheet.getRange(filaEncabezado, 11).setValue('% Avance');
   sheet.getRange(filaEncabezado, 12).setValue('Barra');
 
@@ -139,12 +137,12 @@ function sincronizarDashboard() {
       continue;
     }
 
-    const { sinComenzar, enviadaDEL, enValidacion, validado, enImplementacion, cargadoAula } = datos;
-    const total = sinComenzar + enviadaDEL + enValidacion + validado + enImplementacion + cargadoAula;
+    const { sinComenzar, borrador, validado, dm, implementacion, cargadoAula } = datos;
+    const total = sinComenzar + borrador + validado + dm + implementacion + cargadoAula;
 
-    // %Avance ponderado por etapa
+    // %Avance ponderado por etapa del recurso
     const avancePct = total > 0 ? Math.round(
-      (cargadoAula * 1.0 + enImplementacion * 0.7 + validado * 0.4 + enValidacion * 0.15 + enviadaDEL * 0.05) / total * 100
+      (cargadoAula * 1.0 + implementacion * 0.75 + dm * 0.5 + validado * 0.25 + borrador * 0.05) / total * 100
     ) : 0;
 
     const barra = generarBarra(avancePct);
@@ -152,10 +150,10 @@ function sincronizarDashboard() {
     const fila = i + 1;
     sheet.getRange(fila, 4).setValue(total);
     sheet.getRange(fila, 5).setValue(sinComenzar);
-    sheet.getRange(fila, 6).setValue(enviadaDEL);
-    sheet.getRange(fila, 7).setValue(enValidacion);
-    sheet.getRange(fila, 8).setValue(validado);
-    sheet.getRange(fila, 9).setValue(enImplementacion);
+    sheet.getRange(fila, 6).setValue(borrador);
+    sheet.getRange(fila, 7).setValue(validado);
+    sheet.getRange(fila, 8).setValue(dm);
+    sheet.getRange(fila, 9).setValue(implementacion);
     sheet.getRange(fila, 10).setValue(cargadoAula);
     sheet.getRange(fila, 11).setValue(avancePct + '%');
     sheet.getRange(fila, 12).setValue(barra);
@@ -208,8 +206,8 @@ function contarRecursosHoja(sheet) {
   }
   if (headerIdx === -1 || estadoCol === -1) return null;
 
-  // Contar por los 5 nuevos estados
-  const conteos = { sinComenzar: 0, enviadaDEL: 0, enValidacion: 0, validado: 0, enImplementacion: 0, cargadoAula: 0 };
+  // Contar por los 5 estados de recursos
+  const conteos = { sinComenzar: 0, borrador: 0, validado: 0, dm: 0, implementacion: 0, cargadoAula: 0 };
 
   for (let i = headerIdx + 1; i < data.length; i++) {
     const row = data[i];
