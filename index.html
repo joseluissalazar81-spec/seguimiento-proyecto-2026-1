@@ -2735,7 +2735,10 @@ async function cargarAvanceDashboard(){
       const key=normD(asig);
       let pct=mapa[key];
       if(pct===undefined){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){pct=v;break;}}}
-      if(pct!==undefined) AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:pct};
+      if(pct!==undefined){
+        AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:pct};
+        AVANCE[asig]={...(AVANCE[asig]||{}),avance:pct};
+      }
     });
     console.log('Dashboard cargado: '+Object.keys(mapa).length+' asignaturas');
   }catch(e){console.warn('cargarAvanceDashboard:',e.message);}
