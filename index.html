@@ -2585,42 +2585,6 @@ async function loadDashboardData(){
     return false;
   }
 }
-// ─── Avance en vivo desde Dashboard UST 2026-1 (GAS → CSV) ──────────────────
-async function cargarAvanceDashboard(){
-  const DASH_ID='1NBGFr8UhU5trHSuS87ie1rE9U3rKjapTAQ3oKUq3xn4';
-  function normD(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();}
-  try{
-    const res=await fetch('https://docs.google.com/spreadsheets/d/'+DASH_ID+'/export?format=csv');
-    if(!res.ok)return;
-    const txt=await res.text();
-    const lines=txt.split('
-');
-    let hdr=-1;
-    for(let i=0;i<lines.length;i++){const l=lines[i].toLowerCase();if(l.includes('asignatura')&&(l.includes(' jp')||l.includes('jp,'))){hdr=i;break;}}
-    if(hdr===-1)return;
-    const mapa={};
-    for(let i=hdr+1;i<lines.length;i++){
-      const cols=lines[i].split(',').map(c=>c.replace(/^"|"$/g,'').trim());
-      if(cols.length<10||!cols[2])continue;
-      // CSV: JP,DI,Asignatura,Total,SinComenzar,EnProdDI,ValidDoc,EnProdDM,QA,Terminado,%Avance
-      const pct=parseInt((cols[10]||'0').replace('%',''))||0;
-      mapa[normD(cols[2])]={pct,sc:+cols[4]||0,ep:+cols[5]||0,vd:+cols[6]||0,dm:+cols[7]||0,qa:+cols[8]||0,te:+cols[9]||0};
-    }
-    // Actualizar AVANCE_ALL con datos reales del Dashboard
-    const src=Object.keys(AVANCE_ALL).length?AVANCE_ALL:AVANCE;
-    Object.keys(src).forEach(asig=>{
-      const key=normD(asig);
-      let d=mapa[key];
-      if(!d){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){d=v;break;}}}
-      if(d){
-        const entry=AVANCE_ALL[asig]||{};
-        AVANCE_ALL[asig]={...entry,avance:d.pct};
-      }
-    });
-    console.log('Dashboard UST cargado: '+Object.keys(mapa).length+' asignaturas');
-  }catch(e){console.warn('cargarAvanceDashboard fallo:',e.message);}
-}
-
 
 // ─── STATE ───
 let filters={jp:null,di:null,dg:null,implementador:null,facultad:null,planif:null};
@@ -3197,7 +3161,6 @@ document.getElementById('search').addEventListener('input',e=>{
   // JSONP requiere requests secuenciales (1 a la vez)
   const ok = await loadSheetData();
   await loadDashboardData();
-  await cargarAvanceDashboard();
   await loadReunionData();
   // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
   requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
