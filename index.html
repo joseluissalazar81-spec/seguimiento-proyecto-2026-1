@@ -2713,6 +2713,34 @@ let REUNION_T = {};
 
 function _norm(s){ return String(s||'').trim().toLowerCase().split('\n')[0].trim(); }
 
+async function cargarAvanceDashboard(){
+  const DASH_ID='1NBGFr8UhU5trHSuS87ie1rE9U3rKjapTAQ3oKUq3xn4';
+  function normD(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();}
+  try{
+    const res=await fetch('https://docs.google.com/spreadsheets/d/'+DASH_ID+'/export?format=csv&nocache='+Date.now());
+    if(!res.ok)return;
+    const txt=await res.text();
+    const lines=txt.split('\n');
+    let hdr=-1;
+    for(let i=0;i<lines.length;i++){const l=lines[i].toLowerCase();if(l.includes('asignatura')&&(l.includes(' jp')||l.includes('jp,'))){hdr=i;break;}}
+    if(hdr===-1)return;
+    const mapa={};
+    for(let i=hdr+1;i<lines.length;i++){
+      const cols=lines[i].split(',').map(c=>c.replace(/^"|"$/g,'').trim());
+      if(cols.length<11||!cols[2])continue;
+      const pct=parseInt((cols[10]||'0').replace('%',''))||0;
+      mapa[normD(cols[2])]=pct;
+    }
+    Object.keys(AVANCE_ALL).forEach(asig=>{
+      const key=normD(asig);
+      let pct=mapa[key];
+      if(pct===undefined){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){pct=v;break;}}}
+      if(pct!==undefined) AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:pct};
+    });
+    console.log('Dashboard cargado: '+Object.keys(mapa).length+' asignaturas');
+  }catch(e){console.warn('cargarAvanceDashboard:',e.message);}
+}
+
 async function loadReunionData(){
   for(const s of REUNION_SHEETS){
     try{
@@ -3161,6 +3189,7 @@ document.getElementById('search').addEventListener('input',e=>{
   // JSONP requiere requests secuenciales (1 a la vez)
   const ok = await loadSheetData();
   await loadDashboardData();
+  await cargarAvanceDashboard();
   await loadReunionData();
   // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
   requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
