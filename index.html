@@ -2729,15 +2729,25 @@ async function cargarAvanceDashboard(){
       const cols=lines[i].split(',').map(c=>c.replace(/^"|"$/g,'').trim());
       if(cols.length<11||!cols[2])continue;
       const pct=parseInt((cols[10]||'0').replace('%',''))||0;
-      mapa[normD(cols[2])]=pct;
+      mapa[normD(cols[2])]={
+        pct,
+        sc:+cols[4]||0,
+        di:+cols[5]||0,
+        vd:(+cols[6]||0)+(+cols[7]||0),
+        dm:+cols[8]||0,
+        qa:0,
+        ter:+cols[9]||0
+      };
     }
     Object.keys(AVANCE_ALL).forEach(asig=>{
       const key=normD(asig);
-      let pct=mapa[key];
-      if(pct===undefined){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){pct=v;break;}}}
-      if(pct!==undefined){
-        AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:pct};
-        AVANCE[asig]={...(AVANCE[asig]||{}),avance:pct};
+      let d=mapa[key];
+      if(!d){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){d=v;break;}}}
+      if(d!==undefined){
+        AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:d.pct};
+        AVANCE[asig]={...(AVANCE[asig]||{}),avance:d.pct};
+        const pKey=Object.keys(PROD).find(k=>normD(k)===key||normD(k).startsWith(key.split(' ').slice(0,4).join(' ')));
+        if(pKey) PROD[pKey]={...PROD[pKey],sc:d.sc,di:d.di,vd:d.vd,dm:d.dm,qa:d.qa,ter:d.ter};
       }
     });
     console.log('Dashboard cargado: '+Object.keys(mapa).length+' asignaturas');
