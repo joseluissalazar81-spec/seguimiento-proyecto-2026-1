@@ -781,6 +781,20 @@
     }
     .sb-pill.active .sb-cnt{ background:rgba(255,255,255,.2); }
 
+    /* ── Avance por DI (sidebar) ── */
+    .di-prog-item{border-radius:6px;padding:8px 10px;cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:4px}
+    .di-prog-item:hover{background:rgba(26,72,120,.07);border-color:rgba(26,72,120,.12)}
+    .di-prog-item.active{background:var(--az);border-color:var(--az)}
+    .di-prog-item.active .di-prog-name{color:#fff}
+    .di-prog-item.active .di-prog-pct{color:rgba(255,255,255,.9)!important}
+    .di-prog-item.active .di-prog-sub{color:rgba(255,255,255,.6)}
+    .di-prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .di-prog-name{font-size:12px;font-weight:600;color:var(--text)}
+    .di-prog-pct{font-size:11px;font-weight:800;font-family:'DM Mono',monospace}
+    .di-prog-bar-wrap{height:4px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden;margin-bottom:3px}
+    .di-prog-bar{height:100%;border-radius:2px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+    .di-prog-sub{font-size:10px;color:var(--text-muted)}
+
     /* ── Barra pills facultad (legacy, puede quedar oculta) ── */
     .fac-pills-bar{
       display:flex; align-items:center; flex-wrap:wrap; gap:8px;
@@ -1676,6 +1690,7 @@
   <aside id="sidebar">
     <div id="fac-pills-bar"></div>
     <div id="team-pills-bar"></div>
+    <div id="di-progress-bar"></div>
   </aside>
   <main>
     <!-- ══════════════════════════════════════════════════════
@@ -2631,12 +2646,53 @@ function renderTeamPills(){
   });
   bar.innerHTML = html;
 }
+function renderDIProgress(){
+  const bar = document.getElementById('di-progress-bar');
+  if(!bar || !DATA.length) return;
+  const src   = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  const diMap = {};
+  src.forEach(d=>{
+    const di = (d.di||'').trim(); if(!di||di==='—') return;
+    if(!diMap[di]) diMap[di]={n:0,sum:0,sc:0,bor:0,vd:0,dm:0,ter:0};
+    const s = diMap[di];
+    s.n++;
+    s.sum += (avSrc[d.asignatura]||{}).avance || 0;
+    const p = PROD[d.asignatura] || {};
+    s.sc  += p.sc  || 0;
+    s.bor += p.di  || 0;
+    s.vd  += p.vd  || 0;
+    s.dm  += p.dm  || 0;
+    s.ter += p.ter || 0;
+  });
+  const entries = Object.entries(diMap).sort(([a],[b])=>a.localeCompare(b,'es'));
+  if(!entries.length){ bar.innerHTML=''; return; }
+  let html = '<div class="sb-section-label" style="margin-top:14px">Avance por DI</div>';
+  entries.forEach(([di,s])=>{
+    const pct = s.n>0 ? Math.round(s.sum/s.n) : 0;
+    const clr = pct>=70?'var(--ve)':pct>=40?'var(--am)':'var(--ro)';
+    const act = filters.di===di;
+    const ter = s.ter; const total = s.sc+s.bor+s.vd+s.dm+s.ter;
+    const diEsc = di.replace(/'/g,"\\'");
+    html+=`<div class="di-prog-item${act?' active':''}" onclick="setTeamFilter('di','${diEsc}')">
+      <div class="di-prog-top">
+        <span class="di-prog-name">${di}</span>
+        <span class="di-prog-pct"${act?'':` style="color:${clr}"`}>${pct}%</span>
+      </div>
+      <div class="di-prog-bar-wrap"><div class="di-prog-bar" style="width:${pct}%;background:${act?'rgba(255,255,255,.85)':clr}"></div></div>
+      <div class="di-prog-sub">${s.n} asig · ${ter}/${total} terminadas</div>
+    </div>`;
+  });
+  bar.innerHTML = html;
+}
+
 function setTeamFilter(role, val){
   // toggle: si ya está activo, lo limpia
   filters[role] = filters[role]===val ? null : val;
   // limpiar los otros roles de equipo
   ['jp','di','dg','implementador'].forEach(k=>{ if(k!==role) filters[k]=null; });
   renderTeamPills();
+  renderDIProgress();
   renderTable();
   renderKPIs();
   if(currentView==='fac') renderFacView();
@@ -3210,6 +3266,7 @@ document.getElementById('search').addEventListener('input',e=>{
   if(ok){
     renderFacPills();
     renderTeamPills();
+    renderDIProgress();
     renderKPIs();
     renderTable();
     renderJPQuick();
@@ -3224,6 +3281,7 @@ document.getElementById('search').addEventListener('input',e=>{
     // Executive hero — visible inmediatamente
     renderExecutiveHero();
     // Re-renderizar con datos reales una vez cargados
+    renderDIProgress();
     requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
     // Guardar snapshot tendencia
     const src2=DATA_ALL.length?DATA_ALL:DATA; const avS2=DATA_ALL.length?AVANCE_ALL:AVANCE;
