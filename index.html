@@ -2717,7 +2717,7 @@ async function cargarAvanceDashboard(){
   const DASH_ID='1NBGFr8UhU5trHSuS87ie1rE9U3rKjapTAQ3oKUq3xn4';
   function normD(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();}
   try{
-    const res=await fetch('https://docs.google.com/spreadsheets/d/'+DASH_ID+'/export?format=csv&nocache='+Date.now());
+    const res=await fetch('https://docs.google.com/spreadsheets/d/'+DASH_ID+'/export?format=csv&gid=1289008788&nocache='+Date.now());
     if(!res.ok)return;
     const txt=await res.text();
     const lines=txt.split('\n');
