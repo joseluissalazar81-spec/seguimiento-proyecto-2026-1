@@ -1705,7 +1705,6 @@
   <aside id="sidebar">
     <div id="fac-pills-bar"></div>
     <div id="team-pills-bar"></div>
-    <div id="di-progress-bar"></div>
   </aside>
   <main>
     <!-- ══════════════════════════════════════════════════════
@@ -2667,53 +2666,7 @@ function renderTeamPills(){
   });
   bar.innerHTML = html;
 }
-function renderDIProgress(){
-  const bar = document.getElementById('di-progress-bar');
-  if(!bar || !DATA.length) return;
-  const src   = DATA_ALL.length ? DATA_ALL : DATA;
-  const avSrc = DATA_ALL.length ? AVANCE_ALL : AVANCE;
-  const diMap = {};
-  src.forEach(d=>{
-    const di = (d.di||'').trim(); if(!di||di==='—') return;
-    if(!diMap[di]) diMap[di]={n:0,sum:0,sc:0,bor:0,vd:0,dm:0,qa:0,ter:0};
-    const s = diMap[di];
-    s.n++;
-    s.sum += (avSrc[d.asignatura]||{}).avance || 0;
-    const p = PROD[d.asignatura] || {};
-    s.sc  += p.sc  || 0;
-    s.bor += p.di  || 0;
-    s.vd  += p.vd  || 0;
-    s.dm  += p.dm  || 0;
-    s.qa  += p.qa  || 0;
-    s.ter += p.ter || 0;
-  });
-  const entries = Object.entries(diMap).sort(([a],[b])=>a.localeCompare(b,'es'));
-  if(!entries.length){ bar.innerHTML=''; return; }
-  let html = '<div class="sb-section-label" style="margin-top:14px">% Seguimiento por DI</div>';
-  entries.forEach(([di,s])=>{
-    const total = s.sc + s.bor + s.vd + s.dm + s.qa + s.ter;
-    const segPct = total > 0
-      ? Math.round((20*s.bor + 40*s.vd + 60*s.dm + 80*s.qa + 100*s.ter) / total)
-      : (s.n > 0 ? Math.round(s.sum/s.n) : 0);
-    const clr = segPct>=70?'var(--ve)':segPct>=40?'var(--am)':'var(--ro)';
-    const act = filters.di===di;
-    const diEsc = di.replace(/'/g,"\\'");
-    const subcounts = total > 0
-      ? `${s.ter} term · ${s.vd+s.dm+s.qa} DM/QA · ${s.bor} bor · ${s.sc} sin iniciar`
-      : `${s.n} asig`;
-    html+=`<div class="di-prog-item${act?' active':''}" onclick="setTeamFilter('di','${diEsc}')">
-      <div class="di-prog-top">
-        <span class="di-prog-name">${di}</span>
-        <span class="di-prog-pct"${act?'':` style="color:${clr}"`}>${segPct}%</span>
-      </div>
-      <div class="di-prog-bar-wrap">
-        <div class="di-prog-bar" style="width:${segPct}%;background:${act?'rgba(255,255,255,.85)':clr}"></div>
-      </div>
-      <div class="di-prog-sub">${subcounts}</div>
-    </div>`;
-  });
-  bar.innerHTML = html;
-}
+function renderDIProgress(){}
 
 function setTeamFilter(role, val){
   // toggle: si ya está activo, lo limpia
@@ -2915,9 +2868,7 @@ function renderSidebar(){
     if(filters[g.key])html+=`<button class="clear-all" data-ck="${g.key}">Limpiar filtro</button>`;
     html+=`</div>`;
   }
-  html += '<div id="di-progress-bar"></div>';
   document.getElementById('sidebar').innerHTML=html;
-  renderDIProgress();
   function applyFilter(fn){
     const openAsig=selectedIdx!==null&&currentRows[selectedIdx]?currentRows[selectedIdx].asignatura:null;
     fn();
