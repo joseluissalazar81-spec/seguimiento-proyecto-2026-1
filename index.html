@@ -5491,28 +5491,29 @@ window.addEventListener('load', function(){
   <div id="bot-badge"></div>
 </button>
 
-<div id="bot-window">
-  <div id="bot-header">
-    <div id="bot-header-icon">
+<div id="bot-window" style="background:#ffffff;border:2px solid #1a3a5c;box-shadow:0 12px 48px rgba(0,0,0,.5)">
+  <div id="bot-header" style="background:#1a3a5c;border-bottom:3px solid #d4943a;display:flex;align-items:center;gap:10px;padding:13px 14px">
+    <div id="bot-header-icon" style="width:34px;height:34px;border-radius:50%;background:#d4943a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
     </div>
-    <div id="bot-title">
-      <strong>Pauli — UST 2026-1</strong>
-      <span>Tu asistente del proyecto</span>
+    <div id="bot-title" style="flex:1">
+      <strong style="font-size:14px;font-weight:800;color:#ffffff;display:block">Pauli — UST 2026-1</strong>
+      <span style="font-size:11px;color:#a8c8e0">Tu asistente del proyecto</span>
     </div>
-    <button id="bot-close" onclick="botToggle()">
+    <button id="bot-close" onclick="botToggle()" style="background:none;border:none;cursor:pointer;color:#a8c8e0;padding:5px;display:flex;align-items:center">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div id="bot-msgs"></div>
-  <div id="bot-input-row">
+  <div id="bot-msgs" style="background:#dde4f0;flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;max-height:380px"></div>
+  <div id="bot-input-row" style="display:flex;gap:7px;padding:10px 12px;border-top:2px solid #c8d4e0;background:#ffffff">
     <input id="bot-input" type="text" placeholder="Preguntame algo..." autocomplete="off"
+      style="flex:1;background:#eef2f8;border:2px solid #8090a8;border-radius:22px;padding:8px 14px;color:#0a1628;font-size:13px;outline:none;font-family:inherit;font-weight:500"
       onkeydown="if(event.key==='Enter')botSend()">
-    <button id="bot-send" onclick="botSend()">
+    <button id="bot-send" onclick="botSend()" style="background:#6c5ce7;border:none;border-radius:11px;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
-  <div id="bot-disclaimer">Pauli es una IA y puede cometer errores.</div>
+  <div id="bot-disclaimer" style="padding:4px 12px 8px;font-size:10.5px;color:#607080;text-align:center;background:#ffffff;font-style:italic">Pauli es una IA y puede cometer errores.</div>
 </div>
 
 <script>
@@ -5999,15 +6000,25 @@ window.addEventListener('load', function(){
     const msgs=document.getElementById('bot-msgs');
     const d=document.createElement('div');
     d.className='bot-msg '+who;
+    // Inline styles garantizan visibilidad independiente de CSS externo
+    if(who==='bot'){
+      d.style.cssText='background:#ffffff;color:#0a1628;padding:10px 14px;border-radius:16px;border-bottom-left-radius:4px;border-left:4px solid #1a3a5c;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-width:88%;align-self:flex-start;box-shadow:0 2px 6px rgba(0,0,0,.12)';
+    } else {
+      d.style.cssText='background:#1a3a5c;color:#ffffff;padding:10px 14px;border-radius:16px;border-bottom-right-radius:4px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-width:88%;align-self:flex-end;font-weight:500';
+    }
     d.innerHTML=txt.replace(/\n/g,'<br>');
     msgs.appendChild(d);
     if(chips?.length){
       const cc=document.createElement('div');
       cc.className='bot-chips';
+      cc.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-self:flex-start';
       chips.forEach(c=>{
         const btn=document.createElement('button');
         btn.className='bot-chip';
+        btn.style.cssText='background:#1a3a5c;color:#ffffff;border:none;border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit';
         btn.textContent=c;
+        btn.onmouseenter=()=>{btn.style.background='#d4943a'};
+        btn.onmouseleave=()=>{btn.style.background='#1a3a5c'};
         btn.onclick=()=>{ botProcess(c); };
         cc.appendChild(btn);
       });
