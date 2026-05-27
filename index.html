@@ -5421,5 +5421,235 @@ window.addEventListener('load', function(){
   <div></div>
 </footer>
 
+<!-- ─── CHATBOT ─────────────────────────────────────────────────────────── -->
+<style>
+#bot-btn{position:fixed;bottom:24px;right:24px;z-index:9000;width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--az),var(--tl));border:none;cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,box-shadow .2s}
+#bot-btn:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(0,0,0,.5)}
+#bot-btn svg{pointer-events:none}
+#bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:var(--ro);
+  border-radius:50%;border:2px solid var(--bg);display:none}
+
+#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:330px;
+  background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);display:none;flex-direction:column;overflow:hidden;
+  max-height:480px}
+#bot-window.open{display:flex}
+
+#bot-header{display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:linear-gradient(135deg,rgba(26,72,120,.6),rgba(19,95,93,.4));
+  border-bottom:1px solid rgba(255,255,255,.06)}
+#bot-header-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--az),var(--tl));
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#bot-title{flex:1}
+#bot-title strong{font-size:13px;color:var(--text);display:block}
+#bot-title span{font-size:10px;color:var(--text-muted)}
+#bot-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;
+  border-radius:6px;display:flex;align-items:center;transition:color .15s}
+#bot-close:hover{color:var(--text)}
+
+#bot-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+#bot-msgs::-webkit-scrollbar{width:4px}
+#bot-msgs::-webkit-scrollbar-track{background:transparent}
+#bot-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+.bot-msg{max-width:88%;padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.5;white-space:pre-wrap}
+.bot-msg.bot{background:rgba(26,72,120,.35);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.bot-msg.user{background:rgba(19,95,93,.5);color:var(--text);align-self:flex-end;border-bottom-right-radius:4px}
+.bot-msg strong{color:#90caf9;font-weight:700}
+.bot-msg.typing{opacity:.6}
+
+.bot-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;align-self:flex-start}
+.bot-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;
+  transition:background .15s,color .15s}
+.bot-chip:hover{background:rgba(26,72,120,.4);color:var(--text)}
+
+#bot-input-row{display:flex;gap:6px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.06)}
+#bot-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:7px 12px;color:var(--text);font-size:12.5px;outline:none;
+  font-family:inherit;transition:border-color .15s}
+#bot-input::placeholder{color:var(--text-muted)}
+#bot-input:focus{border-color:rgba(26,72,120,.6)}
+#bot-send{background:linear-gradient(135deg,var(--az),var(--tl));border:none;
+  border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:opacity .15s}
+#bot-send:hover{opacity:.85}
+</style>
+
+<button id="bot-btn" title="Asistente del proyecto" onclick="botToggle()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <div id="bot-badge"></div>
+</button>
+
+<div id="bot-window">
+  <div id="bot-header">
+    <div id="bot-header-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    </div>
+    <div id="bot-title">
+      <strong>Asistente UST 2026-1</strong>
+      <span>Preguntame sobre el proyecto</span>
+    </div>
+    <button id="bot-close" onclick="botToggle()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="bot-msgs"></div>
+  <div id="bot-input-row">
+    <input id="bot-input" type="text" placeholder="Preguntame algo..." autocomplete="off"
+      onkeydown="if(event.key==='Enter')botSend()">
+    <button id="bot-send" onclick="botSend()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  let botOpen = false, botGreeted = false;
+
+  function nrm(s){
+    return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+      .replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  }
+
+  function findAsig(q){
+    const nq = nrm(q);
+    let best = null, bestScore = 0;
+    (window.DATA||[]).forEach(d=>{
+      const na = nrm(d.asignatura);
+      if(nq.includes(na)){ bestScore=999; best=d; return; }
+      const words = na.split(' ').filter(w=>w.length>3);
+      let sc = words.filter(w=>nq.includes(w)).length;
+      if(sc>bestScore){ bestScore=sc; best=d; }
+    });
+    return bestScore>=1 ? best : null;
+  }
+
+  function pct(asig){ return (window.AVANCE||{})[asig?.asignatura]?.avance||0; }
+
+  function botRespond(q){
+    const nq = nrm(q);
+
+    if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
+      return {txt:'¡Hola! Soy el asistente del proyecto UST 2026-1. Podés preguntarme sobre avance, docente, DI, JP o cualquier asignatura.', chips:['Ver promedio','Asignaturas con más avance','Ayuda']};
+
+    if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
+      return {txt:'Podés preguntarme:\n• <strong>Avance de [asignatura]</strong>\n• <strong>Docente de [asignatura]</strong>\n• <strong>DI / JP / DG de [asignatura]</strong>\n• <strong>Promedio de avance</strong>\n• <strong>Asignaturas con más/menos avance</strong>\n• <strong>Total de asignaturas</strong>', chips:['Ver promedio','Más avanzadas','Menos avanzadas']};
+
+    if(nq.match(/cuantas|total.*asig|asig.*total/))
+      return {txt:`Hay <strong>${(window.DATA||[]).length} asignaturas</strong> en el proyecto.`};
+
+    if(nq.match(/promedio|avance general|avance total/) && !findAsig(q)){
+      const arr=window.DATA||[];
+      if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
+      const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
+      return {txt:`El <strong>avance promedio</strong> del proyecto es <strong>${avg}%</strong>.`};
+    }
+
+    if(nq.match(/mayor avance|mas avanzada|mejor avance|top/)){
+      const top=[...(window.DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
+      return {txt:'<strong>Top 5 asignaturas:</strong>\n'+top.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+    }
+
+    if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance/)){
+      const bot=[...(window.DATA||[])].sort((a,b)=>pct(a)-pct(b)).slice(0,5);
+      return {txt:'<strong>Menor avance (5):</strong>\n'+bot.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+    }
+
+    if(nq.match(/facultad|area|escuela/)){
+      const facs={};
+      (window.DATA||[]).forEach(d=>{if(d.facultad){facs[d.facultad]=(facs[d.facultad]||0)+1;}});
+      return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
+    }
+
+    const asig = findAsig(q);
+    if(!asig) return {txt:'No encontré esa asignatura. Intentá con parte del nombre, por ejemplo: "avance Narrativa" o "docente Inteligencia de Negocios".', chips:['Ayuda']};
+
+    const av = pct(asig);
+
+    if(nq.match(/avance|progreso|porcent|%/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nAvance: <strong>${av}%</strong>`, chips:[`Info completa de ${asig.asignatura.split(' ')[0]}`]};
+
+    if(nq.match(/docente|profesor|profe/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nDocente: <strong>${asig.docente||'—'}</strong>`};
+
+    if(nq.match(/\bdi\b|instruccional|diseñador.*i/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nDI: <strong>${asig.di||'—'}</strong>`};
+
+    if(nq.match(/\bdg\b|grafico|multimedia/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nDG: <strong>${asig.dg||'—'}</strong>`};
+
+    if(nq.match(/\bjp\b|jefe.*proyecto|proyecto.*jefe/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nJP: <strong>${asig.jp||'—'}</strong>`};
+
+    if(nq.match(/observ|obs\b|nota/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(window.AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
+
+    return {txt:`<strong>${asig.asignatura}</strong>\n• Avance: ${av}%\n• Docente: ${asig.docente||'—'}\n• JP: ${asig.jp||'—'}\n• DI: ${asig.di||'—'}\n• DG: ${asig.dg||'—'}\n• Área: ${asig.facultad||'—'}`};
+  }
+
+  function addMsg(txt, who, chips){
+    const msgs=document.getElementById('bot-msgs');
+    const d=document.createElement('div');
+    d.className='bot-msg '+who;
+    d.innerHTML=txt.replace(/\n/g,'<br>');
+    msgs.appendChild(d);
+    if(chips?.length){
+      const cc=document.createElement('div');
+      cc.className='bot-chips';
+      chips.forEach(c=>{
+        const btn=document.createElement('button');
+        btn.className='bot-chip';
+        btn.textContent=c;
+        btn.onclick=()=>{ botProcess(c); };
+        cc.appendChild(btn);
+      });
+      msgs.appendChild(cc);
+    }
+    msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function botProcess(q){
+    addMsg(q,'user');
+    const inp=document.getElementById('bot-input');
+    if(inp) inp.value='';
+    setTimeout(()=>{
+      const r=botRespond(q);
+      addMsg(r.txt,'bot',r.chips);
+    },220);
+  }
+
+  window.botSend=function(){
+    const inp=document.getElementById('bot-input');
+    const q=(inp?.value||'').trim();
+    if(!q) return;
+    botProcess(q);
+  };
+
+  window.botToggle=function(){
+    botOpen=!botOpen;
+    const w=document.getElementById('bot-window');
+    const b=document.getElementById('bot-badge');
+    if(botOpen){
+      w.classList.add('open');
+      b.style.display='none';
+      if(!botGreeted){
+        botGreeted=true;
+        setTimeout(()=>addMsg('¡Hola! Soy el asistente del proyecto UST 2026-1. Preguntame sobre avance, docente, DI, JP o cualquier asignatura.','bot',['Ver promedio','Más avanzadas','Ayuda']),300);
+      }
+      setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
+    } else {
+      w.classList.remove('open');
+    }
+  };
+})();
+</script>
+
 </body>
 </html>
