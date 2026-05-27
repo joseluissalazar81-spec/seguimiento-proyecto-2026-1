@@ -5423,28 +5423,52 @@ window.addEventListener('load', function(){
 
 <!-- ── PAULI CHATBOT ── -->
 <style>
-  /* ── Botón flotante cubo UST ── */
+  /* ── Botón cubo 3D UST ── */
+  #pauli-wrap{
+    position:fixed;bottom:28px;right:32px;z-index:9999;
+    /* margen extra para las caras del cubo */
+  }
   #pauli-btn{
-    position:fixed;bottom:24px;right:24px;z-index:9999;
-    width:58px;height:58px;border-radius:10px;
-    background:#1c4535;
+    position:relative;
+    width:56px;height:56px;border-radius:6px 6px 2px 6px;
+    background:#22573f;
     border:none;
-    box-shadow:0 4px 0 #0d2318,0 8px 24px rgba(0,0,0,.55);
+    /* Caras del cubo: capas de sombra desplazadas */
+    box-shadow:
+      1px 1px 0 #1e4f38,
+      2px 2px 0 #1a4632,
+      3px 3px 0 #163d2c,
+      4px 4px 0 #133526,
+      5px 5px 0 #102d20,
+      6px 6px 0 #0d251a,
+      8px 8px 18px rgba(0,0,0,.5);
     color:#fff;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    transition:transform .12s,box-shadow .12s;
+    transition:transform .1s,box-shadow .1s;
     font-family:'Inter',sans-serif;
   }
   #pauli-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 0 #0d2318,0 12px 30px rgba(0,0,0,.65);
+    transform:translate(-2px,-2px);
+    box-shadow:
+      1px 1px 0 #1e4f38,
+      2px 2px 0 #1a4632,
+      3px 3px 0 #163d2c,
+      4px 4px 0 #133526,
+      5px 5px 0 #102d20,
+      6px 6px 0 #0d251a,
+      7px 7px 0 #0a1e14,
+      8px 8px 0 #07160f,
+      10px 10px 22px rgba(0,0,0,.6);
   }
-  #pauli-btn:active{transform:translateY(1px);box-shadow:0 2px 0 #0d2318,0 4px 12px rgba(0,0,0,.55)}
-  #pauli-btn-label{font-size:8px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1}
+  #pauli-btn:active{
+    transform:translate(3px,3px);
+    box-shadow:2px 2px 0 #0d251a,4px 4px 10px rgba(0,0,0,.4);
+  }
+  #pauli-btn-label{font-size:8px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:uppercase;line-height:1}
   #pauli-badge{
-    position:absolute;top:-6px;right:-6px;
+    position:absolute;top:-7px;right:-7px;
     width:18px;height:18px;border-radius:50%;
-    background:#e03030;border:2px solid #1c4535;
+    background:#e03030;border:2px solid #22573f;
     font-size:9px;font-weight:800;color:#fff;
     display:flex;align-items:center;justify-content:center;
   }
@@ -5553,14 +5577,16 @@ window.addEventListener('load', function(){
   @keyframes pauliDot{0%,80%,100%{transform:scale(.65);opacity:.4}40%{transform:scale(1);opacity:1}}
 </style>
 
-<!-- Botón cubo -->
-<button id="pauli-btn" onclick="pauliToggle()" title="Chat Online — Pauli">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-  <div id="pauli-btn-label">Chat</div>
-  <div id="pauli-badge">1</div>
-</button>
+<!-- Botón cubo 3D -->
+<div id="pauli-wrap">
+  <button id="pauli-btn" onclick="pauliToggle()" title="Chat Online — Pauli">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <div id="pauli-btn-label">Chat</div>
+    <div id="pauli-badge">1</div>
+  </button>
+</div>
 
 <div id="pauli-win">
   <!-- Header -->
