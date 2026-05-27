@@ -5537,7 +5537,9 @@ window.addEventListener('load', function(){
   const PROYECTO = {
     nombre: 'Proyecto de Virtualización de Cursos UST 2026-1',
     botNombre: 'Pauli',
+    botOrigen: 'Mi nombre es en honor a Paulina Vera Benavente, Directora del proyecto.',
     descripcion: 'Diseño y producción de recursos educativos digitales para cursos universitarios de la Universidad Santo Tomás, semestre 2026-1.',
+    directora: {nombre:'Paulina Vera Benavente', rol:'Directora del proyecto', mail:'pverab@santotomas.cl'},
     fases: [
       {nombre:'Levantamiento', desc:'Reunir materiales y evidencia del curso con el docente.'},
       {nombre:'Diseño', desc:'Planificación didáctica y estructura de actividades.'},
@@ -5546,23 +5548,35 @@ window.addEventListener('load', function(){
       {nombre:'Implementación', desc:'Carga del curso en el aula virtual Moodle.'},
     ],
     equipo: [
-      {nombre:'María José Suazo',   rol:'JP',             mail:'msuazop@santotomas.cl'},
-      {nombre:'Noelia Escalona',    rol:'JP',             mail:'nomaesga@gmail.com'},
-      {nombre:'José Luis Salazar',  rol:'JP / DI',        mail:'joseluissalazar81@gmail.com'},
-      {nombre:'Nicole Pastene',     rol:'Coordinadora QA',mail:'npasten20@santotomas.cl'},
-      {nombre:'Cristián Domínguez', rol:'DI',             mail:'profe.cristian.d@gmail.com'},
-      {nombre:'Andreina Rodríguez', rol:'DI',             mail:'andreina.rodriguezruiz@gmail.com'},
-      {nombre:'Karen Chávez',       rol:'DI',             mail:'karend.chavezlopez@gmail.com'},
-      {nombre:'Natalie Baeza',      rol:'DI',             mail:'Nbaeza.n@gmail.com'},
-      {nombre:'Brenda Bastías',     rol:'DI',             mail:'brenda.bastiasbaier@gmail.com'},
-      {nombre:'Francisco Tapia',    rol:'DG',             mail:''},
-      {nombre:'Giovanni Perini',    rol:'DG',             mail:''},
-      {nombre:'Elías Castillo',     rol:'Implementador',  mail:'eliascastillo2@gmail.com'},
+      {nombre:'Paulina Vera Benavente',rol:'Directora',       mail:'pverab@santotomas.cl'},
+      {nombre:'María José Suazo',      rol:'JP',              mail:'msuazop@santotomas.cl'},
+      {nombre:'Noelia Escalona',       rol:'JP',              mail:'nomaesga@gmail.com'},
+      {nombre:'José Luis Salazar',     rol:'JP / DI',         mail:'joseluissalazar81@gmail.com'},
+      {nombre:'Nicole Pastene',        rol:'Coordinadora QA', mail:'npasten20@santotomas.cl'},
+      {nombre:'Cristián Domínguez',    rol:'DI',              mail:'profe.cristian.d@gmail.com'},
+      {nombre:'Andreina Rodríguez',    rol:'DI',              mail:'andreina.rodriguezruiz@gmail.com'},
+      {nombre:'Karen Chávez',          rol:'DI',              mail:'karend.chavezlopez@gmail.com'},
+      {nombre:'Natalie Baeza',         rol:'DI',              mail:'Nbaeza.n@gmail.com'},
+      {nombre:'Brenda Bastías',        rol:'DI',              mail:'brenda.bastiasbaier@gmail.com'},
+      {nombre:'Magdalena Quezada',     rol:'DI',              mail:''},
+      {nombre:'Francisco Tapia',       rol:'DG',              mail:''},
+      {nombre:'Giovanni Perini',       rol:'DG',              mail:''},
+      {nombre:'Jenny García',          rol:'DG',              mail:''},
+      {nombre:'Elías Castillo',        rol:'Implementador',   mail:'eliascastillo2@gmail.com'},
+      {nombre:'Antonio Cabrera',       rol:'Implementador',   mail:''},
+    ],
+    manuales: [
+      {nombre:'Manual de Diseño Instruccional',  para:'DI',           desc:'Lineamientos pedagógicos, planificación didáctica, tipos de recursos y evaluaciones.'},
+      {nombre:'Manual del Diseñador Gráfico',    para:'DG',           desc:'Identidad visual UST, color por facultad, herramientas, flujo de trabajo y QA.'},
+      {nombre:'Manual del Implementador',        para:'Implementador',desc:'Cómo implementar aulas virtuales en Moodle, configuración y carga de recursos.'},
+      {nombre:'Guía del docente — Revisión',     para:'Docente',      desc:'Cómo revisar y completar la planificación didáctica.'},
+      {nombre:'Guía del docente — Producción',   para:'Docente',      desc:'Cómo producir y entregar contenidos para el curso virtual.'},
+      {nombre:'Guía de recursos didácticos',     para:'DI',           desc:'Descripción de los 26 recursos disponibles con estándares y plantillas.'},
     ],
     roles: {
-      JP:  'El Jefe de Proyecto lidera la coordinación, gestiona plazos y recursos, y es el punto de contacto con el docente.',
-      DI:  'El Diseñador Instruccional acompaña al docente en el diseño pedagógico del curso virtual.',
-      DG:  'El Diseñador Gráfico produce los recursos multimedia y visuales del curso.',
+      JP:   'El Jefe de Proyecto lidera la coordinación, gestiona plazos y recursos, y es el punto de contacto con el docente.',
+      DI:   'El Diseñador Instruccional acompaña al docente en el diseño pedagógico del curso virtual.',
+      DG:   'El Diseñador Gráfico produce los recursos multimedia y visuales del curso.',
       impl:'El Implementador carga y configura los recursos en el aula virtual Moodle.',
       qa:  'La Coordinadora de Calidad (QA) revisa que los recursos cumplan los estándares antes de publicarse.',
     }
@@ -5571,14 +5585,17 @@ window.addEventListener('load', function(){
   function botRespond(q){
     const nq = nrm(q);
 
-    if(nq.match(/como te llamas|quien eres|tu nombre|eres pauli/))
-      return {txt:'Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, manuales, equipo, avance de asignaturas y más.', chips:['¿Qué podés hacer?','Tipos de recursos']};
+    if(nq.match(/como te llamas|quien eres|tu nombre|eres pauli|por que pauli|de donde.*nombre/))
+      return {txt:'Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1.\n\n${PROYECTO.botOrigen}\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.'.replace('${PROYECTO.botOrigen}', PROYECTO.botOrigen), chips:['¿Quién es Paulina?','Tipos de recursos','Ayuda']};
+
+    if(nq.match(/paulina|directora/))
+      return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, equipo o el avance de cualquier asignatura.', chips:['¿Qué es el proyecto?','Tipos de recursos','Ayuda']};
+      return {txt:'¡Hola! Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, horas, programas o el avance de cualquier asignatura.', chips:['¿Qué es el proyecto?','Tipos de recursos','Ayuda']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP de [asignatura]</strong>\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas</strong> disponibles por área\n• <strong>Manual del DI / DG</strong>\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance', chips:['Tipos de recursos','Los 3 momentos','Ver promedio']};
+      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general', chips:['Tipos de recursos','Los 3 momentos','Ver promedio']};
 
     // Proyecto general
     if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
@@ -5668,6 +5685,22 @@ window.addEventListener('load', function(){
     if(nq.match(/quienes.*dg|dg.*quienes|los dg|listado.*dg/) && !findAsig(q))
       return {txt:'<strong>Diseñadores Gráficos:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol==='DG').map(p=>`• ${p.nombre}`).join('\n')};
 
+    if(nq.match(/implementador|quien implementa|quienes implementan/) && !findAsig(q))
+      return {txt:'<strong>Implementadores:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol==='Implementador').map(p=>`• ${p.nombre}${p.mail?' — '+p.mail:''}`).join('\n')+'\n\nSe encargan de cargar y configurar los recursos en el aula virtual Moodle.', chips:['Manual del Implementador']};
+
+    // Manuales
+    if(nq.match(/que manuales|listado.*manual|todos.*manual|manuales disponibles/) && !findAsig(q))
+      return {txt:'<strong>Manuales y guías disponibles:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> (para ${m.para})`).join('\n'), chips:['Manual del DI','Manual del DG','Manual del Implementador']};
+
+    if(nq.match(/manual.*implementador|implementador.*manual|moodle.*manual/))
+      return {txt:'<strong>Manual del Implementador — Moodle UST</strong>\n\nCubre:\n• Configuración de aulas virtuales en Moodle\n• Carga de recursos por tipo\n• Estructura de cursos e-learning\n• Criterios de calidad antes de publicar\n\nDirigido a: Elías Castillo y Antonio Cabrera', chips:['¿Quiénes son los implementadores?','Dupla DI-DG']};
+
+    if(nq.match(/guia.*docente|docente.*guia|entregables.*docente|que entrega.*docente/))
+      return {txt:'<strong>Guías para el docente:</strong>\n\n<strong>1. Guía de Revisión de Planificación</strong>\nCómo el docente revisa y aprueba la planificación didáctica elaborada por el DI.\n\n<strong>2. Guía de Producción de Contenidos</strong>\nCómo el docente debe producir y entregar sus materiales (PPT, guiones, lecturas, etc.).\n\n<strong>3. Entregables del docente</strong>\nLista de compromisos y fechas en el proceso de diseño del curso.', chips:['Fases del proceso']};
+
+    if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
+      return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nEl proyecto tiene documentos de capacitación para cada rol:\n• Manual del DI (diseño instruccional e-learning)\n• Manual del DG (lineamientos gráficos UST)\n• Manual del Implementador (Moodle)\n• Guías para el docente (revisión y producción)\n• Presentación de kick-off para reunión de inicio con docentes\n• Guía de recursos didácticos (26 tipos de recursos)', chips:['Manual del DI','Manual del DG','Manual del Implementador']};
+
     // Búsqueda de persona por nombre
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
     if(personaMatch && !findAsig(q))
@@ -5721,10 +5754,19 @@ window.addEventListener('load', function(){
     if(nq.match(/\bjp\b|jefe.*proyecto|proyecto.*jefe/))
       return {txt:`<strong>${asig.asignatura}</strong>\nJP: <strong>${asig.jp||'—'}</strong>`};
 
+    if(nq.match(/implementador|quien implementa/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nImplementador: <strong>${asig.implementador||'—'}</strong>`};
+
     if(nq.match(/observ|obs\b|nota/))
       return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(window.AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
 
-    return {txt:`<strong>${asig.asignatura}</strong>\n• Avance: ${av}%\n• Docente: ${asig.docente||'—'}\n• JP: ${asig.jp||'—'}\n• DI: ${asig.di||'—'}\n• DG: ${asig.dg||'—'}\n• Área: ${asig.facultad||'—'}`};
+    if(nq.match(/reunion|reunión|kick.?off/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nReunión de inicio: <strong>${asig.reunion||'—'}</strong>\nPlanificación: <strong>${asig.planif||'—'}</strong>`};
+
+    if(nq.match(/programa|formato|plan\b/))
+      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>`};
+
+    return {txt:`<strong>${asig.asignatura}</strong>\n• Avance: ${av}%\n• Área: ${asig.facultad||'—'}\n• Formato: ${asig.fmt||'—'}\n• Docente: ${asig.docente||'—'}\n• JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}\n• DG: ${asig.dg||'—'} · Impl: ${asig.implementador||'—'}`, chips:[`Avance ${asig.asignatura.split(' ')[0]}`]};
   }
 
   function addMsg(txt, who, chips){
