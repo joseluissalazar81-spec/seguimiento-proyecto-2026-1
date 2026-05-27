@@ -5610,28 +5610,32 @@ window.addEventListener('load', function(){
     // ── RECURSOS ──────────────────────────────────────────────────────────────
 
     // Tipos de recursos general
-    if(nq.match(/tipos de recurso|que recursos|cuantos tipos|t1|t2|t3|t4/) && !nq.match(/capsula|videoclase|genially|podcast|infografia|guia|presentacion|foro|tarea/))
+    if(nq.match(/tipos de recurso|que recursos|cuantos tipos|t1|t2|t3|t4/) && !nq.match(/capsula|videoclase|genially|podcast|infografia|guia|presentacion|foro|tarea/) && !findAsig(q))
       return {txt:'<strong>Tipos de recursos didácticos:</strong>\n\n<strong>T1 — Audiovisuales e interactivos</strong> (20% horas asincrónicas)\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Video bienvenida/cierre\n\n<strong>T2 — Prácticos y evaluativos</strong> (80% horas asincrónicas)\nTareas, Foros, Evaluaciones, Glosarios, Lecturas, Infografías\n\n<strong>T3 — Materiales sesiones sincrónicas</strong>\nPresentaciones, Guías de facilitación, Dinámicas en vivo, Plantillas ejercicios\n\n<strong>T4 — TPE guiado</strong>\nGuías de análisis, actividades preparatorias previas a clases', chips:['¿Qué es una cápsula?','¿Qué es un Genially?','Los 3 momentos']};
 
     // Cápsula
     if(nq.match(/capsula|capsulas/))
-      return {txt:'<strong>Cápsula (T1)</strong>\nVideo corto que desarrolla un único concepto clave. <strong>Máx. 2 minutos / 280 palabras.</strong>\n\n• DI crea el guion literario y técnico\n• DG produce el video\n• Ideal para: Preparación o reforzar un contenido específico\n• Plantilla: <em>T1_Plantilla_video.docx</em>', chips:['¿Qué es una videoclase?','Tipos de recursos']};
+      return {txt:'<strong>Cápsula (T1)</strong>\nVideo corto que desarrolla un único concepto clave. <strong>Máx. 2 minutos / 280 palabras.</strong>\n\n• DI crea el guion literario y técnico\n• DG produce el video\n• Ideal para: Preparación o reforzar un contenido específico\n• Plantilla: <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a>', chips:['¿Qué es una videoclase?','Pasame plantilla video','Tipos de recursos']};
 
     // Videoclase
     if(nq.match(/videoclase|video clase/))
-      return {txt:'<strong>Videoclase (T1)</strong>\nVideo con desarrollo profundo del tema. <strong>Máx. 10 minutos / 1.400 palabras.</strong>\n\n• 2-3 bloques temáticos con ejemplos y transiciones\n• DI hace el guion, DG produce el video\n• Ideal para: Preparación o Desarrollo cuando el tema necesita más tiempo\n• Plantilla: <em>T1_Plantilla_video.docx</em>', chips:['¿Qué es una cápsula?','Tipos de recursos']};
+      return {txt:'<strong>Videoclase (T1)</strong>\nVideo con desarrollo profundo del tema. <strong>Máx. 10 minutos / 1.400 palabras.</strong>\n\n• 2-3 bloques temáticos con ejemplos y transiciones\n• DI hace el guion, DG produce el video\n• Ideal para: Preparación o Desarrollo cuando el tema necesita más tiempo\n• Plantilla: <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a>', chips:['¿Qué es una cápsula?','Pasame plantilla video','Tipos de recursos']};
 
     // Genially
     if(nq.match(/genially/))
-      return {txt:'<strong>Genially interactivo (T1)</strong>\nRecurso navegable con menú de temas, hotspots, autoevaluación y actividad reflexiva.\n\n• 3 a 5 actividades interactivas — 15 a 20 min para el estudiante\n• DI hace el guion técnico por slide, DG crea las piezas gráficas\n• Ideal para: Preparación o Trabajo independiente con varios conceptos relacionados\n• Plantilla: <em>T1_Plantilla_Genially_Interactivo.pptx</em>', chips:['Tipos de recursos','Los 3 momentos']};
+      return {txt:'<strong>Genially interactivo (T1)</strong>\nRecurso navegable con menú de temas, hotspots, autoevaluación y actividad reflexiva.\n\n• 3 a 5 actividades interactivas — 15 a 20 min para el estudiante\n• DI hace el guion técnico por slide, DG crea las piezas gráficas\n• Ideal para: Preparación o Trabajo independiente con varios conceptos relacionados\n• Plantilla: <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank">T1_Plantilla_Genially_Interactivo.pptx ↗</a>', chips:['Tipos de recursos','Pasame plantilla Genially','Los 3 momentos']};
 
     // Podcast
     if(nq.match(/podcast/))
-      return {txt:'<strong>Podcast educativo (T1)</strong>\nAudio con 2 personajes diferenciados. <strong>Máx. 5 minutos.</strong>\n\n• Estructura: Introducción (30 seg) → Desarrollo (3:30 min) → Cierre (1 min)\n• DI hace el guion literario completo, DG produce el audio\n• Ideal para: Preparación o Trabajo independiente\n• Plantilla: <em>T1_Plantilla_podcast.docx</em>', chips:['Tipos de recursos']};
+      return {txt:'<strong>Podcast educativo (T1)</strong>\nAudio con 2 personajes diferenciados (A y B). <strong>Máx. 5 minutos.</strong>\n\n<strong>Estructura del guión:</strong>\n🎙 <strong>Introducción</strong> (30 seg) — Personaje A presenta el tema, B hace una pregunta gancho\n🎧 <strong>Desarrollo</strong> (3 min 30 seg) — 3 bloques conversacionales:\n  · Bloque 1: Concepto clave + ejemplo concreto\n  · Bloque 2: Profundización o contraste\n  · Bloque 3: Aplicación práctica o caso\n🔔 <strong>Cierre</strong> (1 min) — Síntesis, mensaje final y referencia bibliográfica\n\n<strong>Reglas:</strong>\n• 5–7 oraciones por bloque · tono conversacional, NO leer slides\n• Sin siglas sin explicar · evitar párrafos de más de 3 líneas\n• DI escribe el guión literario completo · DG produce el MP3 en Canva\n\n📄 Plantilla: <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank">T1_Plantilla_podcast.docx ↗</a>', chips:['Tipos de recursos','Pasame plantilla podcast','Prompts IA']};
 
     // Infografía
     if(nq.match(/infografia|infografía/))
-      return {txt:'<strong>Infografía (T1)</strong>\nRecurso estático con texto en bloques cortos, imágenes y bibliografía APA 7. <strong>1 página — 10 a 15 min</strong> para el estudiante.\n\n• DI crea el guion completo (texto, imágenes sugeridas, referencias)\n• DG hace la creación gráfica\n• Ideal para: Sintetizar visualmente un concepto, proceso o comparación\n• Plantilla: <em>T1_Plantilla_infografia.docx</em>\n\n<strong>Infografía interactiva:</strong> con capas navegables tipo pop-up (3-5 elementos). Plantilla: <em>T1_Plantilla_infografia_interactiva.pptx</em>', chips:['Tipos de recursos']};
+      return {txt:'<strong>Infografía (T1)</strong>\n1 página visual. <strong>10 a 15 min</strong> para el estudiante.\n\n<strong>Estructura del guión:</strong>\n📌 <strong>Título</strong> — claro e impactante (máx. 8 palabras)\n📋 <strong>Introducción</strong> — 1–2 oraciones que contextualizan el tema\n📊 <strong>4–5 bloques de contenido</strong> — subtítulo + 3–4 líneas + ícono/imagen sugerida\n📚 <strong>Bibliografía APA 7</strong> al pie de página\n\n<strong>Reglas DI/DG:</strong>\n• Máx. 200 palabras en total\n• Imágenes libres de derechos (Freepik o Unsplash)\n• Colores corporativos UST + color de facultad\n• Fondo blanco o color plano — sin fondos complejos\n• DI entrega guión completo con sugerencias visuales · DG produce la pieza\n\n<strong>Infografía interactiva:</strong> 3–5 elementos pop-up navegables, exporta como SCORM desde Genially.\n\n📄 Plantilla: <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank">T1_Plantilla_infografia.docx ↗</a>', chips:['Tipos de recursos','Pasame plantilla infografia','Colores por facultad']};
+
+    // Presentación sincrónica
+    if(nq.match(/presentacion|presentación|ppt\b|powerpoint/) && !findAsig(q))
+      return {txt:'<strong>Presentación sincrónica (T3)</strong>\nMaterial de apoyo para sesiones con el docente.\n\n<strong>Estructura:</strong>\n📎 <strong>Portada</strong> — nombre asignatura, logo UST, nombre sesión, semana\n📌 <strong>Agenda</strong> — 3–5 puntos de la clase\n📋 <strong>Desarrollo</strong> — 1 slide = 1 idea · máx. 6 líneas / 24 palabras por slide\n💬 <strong>Actividad o reflexión</strong> — instrucción clara para el estudiante\n✅ <strong>Cierre</strong> — síntesis de los puntos clave de la sesión\n\n<strong>Reglas:</strong>\n• T3 <strong>no pasa por DG</strong> — el DI completa la plantilla directamente\n• Sin animaciones complejas · fuente Arial · colores UST + color de facultad\n• Fotos e íconos libres de derechos (Freepik)\n• Plantilla: <em>T3_Plantilla_Actividad_Sincrónica.docx</em>', chips:['Tipos de recursos','Plantillas T3','Los 3 momentos']};
 
     // Guía de facilitación
     if(nq.match(/guia de facilitacion|guia facilitacion|guías de facilitación/))
@@ -5643,7 +5647,7 @@ window.addEventListener('load', function(){
 
     // Plantillas
     if(nq.match(/plantilla.*t1|t1.*plantilla/))
-      return {txt:'<strong>Plantillas T1 — Audiovisuales e interactivos</strong>\n\n• <em>T1_Plantilla_video.docx</em> → Cápsula y Videoclase\n• <em>T1_Plantilla_podcast.docx</em> → Podcast educativo\n• <em>T1_Plantilla_infografia.docx</em> → Infografía estática\n• <em>T1_Plantilla_infografia_interactiva.pptx</em> → Infografía interactiva\n• <em>T1_Plantilla_Genially_Interactivo.pptx</em> → Genially navegable\n\nTodos los T1 pasan por el DG para producción.', chips:['Plantillas T2','Plantillas T3','Plantillas T4']};
+      return {txt:'<strong>Plantillas T1 — Audiovisuales e interactivos</strong>\n\n📄 <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a> → Cápsula y Videoclase\n📄 <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank">T1_Plantilla_podcast.docx ↗</a> → Podcast educativo\n📄 <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank">T1_Plantilla_infografia.docx ↗</a> → Infografía estática\n📄 <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank">T1_Plantilla_Genially_Interactivo.pptx ↗</a> → Genially navegable\n\nTodos los T1 pasan por el DG para producción.', chips:['Plantillas T2','Plantillas T3','Plantillas T4']};
 
     if(nq.match(/plantilla.*t2|t2.*plantilla/))
       return {txt:'<strong>Plantillas T2 — Actividades prácticas y evaluativas</strong>\n\n<strong>Documentos académicos (variantes por facultad):</strong>\n• <em>T2_Plantilla_guia_de_estudio.docx</em> (Ing. y Negocios, Salud, Recursos, Formación, Sociales)\n• <em>T2_Plantilla Apunte.docx</em> (Ing. y Negocios, Salud, Recursos, Formación, Sociales)\n\n<strong>Actividades y evaluaciones:</strong>\n• <em>T2_Plantilla_Actividad_de_clase.docx</em>\n• <em>T2_Plantilla_Tarea.docx</em>\n• <em>T2_Plantilla_prueba_desarrollo.docx</em>\n• <em>T2_Plantilla_Lista_Cotejo.docx</em>\n• <em>T2_Plantilla_Pauta_Corrección.docx</em>', chips:['Plantillas T1','Plantillas T3','Plantillas T4']};
@@ -5653,6 +5657,19 @@ window.addEventListener('load', function(){
 
     if(nq.match(/plantilla.*t4|t4.*plantilla/))
       return {txt:'<strong>Plantillas T4 — TPE guiado</strong>\n\n• <em>T4_Plantilla_Actividad_TPE.docx</em> (variantes: Formación, Sociales, Recursos Naturales, Ing. y Negocios)\n• <em>T4_Plantilla_Guía_preparación.docx</em>\n• <em>T4_Plantilla_Encuesta_de_interés.docx</em>\n\nRecursos para que el estudiante trabaje de forma autónoma (Trabajo Personal del Estudiante).', chips:['Plantillas T2','Plantillas T3','Los 3 momentos']};
+
+    // Pasame plantilla (links directos de Drive)
+    if(nq.match(/pasame|dame.*plantilla|quiero.*plantilla|necesito.*plantilla|link.*plantilla|enlace.*plantilla|descargar.*plantilla/)){
+      if(nq.match(/video|capsula|videoclase/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank"><strong>T1_Plantilla_video.docx ↗</strong></a>\nÚsala para guiones de cápsula y videoclase.', chips:['¿Qué es una cápsula?','Tipos de recursos']};
+      if(nq.match(/podcast/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank"><strong>T1_Plantilla_podcast.docx ↗</strong></a>\nÚsala para el guión literario del podcast educativo.', chips:['¿Cómo debe ser un podcast?','Tipos de recursos']};
+      if(nq.match(/infografia|infografía/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank"><strong>T1_Plantilla_infografia.docx ↗</strong></a>\nÚsala para el guión de infografía estática.', chips:['¿Cómo debe ser una infografía?','Tipos de recursos']};
+      if(nq.match(/genially/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank"><strong>T1_Plantilla_Genially_Interactivo.pptx ↗</strong></a>\nÚsala para el guión técnico por slide del Genially.', chips:['¿Qué es un Genially?','Tipos de recursos']};
+      return {txt:'📂 <strong>Plantillas T1 disponibles:</strong>\n\n📄 <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a> (cápsula / videoclase)\n📄 <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank">T1_Plantilla_podcast.docx ↗</a>\n📄 <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank">T1_Plantilla_infografia.docx ↗</a>\n📄 <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank">T1_Plantilla_Genially_Interactivo.pptx ↗</a>\n\nPara T2/T3/T4 escribí <strong>Plantillas T2</strong>, <strong>Plantillas T3</strong> o <strong>Plantillas T4</strong>.', chips:['Plantillas T2','Plantillas T3','Plantillas T4']};
+    }
 
     if(nq.match(/plantilla|plantillas/) && !findAsig(q))
       return {txt:'<strong>Plantillas del proyecto — organizadas por tipo de recurso</strong>\n\n<strong>T1 — Audiovisuales e interactivos:</strong>\nVideo, Podcast, Infografía, Infografía interactiva, Genially\n\n<strong>T2 — Actividades prácticas y evaluativas:</strong>\nGuía de estudio, Apunte (x5 facultades), Actividad de clase, Tarea, Prueba de desarrollo, Lista Cotejo, Pauta Corrección\n\n<strong>T3 — Materiales sincrónicas:</strong>\nActividad Sincrónica\n\n<strong>T4 — TPE guiado:</strong>\nActividad TPE (x4 facultades), Guía de preparación, Encuesta de interés\n\nAccedé desde: <em>Carpeta 2. Plantillas</em> en el Drive del proyecto.', chips:['Plantillas T1','Plantillas T2','Plantillas T4']};
@@ -5935,7 +5952,40 @@ window.addEventListener('load', function(){
     if(nq.match(/programa|formato|plan\b/))
       return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>`};
 
-    return {txt:`<strong>${asig.asignatura}</strong>\n• Avance: ${av}%\n• Área: ${asig.facultad||'—'}\n• Formato: ${asig.fmt||'—'}\n• Docente: ${asig.docente||'—'}\n• JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}\n• DG: ${asig.dg||'—'} · Impl: ${asig.implementador||'—'}`, chips:[`Avance ${asig.asignatura.split(' ')[0]}`]};
+    if(nq.match(/t1|t2|t3|t4|tipos.*recurso|recursos.*tipo/)){
+      const fmt=asig.fmt||'—';
+      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${fmt}</strong> · Avance: <strong>${av}%</strong>\n\nLos recursos T1/T2/T3/T4 producidos están detallados en la planificación didáctica de esta asignatura.\n\n<strong>T1:</strong> Audiovisuales (cápsula, videoclase, podcast, infografía, Genially)\n<strong>T2:</strong> Actividades y evaluaciones (tareas, foros, pruebas, guías)\n<strong>T3:</strong> Materiales sincrónicas (presentaciones, guías de facilitación)\n<strong>T4:</strong> TPE guiado (actividades autónomas previas a clase)\n\n💡 Consultá la planificación con <strong>${asig.di||'el DI'}</strong> o <strong>${asig.jp||'el JP'}</strong>.`, chips:['Tipos de recursos','Plantillas T1']};
+    }
+
+    // Ficha completa de la asignatura
+    {
+      const avObj=(window.AVANCE||{})[asig.asignatura]||{};
+      const hitos=avObj.hitos||{};
+      const hitoMeta=(typeof HITO_META!=='undefined'?HITO_META:[]);
+      const hitoStr=hitoMeta.map(h=>{
+        const v=hitos[h.key]||'—';
+        const icon=v==='Validada'?'✅':v==='Enviada'?'📤':v==='En construcción'?'🔨':v==='No aplica'?'➖':v==='No inicia'?'⏸':'▫';
+        return `${icon} ${h.label}: ${v}`;
+      }).join('\n');
+      const obs=avObj.obs||asig.obs||'';
+      let txt=`<strong>${asig.asignatura}</strong>\n`;
+      txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
+      txt+=`📊 Avance: <strong>${av}%</strong>\n`;
+      txt+=`🏫 Facultad: ${asig.facultad||'—'}\n`;
+      txt+=`📋 Formato: ${asig.fmt||'—'}\n`;
+      txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
+      txt+=`👤 Docente: <strong>${asig.docente||'—'}</strong>\n`;
+      txt+=`🗂 JP: ${asig.jp||'—'}\n`;
+      txt+=`🎓 DI: ${asig.di||'—'}\n`;
+      txt+=`🎨 DG: ${asig.dg||'—'}\n`;
+      txt+=`💻 Implementador: ${asig.implementador||'—'}\n`;
+      txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
+      txt+=`📅 Reunión inicio: ${asig.reunion||'—'}\n`;
+      txt+=`📅 Planificación: ${asig.planif||'—'}\n`;
+      if(hitoStr){txt+=`━━━━━━━━━━━━━━━━━━━━━\n<strong>Hitos de producción:</strong>\n${hitoStr}\n`;}
+      if(obs){txt+=`━━━━━━━━━━━━━━━━━━━━━\n📝 Obs: ${obs}\n`;}
+      return {txt, chips:['Avance por facultad','Top 5']};
+    }
   }
 
   function addMsg(txt, who, chips){
