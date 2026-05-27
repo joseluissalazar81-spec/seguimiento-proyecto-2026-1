@@ -5747,6 +5747,33 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`};
 
     // Stats generales
+    // Directoras/directores de escuela (DNE)
+    if(nq.match(/director|directora|dne|encargad|director.*facultad|director.*escuela|director.*programa/)){
+      const dne = (typeof DNE_DATA!=='undefined'?DNE_DATA:[]);
+      if(!dne.length) return {txt:'No hay datos de directores cargados.'};
+      // agrupar por facultad
+      const byFac={};
+      dne.forEach(d=>{
+        if(!byFac[d.facultad]) byFac[d.facultad]=[];
+        byFac[d.facultad].push(`  · ${d.nombre} — ${d.escuela} (${d.programa})`);
+      });
+      const txt='<strong>Directores/as de Escuela por facultad:</strong>\n'+
+        Object.entries(byFac).map(([f,ps])=>`\n<strong>${f}:</strong>\n${ps.join('\n')}`).join('\n');
+      return {txt, chips:['Avance por facultad','¿Quién es el equipo?']};
+    }
+
+    // Docentes del proyecto (listado o por facultad)
+    if(nq.match(/docentes.*proyecto|listado.*docente|todos.*docente|docente.*facultad|docentes.*facultad|docentes.*area/) && !findAsig(q)){
+      const data=window.DATA||[];
+      if(!data.length) return {txt:'Los datos aún no cargaron.'};
+      // si menciona facultad específica, filtrar
+      const facMatch=Object.keys((()=>{const f={};data.forEach(d=>{if(d.facultad)f[d.facultad]=1;});return f;})())
+        .find(f=>nq.includes(nrm(f).split(' ')[0]));
+      const lista=facMatch?data.filter(d=>d.facultad===facMatch):data;
+      const header=facMatch?`<strong>Docentes — ${facMatch}:</strong>`:`<strong>Todos los docentes (${lista.length} asignaturas):</strong>`;
+      return {txt:header+'\n'+lista.map(d=>`• ${d.docente||'—'} — <em>${d.asignatura}</em>`).join('\n')};
+    }
+
     if(nq.match(/cuantas|total.*asig|asig.*total/))
       return {txt:`Hay <strong>${(window.DATA||[]).length} asignaturas</strong> en el proyecto.`};
 
