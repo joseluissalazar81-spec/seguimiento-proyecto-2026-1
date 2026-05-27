@@ -1,21 +1,3 @@
-/**
- * UST 2026-1 — API de Estados de Seguimiento DI
- *
- * INSTRUCCIONES DE PUBLICACIÓN:
- * 1. Abre cualquier planilla Google → Extensiones → Apps Script
- * 2. Pega este script completo → Guarda (Ctrl+S)
- * 3. Clic en "Implementar" → "Nueva implementación"
- * 4. Tipo: Aplicación web
- *    - Ejecutar como: Yo (tu cuenta)
- *    - Quién tiene acceso: Cualquier persona
- * 5. Clic "Implementar" → copia la URL que aparece
- * 6. Pégala en el dashboard cuando te la pida
- *
- * La URL tiene este formato:
- *   https://script.google.com/macros/s/XXXXXXX/exec
- */
-
-// ─── IDs de planillas de seguimiento por DI ──────────────────────────────────
 const SEG_IDS = [
   { id: '1mvc5S3viFNOQr3e8oXHKPT5gQHiA0rS5AsXObR83IYA', di: 'Andreina'    },
   { id: '1MzcRjzWPa6PDCkZdTdOGpyMeUJTXtUGMNg3tkIORWiE', di: 'Cristián'    },
@@ -29,35 +11,44 @@ const SEG_IDS = [
   { id: '1L43dz5b1_QbAbc1pJSmAzHYoZUGQCmAsksVmhsA-FPc', di: 'Natalia 2'   },
 ];
 
-// ─── Punto de entrada de la web app ──────────────────────────────────────────
+// Estados en la col F del seguimiento → categoría interna
+const ESTADO_MAP = {
+  'sin comenzar':          'sc',
+  'en produccion di':      'di',
+  'en produccion borrador':'di',
+  'borrador':              'di',
+  'validado docente':      'vd',
+  'validado':              'vd',
+  'en produccion dm':      'dm',
+  'en diseno grafico':     'dm',
+  'implementacion':        'qa',
+  'en implementacion':     'qa',
+  'terminado':             'ter',
+  'cargado en aula':       'ter',
+  'cargado en moodle':     'ter',
+};
+
 function doGet(e) {
   try {
     const data = leerTodosLosSeguimientos();
-    const json = JSON.stringify({ ok: true, data, ts: Date.now() });
-    return ContentService
-      .createTextOutput(json)
+    return ContentService.createTextOutput(JSON.stringify({ ok: true, data, ts: Date.now() }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
+    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: err.message }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// ─── Lee todas las planillas y devuelve mapa asig_norm → conteos ─────────────
 function leerTodosLosSeguimientos() {
   const mapa = {};
-
   SEG_IDS.forEach(entry => {
     try {
       const ss = SpreadsheetApp.openById(entry.id);
       ss.getSheets().forEach(sheet => {
-        const res = parsearHoja(sheet, entry.di);
+        const res = parsearHoja(sheet);
         if (!res) return;
         const key = norm(res.asignatura);
-        if (!mapa[key]) {
-          mapa[key] = { asignatura: res.asignatura, di: entry.di, sc: 0, di_: 0, vd: 0, dm: 0, qa: 0, ter: 0 };
-        }
+        if (!mapa[key]) mapa[key] = { asignatura: res.asignatura, di: entry.di, sc:0, di_:0, vd:0, dm:0, qa:0, ter:0 };
         mapa[key].sc  += res.sc;
         mapa[key].di_ += res.di;
         mapa[key].vd  += res.vd;
@@ -65,21 +56,16 @@ function leerTodosLosSeguimientos() {
         mapa[key].qa  += res.qa;
         mapa[key].ter += res.ter;
       });
-    } catch (e) {
-      Logger.log('Error ' + entry.di + ': ' + e.message);
-    }
+    } catch(e) { Logger.log('Error ' + entry.di + ': ' + e.message); }
   });
-
-  // Renombrar di_ → di en la salida para compatibilidad con el dashboard
   const salida = {};
-  Object.entries(mapa).forEach(([k, v]) => {
-    salida[k] = { asignatura: v.asignatura, di: v.di, sc: v.sc, bor: v.di_, vd: v.vd, dm: v.dm, qa: v.qa, ter: v.ter };
+  Object.entries(mapa).forEach(([k,v]) => {
+    salida[k] = { asignatura:v.asignatura, di:v.di, sc:v.sc, bor:v.di_, vd:v.vd, dm:v.dm, qa:v.qa, ter:v.ter };
   });
   return salida;
 }
 
-// ─── Parsea una hoja DI y cuenta recursos por estado ─────────────────────────
-function parsearHoja(sheet, diNombre) {
+function parsearHoja(sheet) {
   const data = sheet.getDataRange().getValues();
   if (data.length < 4) return null;
 
@@ -90,8 +76,7 @@ function parsearHoja(sheet, diNombre) {
       const c = String(data[i][j] || '');
       if (c.match(/^asignatura\s*:/i)) {
         asignatura = c.replace(/^asignatura\s*:\s*/i, '').trim();
-        if (asignatura.includes(',') && asignatura.length > 50)
-          asignatura = asignatura.split(',')[0].trim();
+        if (asignatura.includes(',') && asignatura.length > 50) asignatura = asignatura.split(',')[0].trim();
         break;
       }
     }
@@ -99,70 +84,54 @@ function parsearHoja(sheet, diNombre) {
   }
   if (!asignatura) return null;
 
-  // Encontrar fila de encabezados
-  let hdrIdx = -1;
-  const cols = { semana: -1, borrador: -1, validado: -1, dm: -1, impl: -1, cargado: -1 };
+  // Encontrar fila de encabezados (busca fila con "Semana" y "Estado")
+  let hdrIdx = -1, colSemana = -1, colEstado = -1;
 
   for (let i = 0; i < Math.min(15, data.length); i++) {
-    const fila = data[i].map(c => String(c || '').toLowerCase().replace(/\s+/g, ' ').trim());
+    const fila = data[i].map(c => String(c||'').toLowerCase().replace(/\s+/g,' ').trim());
     if (!fila.some(c => c === 'semana')) continue;
-
-    // Posiciones fijas confirmadas: H=7 borrador, J=9 validado, L=11 DM, N=13 impl, Q=16 cargado
-    if (fila.length > 16) {
-      cols.borrador = 7;
-      cols.validado = 9;
-      cols.dm       = 11;
-      cols.impl     = 13;
-      cols.cargado  = 16;
-    }
-
-    // Detección por nombre como refinamiento (puede override las posiciones fijas)
     fila.forEach((h, j) => {
-      if (h === 'semana')                                                    cols.semana   = j;
-      if (h.includes('borrador'))                                            cols.borrador = j;
-      if (h.includes('validado') && !h.includes('borrador'))                 cols.validado = j;
-      if (h.includes('producto dm') || (h.includes('link') && / dm/.test(h))) cols.dm     = j;
-      if (h.includes('producto impl') || h.includes('implementa'))           cols.impl     = j;
-      if (h.includes('cargado'))                                             cols.cargado  = j;
+      if (h === 'semana') colSemana = j;
+      if (h === 'estado' || h.includes('estado del')) colEstado = j;
     });
-
+    if (colEstado === -1) colEstado = 5; // fallback: col F
     hdrIdx = i;
     break;
   }
-  if (hdrIdx === -1 || cols.semana === -1) return null;
+  if (hdrIdx === -1 || colSemana === -1) return null;
 
-  // Contar recursos por estado
-  let sc = 0, di = 0, vd = 0, dm = 0, qa = 0, ter = 0;
-
+  // Contar por estado
+  let sc=0, di=0, vd=0, dm=0, qa=0, ter=0;
   for (let i = hdrIdx + 1; i < data.length; i++) {
     const row = data[i];
-    const semana = String(row[cols.semana] || '').trim().toUpperCase();
+    const semana = String(row[colSemana] || '').trim().toUpperCase();
     if (!semana.match(/^S\d+$/)) continue;
 
-    const tieneBor  = cols.borrador >= 0 && String(row[cols.borrador] || '').trim().length > 5;
-    const tieneVd   = cols.validado >= 0 && String(row[cols.validado] || '').trim().length > 5;
-    const tieneDm   = cols.dm       >= 0 && String(row[cols.dm]       || '').trim().length > 5;
-    const tieneImpl = cols.impl     >= 0 && String(row[cols.impl]      || '').trim().length > 5;
-    const cargadoV  = cols.cargado  >= 0 ? String(row[cols.cargado] || '').trim().toLowerCase() : '';
-    const cargado   = cargadoV === 'sí' || cargadoV === 'si' || cargadoV.includes('observac');
+    const estadoRaw = norm(String(row[colEstado] || ''));
+    const cat = ESTADO_MAP[estadoRaw] || 'sc';
 
-    if (cargado)        ter++;
-    else if (tieneImpl) qa++;
-    else if (tieneDm)   dm++;
-    else if (tieneVd)   vd++;
-    else if (tieneBor)  di++;
-    else                sc++;
+    if      (cat === 'ter') ter++;
+    else if (cat === 'qa')  qa++;
+    else if (cat === 'dm')  dm++;
+    else if (cat === 'vd')  vd++;
+    else if (cat === 'di')  di++;
+    else                    sc++;
   }
-
   return { asignatura, sc, di, vd, dm, qa, ter };
 }
 
-// ─── Normalizar texto ─────────────────────────────────────────────────────────
 function norm(s) {
-  return String(s)
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+}
+
+function debugHoja() {
+  const ss = SpreadsheetApp.openById('1cWGEka3pfO1mJD64IsP-hwbh5bCIy44H8Y9YgalA6jg');
+  const sheet = ss.getSheets()[0];
+  const data = sheet.getDataRange().getValues();
+  Logger.log('Hoja: ' + sheet.getName() + ' | Filas: ' + data.length);
+  for (let i = 0; i < Math.min(20, data.length); i++) {
+    const fila = data[i].map(c => String(c||'').trim()).filter(c=>c);
+    if (fila.length > 0) Logger.log('F'+(i+1)+': '+fila.slice(0,8).join(' | '));
+  }
 }
