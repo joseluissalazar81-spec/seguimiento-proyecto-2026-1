@@ -5733,6 +5733,42 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
     }
 
+    // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
+
+    function listarFmt(label, fn){
+      const lista=(window.DATA||[]).filter(fn);
+      if(!lista.length) return {txt:`No encontré asignaturas de tipo <strong>${label}</strong>.`};
+      return {txt:`<strong>${label}</strong> (${lista.length}):\n`+lista.map(d=>`• ${d.asignatura}${d.jp?' · JP: '+d.jp:''}`).join('\n')};
+    }
+
+    if(nq.match(/a\+s|aprendizaje.?servicio|servicio.?aprendizaje/))
+      return listarFmt('A+S (Aprendizaje + Servicio)', d=>nrm(d.asignatura).includes('a s')||String(d.fmt).toLowerCase().includes('a+s')||(d.asignatura||'').includes('A+S'));
+
+    if(nq.match(/redise[nñ]o|redisenos/))
+      return listarFmt('Rediseños', d=>nrm(d.fmt).includes('rediseno')||nrm(d.fmt).includes('antiguo'));
+
+    if(nq.match(/nuevo|dise[nñ]o nuevo|asig.*nueva/))
+      return listarFmt('Diseños nuevos', d=>nrm(d.fmt)==='nuevo'||nrm(d.fmt).includes('nuevo'));
+
+    if(nq.match(/adecuaci[oó]n|adecuaciones/))
+      return listarFmt('Adecuaciones', d=>nrm(d.fmt).includes('adecuacion'));
+
+    if(nq.match(/ajuste.*aula|aula.*ajuste/))
+      return listarFmt('Ajustes de aula', d=>nrm(d.fmt).includes('ajuste'));
+
+    if(nq.match(/tipos.*formato|formatos.*asig|que formatos|cuantos.*formato/) && !findAsig(q)){
+      const fmts={};
+      (window.DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      return {txt:'<strong>Asignaturas por tipo de trabajo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n'), chips:['Diseños nuevos','Rediseños','Adecuaciones']};
+    }
+
+    if(nq.match(/\bformato\b|tipo.*trabajo/) && findAsig(q)){/* handled below */}
+    else if(nq.match(/\bformato\b|tipo.*trabajo/) && !findAsig(q)){
+      const fmts={};
+      (window.DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      return {txt:'<strong>Asignaturas por tipo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
+    }
+
     // Asignatura específica
     const asig = findAsig(q);
     if(!asig) return {txt:'No encontré esa asignatura ni esa persona. Intentá con parte del nombre o escribí <strong>ayuda</strong> para ver ejemplos.', chips:['Ayuda','¿Quién es el equipo?']};
