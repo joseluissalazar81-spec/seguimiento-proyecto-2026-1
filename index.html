@@ -387,7 +387,7 @@
     .dl-val{font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
 
     /* ── ESTADO RECURSOS (5 tarjetas) ── */
-    .recursos-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+    .recursos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
     .rc{border-radius:var(--radius-sm);padding:10px 8px;text-align:center;border:1px solid;transition:transform .18s}
     .rc:hover{transform:translateY(-2px)}
     .rc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px}
@@ -3068,7 +3068,7 @@ function openPanel(idx){
     data:{datasets:[{data:donaData,backgroundColor:donaColors,borderWidth:2,borderColor:'#fff',hoverOffset:4}]},
     options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} recursos`}}},animation:{duration:500}}
   });
-  const labels=['Sin comenzar','En prod. DI','Val. Docente','En prod. DM','QA','Terminado'];
+  const labels=['No iniciado','En prod. (borrador)','Validado','En prod. DM','En implementación','Cargado en Aula'];
   document.getElementById('dona-legend').innerHTML=labels.map((l,i)=>`
     <div class="dl-item">
       <span class="dl-dot" style="background:${donaColors[i]}"></span>
@@ -3098,11 +3098,12 @@ function openPanel(idx){
   }).join('');
 
   const rcDefs=[
-    {label:'Sin comenzar',cls:'rc0',val:p.sc},
-    {label:'En prod. DI', cls:'rc1',val:p.di},
-    {label:'Val. Docente',cls:'rc2',val:p.vd},
-    {label:'En prod. DM',cls:'rc3',val:p.dm},
-    {label:'Terminado',  cls:'rc4',val:p.ter},
+    {label:'No iniciado',        cls:'rc0',val:p.sc},
+    {label:'En prod. (borrador)',cls:'rc1',val:p.di},
+    {label:'Validado',           cls:'rc2',val:p.vd},
+    {label:'En prod. DM',        cls:'rc3',val:p.dm},
+    {label:'En implementación',  cls:'rc4',val:p.qa},
+    {label:'Cargado en Aula',    cls:'rc1',val:p.ter},
   ];
   document.getElementById('recursos-grid').innerHTML=rcDefs.map(r=>`
     <div class="rc ${r.cls}">
