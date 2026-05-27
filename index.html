@@ -1631,67 +1631,40 @@
     .inf-btn-pdf:hover{opacity:.88;transform:translateY(-1px)}
     .inf-btn svg{flex-shrink:0}
 
-    /* ── PAULI CHATBOT ──────────────────────────────────── */
-    #bot-btn{position:fixed!important;bottom:24px!important;right:24px!important;z-index:9999!important;
-      width:54px;height:54px;border-radius:50%;background:#1a3a5c!important;
-      border:3px solid #d4943a!important;cursor:pointer;
-      box-shadow:0 4px 20px rgba(0,0,0,.5)!important;
-      display:flex;align-items:center;justify-content:center;transition:transform .2s}
-    #bot-btn:hover{transform:scale(1.1)}
+    /* ── PAULI — panel lateral (mismo patrón que #panel) ── */
+    #bot-btn{position:fixed;bottom:24px;right:24px;z-index:600;width:52px;height:52px;
+      border-radius:50%;background:#1a3a5c;border:3px solid #d4943a;cursor:pointer;
+      box-shadow:0 4px 20px rgba(0,0,0,.45);display:flex;align-items:center;
+      justify-content:center;transition:transform .2s}
+    #bot-btn:hover{transform:scale(1.08)}
     #bot-btn svg{pointer-events:none}
-    #bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;
-      background:#c0392b;border-radius:50%;border:2px solid #fff;display:none}
-    #bot-window{position:fixed!important;bottom:86px!important;right:24px!important;
-      z-index:9998!important;width:375px!important;
-      background:#ffffff!important;border:2px solid #1a3a5c!important;
-      border-radius:16px!important;box-shadow:0 12px 48px rgba(0,0,0,.45)!important;
-      display:none;flex-direction:column;overflow:hidden;max-height:555px}
-    #bot-window.open{display:flex!important}
-    #bot-header{display:flex;align-items:center;gap:10px;padding:13px 14px;
-      background:#1a3a5c!important;border-bottom:3px solid #d4943a!important}
-    #bot-header-icon{width:34px;height:34px;border-radius:50%;background:#d4943a!important;
-      display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    #bot-title strong{font-size:14px!important;font-weight:800!important;
-      color:#ffffff!important;display:block;letter-spacing:.02em}
-    #bot-title span{font-size:11px!important;color:#a8c8e0!important}
-    #bot-close{background:none;border:none;cursor:pointer;color:#a8c8e0;
-      padding:5px;border-radius:6px;display:flex;align-items:center}
-    #bot-close:hover{color:#ffffff!important}
-    #bot-msgs{flex:1;overflow-y:auto;padding:14px 12px;
-      background:#dde4f0!important;
-      display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+    #bot-panel{
+      position:fixed;top:0;right:0;width:400px;height:100vh;
+      background:#f4f7fb;
+      border-left:3px solid #1a3a5c;
+      box-shadow:-6px 0 40px rgba(0,0,0,.35);
+      z-index:700;display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+    #bot-panel.open{transform:translateX(0)}
+    #bot-panel-header{
+      background:#1a3a5c;
+      border-bottom:3px solid #d4943a;
+      padding:16px 18px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:space-between}
+    #bot-msgs{flex:1;overflow-y:auto;padding:16px 14px;
+      background:#f4f7fb;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
     #bot-msgs::-webkit-scrollbar{width:5px}
-    #bot-msgs::-webkit-scrollbar-thumb{background:#8090a8;border-radius:4px}
-    .bot-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:13.5px!important;
-      line-height:1.55!important;white-space:pre-wrap;word-break:break-word;font-family:inherit}
-    .bot-msg.bot{background:#ffffff!important;color:#0a1628!important;
-      align-self:flex-start;border-bottom-left-radius:4px;
-      border-left:4px solid #1a3a5c!important;
-      box-shadow:0 2px 6px rgba(0,0,0,.15)!important}
-    .bot-msg.bot strong{color:#1a3a5c!important;font-weight:700!important}
-    .bot-msg.bot a{color:#1558a0!important;font-weight:600;text-decoration:underline}
-    .bot-msg.user{background:#1a3a5c!important;color:#ffffff!important;
-      align-self:flex-end;border-bottom-right-radius:4px;font-weight:500}
-    .bot-msg.user strong{color:#fbbf24!important}
-    .bot-msg.typing{opacity:.5}
-    .bot-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-self:flex-start}
-    .bot-chip{background:#1a3a5c!important;border:none;border-radius:20px;
-      padding:5px 13px;font-size:12px!important;color:#ffffff!important;
-      font-weight:600;cursor:pointer;transition:background .15s}
-    .bot-chip:hover{background:#d4943a!important}
-    #bot-input-row{display:flex;gap:7px;padding:10px 12px;
-      border-top:2px solid #c8d4e0;background:#ffffff!important}
-    #bot-input{flex:1;background:#eef2f8!important;border:2px solid #8090a8!important;
-      border-radius:22px;padding:8px 14px;color:#0a1628!important;
-      font-size:13px!important;outline:none;font-family:inherit;font-weight:500}
-    #bot-input::placeholder{color:#607080!important}
-    #bot-input:focus{border-color:#1a3a5c!important;background:#ffffff!important}
-    #bot-send{background:#6c5ce7!important;border:none;border-radius:11px;
-      width:38px;height:38px;cursor:pointer;display:flex;align-items:center;
-      justify-content:center;flex-shrink:0}
-    #bot-send:hover{background:#5a4bd1!important}
-    #bot-disclaimer{padding:4px 12px 8px;font-size:10.5px;
-      color:#607080!important;text-align:center;background:#ffffff!important;font-style:italic}
+    #bot-msgs::-webkit-scrollbar-thumb{background:#a0aec0;border-radius:4px}
+    #bot-input-row{display:flex;gap:8px;padding:12px 14px;
+      border-top:2px solid #c8d4e0;background:#ffffff;flex-shrink:0}
+    #bot-input{flex:1;background:#eef2f8;border:2px solid #a0b0c0;
+      border-radius:24px;padding:9px 16px;color:#0a1628;font-size:13.5px;
+      outline:none;font-family:inherit;font-weight:500}
+    #bot-input::placeholder{color:#6080a0}
+    #bot-input:focus{border-color:#1a3a5c;background:#fff}
+    #bot-send{background:#6c5ce7;border:none;border-radius:12px;width:40px;height:40px;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    #bot-send:hover{background:#5a4bd1}
   </style>
 </head>
 <body>
@@ -5484,36 +5457,37 @@ window.addEventListener('load', function(){
 </footer>
 
 <!-- ─── CHATBOT ─────────────────────────────────────────────────────────── -->
-<button id="bot-btn" title="Asistente del proyecto" onclick="botToggle()">
+<button id="bot-btn" title="Preguntale a Pauli" onclick="botToggle()">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
   </svg>
-  <div id="bot-badge"></div>
 </button>
 
-<div id="bot-window" style="background:#ffffff;border:2px solid #1a3a5c;box-shadow:0 12px 48px rgba(0,0,0,.5)">
-  <div id="bot-header" style="background:#1a3a5c;border-bottom:3px solid #d4943a;display:flex;align-items:center;gap:10px;padding:13px 14px">
-    <div id="bot-header-icon" style="width:34px;height:34px;border-radius:50%;background:#d4943a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+<!-- Panel lateral — mismo patrón que #panel (filtros), garantiza visibilidad -->
+<div id="bot-panel">
+  <div id="bot-panel-header">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:#d4943a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.02em">Pauli</div>
+        <div style="font-size:11px;color:#a8c8e0;font-weight:400">Asistente del proyecto UST 2026-1</div>
+      </div>
     </div>
-    <div id="bot-title" style="flex:1">
-      <strong style="font-size:14px;font-weight:800;color:#ffffff;display:block">Pauli — UST 2026-1</strong>
-      <span style="font-size:11px;color:#a8c8e0">Tu asistente del proyecto</span>
-    </div>
-    <button id="bot-close" onclick="botToggle()" style="background:none;border:none;cursor:pointer;color:#a8c8e0;padding:5px;display:flex;align-items:center">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <button onclick="botToggle()" style="background:none;border:none;cursor:pointer;color:#a8c8e0;padding:6px;display:flex;align-items:center;border-radius:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div id="bot-msgs" style="background:#dde4f0;flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;max-height:380px"></div>
-  <div id="bot-input-row" style="display:flex;gap:7px;padding:10px 12px;border-top:2px solid #c8d4e0;background:#ffffff">
-    <input id="bot-input" type="text" placeholder="Preguntame algo..." autocomplete="off"
-      style="flex:1;background:#eef2f8;border:2px solid #8090a8;border-radius:22px;padding:8px 14px;color:#0a1628;font-size:13px;outline:none;font-family:inherit;font-weight:500"
+  <div id="bot-msgs"></div>
+  <div id="bot-input-row">
+    <input id="bot-input" type="text" placeholder="Escribí tu pregunta…" autocomplete="off"
       onkeydown="if(event.key==='Enter')botSend()">
-    <button id="bot-send" onclick="botSend()" style="background:#6c5ce7;border:none;border-radius:11px;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    <button id="bot-send" onclick="botSend()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
-  <div id="bot-disclaimer" style="padding:4px 12px 8px;font-size:10.5px;color:#607080;text-align:center;background:#ffffff;font-style:italic">Pauli es una IA y puede cometer errores.</div>
+  <div style="padding:5px 16px 10px;font-size:10.5px;color:#8090a0;text-align:center;font-style:italic">Pauli es IA y puede cometer errores.</div>
 </div>
 
 <script>
@@ -6046,11 +6020,9 @@ window.addEventListener('load', function(){
 
   window.botToggle=function(){
     botOpen=!botOpen;
-    const w=document.getElementById('bot-window');
-    const b=document.getElementById('bot-badge');
+    const w=document.getElementById('bot-panel');
     if(botOpen){
       w.classList.add('open');
-      b.style.display='none';
       if(!botGreeted){
         botGreeted=true;
         setTimeout(()=>addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, equipo, o el avance de cualquier asignatura.','bot',['Tipos de recursos','Los 3 momentos','Ver promedio']),300);
