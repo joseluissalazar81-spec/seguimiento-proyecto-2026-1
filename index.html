@@ -5533,26 +5533,100 @@ window.addEventListener('load', function(){
 
   function pct(asig){ return (window.AVANCE||{})[asig?.asignatura]?.avance||0; }
 
+  // Conocimiento del proyecto UST 2026-1
+  const PROYECTO = {
+    nombre: 'Proyecto de Virtualización de Cursos UST 2026-1',
+    descripcion: 'Diseño y producción de recursos educativos digitales para cursos universitarios de la Universidad Santo Tomás, semestre 2026-1.',
+    fases: [
+      {nombre:'Levantamiento', desc:'Reunir materiales y evidencia del curso con el docente.'},
+      {nombre:'Diseño', desc:'Planificación didáctica y estructura de actividades.'},
+      {nombre:'Producción', desc:'Desarrollar contenidos y recursos multimedia.'},
+      {nombre:'Revisión', desc:'Validación académica con el docente y ajustes finales.'},
+      {nombre:'Implementación', desc:'Carga del curso en el aula virtual Moodle.'},
+    ],
+    equipo: [
+      {nombre:'María José Suazo',   rol:'JP',             mail:'msuazop@santotomas.cl'},
+      {nombre:'Noelia Escalona',    rol:'JP',             mail:'nomaesga@gmail.com'},
+      {nombre:'José Luis Salazar',  rol:'JP / DI',        mail:'joseluissalazar81@gmail.com'},
+      {nombre:'Nicole Pastene',     rol:'Coordinadora QA',mail:'npasten20@santotomas.cl'},
+      {nombre:'Cristián Domínguez', rol:'DI',             mail:'profe.cristian.d@gmail.com'},
+      {nombre:'Andreina Rodríguez', rol:'DI',             mail:'andreina.rodriguezruiz@gmail.com'},
+      {nombre:'Karen Chávez',       rol:'DI',             mail:'karend.chavezlopez@gmail.com'},
+      {nombre:'Natalie Baeza',      rol:'DI',             mail:'Nbaeza.n@gmail.com'},
+      {nombre:'Brenda Bastías',     rol:'DI',             mail:'brenda.bastiasbaier@gmail.com'},
+      {nombre:'Francisco Tapia',    rol:'DG',             mail:''},
+      {nombre:'Giovanni Perini',    rol:'DG',             mail:''},
+      {nombre:'Elías Castillo',     rol:'Implementador',  mail:'eliascastillo2@gmail.com'},
+    ],
+    roles: {
+      JP:  'El Jefe de Proyecto lidera la coordinación, gestiona plazos y recursos, y es el punto de contacto con el docente.',
+      DI:  'El Diseñador Instruccional acompaña al docente en el diseño pedagógico del curso virtual.',
+      DG:  'El Diseñador Gráfico produce los recursos multimedia y visuales del curso.',
+      impl:'El Implementador carga y configura los recursos en el aula virtual Moodle.',
+      qa:  'La Coordinadora de Calidad (QA) revisa que los recursos cumplan los estándares antes de publicarse.',
+    }
+  };
+
   function botRespond(q){
     const nq = nrm(q);
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy el asistente del proyecto UST 2026-1. Podés preguntarme sobre avance, docente, DI, JP o cualquier asignatura.', chips:['Ver promedio','Asignaturas con más avance','Ayuda']};
+      return {txt:'¡Hola! Soy el asistente del proyecto <strong>UST 2026-1</strong>. Preguntame sobre avance, equipo, fases del proceso o cualquier asignatura.', chips:['¿Qué es el proyecto?','Ver promedio','Ayuda']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme:\n• <strong>Avance de [asignatura]</strong>\n• <strong>Docente de [asignatura]</strong>\n• <strong>DI / JP / DG de [asignatura]</strong>\n• <strong>Promedio de avance</strong>\n• <strong>Asignaturas con más/menos avance</strong>\n• <strong>Total de asignaturas</strong>', chips:['Ver promedio','Más avanzadas','Menos avanzadas']};
+      return {txt:'Podés preguntarme:\n• <strong>Avance / docente / DI / JP de [asignatura]</strong>\n• <strong>¿Qué es el proyecto?</strong>\n• <strong>¿Cuáles son las fases?</strong>\n• <strong>¿Quiénes son los DI / JP / DG?</strong>\n• <strong>Promedio de avance</strong>\n• <strong>Asignaturas con más/menos avance</strong>\n• <strong>Asignaturas por área</strong>', chips:['¿Qué es el proyecto?','Ver promedio','Más avanzadas']};
 
+    // Proyecto general
+    if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
+      return {txt:`<strong>${PROYECTO.nombre}</strong>\n\n${PROYECTO.descripcion}\n\nEl proceso tiene 5 fases: Levantamiento → Diseño → Producción → Revisión → Implementación.`, chips:['¿Cuáles son las fases?','¿Quién es el equipo?']};
+
+    // Fases
+    if(nq.match(/fases|etapas|proceso|flujo de trabajo/))
+      return {txt:'<strong>Fases del proceso:</strong>\n'+PROYECTO.fases.map((f,i)=>`${i+1}. <strong>${f.nombre}</strong>: ${f.desc}`).join('\n')};
+
+    // Equipo completo
+    if(nq.match(/equipo|integrantes|quienes son|miembros/))
+      return {txt:'<strong>Equipo del proyecto:</strong>\n'+PROYECTO.equipo.map(p=>`• ${p.nombre} — ${p.rol}`).join('\n')};
+
+    // Rol JP
+    if(nq.match(/que hace.*jp|rol.*jp|jp.*rol|jefe.*proyecto.*hace|para que.*jp/) && !findAsig(q))
+      return {txt:`<strong>Jefe de Proyecto (JP)</strong>\n${PROYECTO.roles.JP}\n\n<strong>JP del equipo:</strong>\n${PROYECTO.equipo.filter(p=>p.rol.includes('JP')).map(p=>`• ${p.nombre}`).join('\n')}`};
+
+    // Rol DI
+    if(nq.match(/que hace.*di|rol.*di|di.*rol|diseñador.*instruccional.*hace|para que.*di/) && !findAsig(q))
+      return {txt:`<strong>Diseñador Instruccional (DI)</strong>\n${PROYECTO.roles.DI}\n\n<strong>DI del equipo:</strong>\n${PROYECTO.equipo.filter(p=>p.rol==='DI'||p.rol.includes('DI')).map(p=>`• ${p.nombre}`).join('\n')}`};
+
+    // Rol DG
+    if(nq.match(/que hace.*dg|rol.*dg|dg.*rol|diseñador.*grafico.*hace|para que.*dg/) && !findAsig(q))
+      return {txt:`<strong>Diseñador Gráfico (DG)</strong>\n${PROYECTO.roles.DG}\n\n<strong>DG del equipo:</strong>\n${PROYECTO.equipo.filter(p=>p.rol==='DG').map(p=>`• ${p.nombre}`).join('\n')}`};
+
+    // Quiénes son los JP / DI / DG
+    if(nq.match(/quienes.*jp|jp.*quienes|los jp|listado.*jp/) && !findAsig(q))
+      return {txt:'<strong>Jefes de Proyecto:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol.includes('JP')).map(p=>`• ${p.nombre}`).join('\n')};
+
+    if(nq.match(/quienes.*di|di.*quienes|los di|listado.*di/) && !findAsig(q))
+      return {txt:'<strong>Diseñadores Instruccionales:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol.includes('DI')).map(p=>`• ${p.nombre}`).join('\n')};
+
+    if(nq.match(/quienes.*dg|dg.*quienes|los dg|listado.*dg/) && !findAsig(q))
+      return {txt:'<strong>Diseñadores Gráficos:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol==='DG').map(p=>`• ${p.nombre}`).join('\n')};
+
+    // Búsqueda de persona por nombre
+    const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+    if(personaMatch && !findAsig(q))
+      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`};
+
+    // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
       return {txt:`Hay <strong>${(window.DATA||[]).length} asignaturas</strong> en el proyecto.`};
 
-    if(nq.match(/promedio|avance general|avance total/) && !findAsig(q)){
+    if(nq.match(/promedio|avance general|avance total|avance del proyecto/) && !findAsig(q)){
       const arr=window.DATA||[];
       if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
       const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
       return {txt:`El <strong>avance promedio</strong> del proyecto es <strong>${avg}%</strong>.`};
     }
 
-    if(nq.match(/mayor avance|mas avanzada|mejor avance|top/)){
+    if(nq.match(/mayor avance|mas avanzada|mejor avance|top|mas adelantada/)){
       const top=[...(window.DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
       return {txt:'<strong>Top 5 asignaturas:</strong>\n'+top.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
@@ -5562,24 +5636,25 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Menor avance (5):</strong>\n'+bot.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
 
-    if(nq.match(/facultad|area|escuela/)){
+    if(nq.match(/facultad|area|escuela/) && !findAsig(q)){
       const facs={};
       (window.DATA||[]).forEach(d=>{if(d.facultad){facs[d.facultad]=(facs[d.facultad]||0)+1;}});
       return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
     }
 
+    // Asignatura específica
     const asig = findAsig(q);
-    if(!asig) return {txt:'No encontré esa asignatura. Intentá con parte del nombre, por ejemplo: "avance Narrativa" o "docente Inteligencia de Negocios".', chips:['Ayuda']};
+    if(!asig) return {txt:'No encontré esa asignatura ni esa persona. Intentá con parte del nombre o escribí <strong>ayuda</strong> para ver ejemplos.', chips:['Ayuda','¿Quién es el equipo?']};
 
     const av = pct(asig);
 
     if(nq.match(/avance|progreso|porcent|%/))
-      return {txt:`<strong>${asig.asignatura}</strong>\nAvance: <strong>${av}%</strong>`, chips:[`Info completa de ${asig.asignatura.split(' ')[0]}`]};
+      return {txt:`<strong>${asig.asignatura}</strong>\nAvance: <strong>${av}%</strong>`, chips:[`Info completa ${asig.asignatura.split(' ')[0]}`]};
 
     if(nq.match(/docente|profesor|profe/))
       return {txt:`<strong>${asig.asignatura}</strong>\nDocente: <strong>${asig.docente||'—'}</strong>`};
 
-    if(nq.match(/\bdi\b|instruccional|diseñador.*i/))
+    if(nq.match(/\bdi\b|instruccional/))
       return {txt:`<strong>${asig.asignatura}</strong>\nDI: <strong>${asig.di||'—'}</strong>`};
 
     if(nq.match(/\bdg\b|grafico|multimedia/))
