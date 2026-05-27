@@ -1630,6 +1630,68 @@
     .inf-btn-pdf{background:linear-gradient(135deg,#b03030,#c04848);color:#fff}
     .inf-btn-pdf:hover{opacity:.88;transform:translateY(-1px)}
     .inf-btn svg{flex-shrink:0}
+
+    /* ── PAULI CHATBOT ──────────────────────────────────── */
+    #bot-btn{position:fixed!important;bottom:24px!important;right:24px!important;z-index:9999!important;
+      width:54px;height:54px;border-radius:50%;background:#1a3a5c!important;
+      border:3px solid #d4943a!important;cursor:pointer;
+      box-shadow:0 4px 20px rgba(0,0,0,.5)!important;
+      display:flex;align-items:center;justify-content:center;transition:transform .2s}
+    #bot-btn:hover{transform:scale(1.1)}
+    #bot-btn svg{pointer-events:none}
+    #bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;
+      background:#c0392b;border-radius:50%;border:2px solid #fff;display:none}
+    #bot-window{position:fixed!important;bottom:86px!important;right:24px!important;
+      z-index:9998!important;width:375px!important;
+      background:#ffffff!important;border:2px solid #1a3a5c!important;
+      border-radius:16px!important;box-shadow:0 12px 48px rgba(0,0,0,.45)!important;
+      display:none;flex-direction:column;overflow:hidden;max-height:555px}
+    #bot-window.open{display:flex!important}
+    #bot-header{display:flex;align-items:center;gap:10px;padding:13px 14px;
+      background:#1a3a5c!important;border-bottom:3px solid #d4943a!important}
+    #bot-header-icon{width:34px;height:34px;border-radius:50%;background:#d4943a!important;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    #bot-title strong{font-size:14px!important;font-weight:800!important;
+      color:#ffffff!important;display:block;letter-spacing:.02em}
+    #bot-title span{font-size:11px!important;color:#a8c8e0!important}
+    #bot-close{background:none;border:none;cursor:pointer;color:#a8c8e0;
+      padding:5px;border-radius:6px;display:flex;align-items:center}
+    #bot-close:hover{color:#ffffff!important}
+    #bot-msgs{flex:1;overflow-y:auto;padding:14px 12px;
+      background:#dde4f0!important;
+      display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+    #bot-msgs::-webkit-scrollbar{width:5px}
+    #bot-msgs::-webkit-scrollbar-thumb{background:#8090a8;border-radius:4px}
+    .bot-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:13.5px!important;
+      line-height:1.55!important;white-space:pre-wrap;word-break:break-word;font-family:inherit}
+    .bot-msg.bot{background:#ffffff!important;color:#0a1628!important;
+      align-self:flex-start;border-bottom-left-radius:4px;
+      border-left:4px solid #1a3a5c!important;
+      box-shadow:0 2px 6px rgba(0,0,0,.15)!important}
+    .bot-msg.bot strong{color:#1a3a5c!important;font-weight:700!important}
+    .bot-msg.bot a{color:#1558a0!important;font-weight:600;text-decoration:underline}
+    .bot-msg.user{background:#1a3a5c!important;color:#ffffff!important;
+      align-self:flex-end;border-bottom-right-radius:4px;font-weight:500}
+    .bot-msg.user strong{color:#fbbf24!important}
+    .bot-msg.typing{opacity:.5}
+    .bot-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-self:flex-start}
+    .bot-chip{background:#1a3a5c!important;border:none;border-radius:20px;
+      padding:5px 13px;font-size:12px!important;color:#ffffff!important;
+      font-weight:600;cursor:pointer;transition:background .15s}
+    .bot-chip:hover{background:#d4943a!important}
+    #bot-input-row{display:flex;gap:7px;padding:10px 12px;
+      border-top:2px solid #c8d4e0;background:#ffffff!important}
+    #bot-input{flex:1;background:#eef2f8!important;border:2px solid #8090a8!important;
+      border-radius:22px;padding:8px 14px;color:#0a1628!important;
+      font-size:13px!important;outline:none;font-family:inherit;font-weight:500}
+    #bot-input::placeholder{color:#607080!important}
+    #bot-input:focus{border-color:#1a3a5c!important;background:#ffffff!important}
+    #bot-send{background:#6c5ce7!important;border:none;border-radius:11px;
+      width:38px;height:38px;cursor:pointer;display:flex;align-items:center;
+      justify-content:center;flex-shrink:0}
+    #bot-send:hover{background:#5a4bd1!important}
+    #bot-disclaimer{padding:4px 12px 8px;font-size:10.5px;
+      color:#607080!important;text-align:center;background:#ffffff!important;font-style:italic}
   </style>
 </head>
 <body>
@@ -5422,71 +5484,6 @@ window.addEventListener('load', function(){
 </footer>
 
 <!-- ─── CHATBOT ─────────────────────────────────────────────────────────── -->
-<style>
-/* ── PAULI BOT ─────────────────────────────────────── */
-#bot-btn{position:fixed;bottom:24px;right:24px;z-index:9000;width:54px;height:54px;border-radius:50%;
-  background:#1a3a5c;border:3px solid #d4943a;cursor:pointer;
-  box-shadow:0 4px 20px #0005;display:flex;align-items:center;justify-content:center;
-  transition:transform .2s}
-#bot-btn:hover{transform:scale(1.1)}
-#bot-btn svg{pointer-events:none}
-#bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:#c0392b;
-  border-radius:50%;border:2px solid #fff;display:none}
-
-#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:375px;
-  background:#ffffff;border:2px solid #1a3a5c;border-radius:16px;
-  box-shadow:0 12px 48px #0006;display:none;flex-direction:column;overflow:hidden;max-height:555px}
-#bot-window.open{display:flex}
-
-#bot-header{display:flex;align-items:center;gap:10px;padding:13px 14px;
-  background:#1a3a5c;border-bottom:3px solid #d4943a}
-#bot-header-icon{width:34px;height:34px;border-radius:50%;background:#d4943a;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0}
-#bot-title{flex:1}
-#bot-title strong{font-size:14px;font-weight:800;color:#ffffff;display:block;letter-spacing:.02em}
-#bot-title span{font-size:11px;color:#a8c8e0;font-weight:400}
-#bot-close{background:none;border:none;cursor:pointer;color:#a8c8e0;padding:5px;
-  border-radius:6px;display:flex;align-items:center}
-#bot-close:hover{color:#ffffff;background:#ffffff22}
-
-#bot-msgs{flex:1;overflow-y:auto;padding:14px 12px;background:#eef2f8;
-  display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
-#bot-msgs::-webkit-scrollbar{width:5px}
-#bot-msgs::-webkit-scrollbar-thumb{background:#b0bcc8;border-radius:4px}
-
-.bot-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:13.5px;
-  line-height:1.55;white-space:pre-wrap;word-break:break-word;font-family:inherit;font-weight:400}
-
-/* Pauli — fondo azul claro fuerte, texto negro */
-.bot-msg.bot{background:#dbeafe;color:#0a1628;align-self:flex-start;
-  border-bottom-left-radius:4px;border-left:4px solid #1a3a5c}
-.bot-msg.bot strong{color:#1a3a5c;font-weight:700}
-.bot-msg.bot a{color:#1558a0;font-weight:600;text-decoration:underline}
-
-/* Usuario — azul marino fuerte, texto blanco */
-.bot-msg.user{background:#1a3a5c;color:#ffffff;align-self:flex-end;
-  border-bottom-right-radius:4px;font-weight:500}
-.bot-msg.user strong{color:#fbbf24}
-.bot-msg.typing{opacity:.5}
-
-.bot-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-self:flex-start}
-.bot-chip{background:#1a3a5c;border:none;border-radius:20px;
-  padding:5px 13px;font-size:12px;color:#ffffff;font-weight:600;cursor:pointer;
-  transition:background .15s}
-.bot-chip:hover{background:#d4943a;color:#ffffff}
-
-#bot-input-row{display:flex;gap:7px;padding:10px 12px;border-top:2px solid #dde4ee;background:#ffffff}
-#bot-input{flex:1;background:#eef2f8;border:2px solid #b0bcc8;
-  border-radius:22px;padding:8px 14px;color:#0a1628;font-size:13px;outline:none;font-family:inherit;font-weight:500}
-#bot-input::placeholder{color:#7a90a8}
-#bot-input:focus{border-color:#1a3a5c;background:#ffffff}
-#bot-send{background:#6c5ce7;border:none;border-radius:11px;width:38px;height:38px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  box-shadow:0 2px 8px #6c5ce755}
-#bot-send:hover{background:#5a4bd1}
-#bot-disclaimer{padding:4px 12px 8px;font-size:10.5px;color:#5a6878;text-align:center;background:#ffffff;font-style:italic}
-</style>
-
 <button id="bot-btn" title="Asistente del proyecto" onclick="botToggle()">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -5798,8 +5795,11 @@ window.addEventListener('load', function(){
       return {txt:header+'\n'+lista.map(d=>`• ${d.docente||'—'} — <em>${d.asignatura}</em>`).join('\n')};
     }
 
-    if(nq.match(/cuantas|total.*asig|asig.*total/))
-      return {txt:`Hay <strong>${(window.DATA||[]).length} asignaturas</strong> en el proyecto.`};
+    if(nq.match(/cuantas|cantidad.*asig|cuanto.*asig|total.*asig|asig.*total|numero.*asig|asig.*numero|hay.*asig|asig.*hay/)){
+      const n=(window.DATA||[]).length;
+      if(!n) return {txt:'Los datos aún no cargaron. Intentá en un momento.'};
+      return {txt:`El proyecto tiene <strong>${n} asignaturas</strong> en total.`, chips:['Avance por facultad','Top 5']};
+    }
 
     if(nq.match(/promedio|avance general|avance total|avance del proyecto/) && !findAsig(q)){
       const arr=window.DATA||[];
