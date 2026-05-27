@@ -5757,6 +5757,22 @@ window.addEventListener('load', function(){
       return {txt:`El <strong>avance promedio</strong> del proyecto es <strong>${avg}%</strong>.`};
     }
 
+    // Asignaturas de una persona (DI, DG, JP, docente)
+    const personaQ = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+    if(personaQ && (nq.match(/cuantas|cuanto|asig|cargo|tiene|asignatura|lista/))) {
+      const nombre = personaQ.nombre;
+      const nNom = nrm(nombre);
+      const primerNombre = nNom.split(' ')[0];
+      const apellido = nNom.split(' ').slice(-1)[0];
+      const asigs = (window.DATA||[]).filter(d=>{
+        const campos=[d.di,d.dg,d.jp,d.implementador,d.docente];
+        return campos.some(c=>c && (nrm(c).includes(primerNombre)||nrm(c).includes(apellido)));
+      });
+      if(!asigs.length) return {txt:`No encontré asignaturas asignadas a <strong>${nombre}</strong>.`};
+      const avg = Math.round(asigs.reduce((s,d)=>s+pct(d),0)/asigs.length);
+      return {txt:`<strong>${nombre}</strong> (${personaQ.rol})\n<strong>${asigs.length} asignaturas</strong> · Avance promedio: <strong>${avg}%</strong>\n\n`+asigs.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+    }
+
     if(nq.match(/mayor avance|mas avanzada|mejor avance|top|mas adelantada/)){
       const top=[...(window.DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
       return {txt:'<strong>Top 5 asignaturas:</strong>\n'+top.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
@@ -5793,6 +5809,35 @@ window.addEventListener('load', function(){
       });
       return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,v])=>`• ${f}: ${v.total} asig. · prom. ${Math.round(v.sum/v.total)}%`).join('\n'), chips:['Avance por facultad','Top 5']};
     }
+
+    // ── RANKING POR ROL ──────────────────────────────────────────────────────
+
+    function rankPorRol(campo, label){
+      const map={};
+      (window.DATA||[]).forEach(d=>{
+        const k=(d[campo]||'').trim();
+        if(!k) return;
+        if(!map[k]) map[k]={total:0,sum:0,asigs:[]};
+        map[k].total++;
+        map[k].sum+=pct(d);
+        map[k].asigs.push(d.asignatura);
+      });
+      if(!Object.keys(map).length) return {txt:'Los datos aún no cargaron.'};
+      const sorted=Object.entries(map).sort((a,b)=>(b[1].sum/b[1].total)-(a[1].sum/a[1].total));
+      return {txt:`<strong>Avance promedio por ${label}:</strong>\n`+sorted.map(([n,v],i)=>`${i===0?'🥇':i===1?'🥈':i===2?'🥉':'•'} ${n}: <strong>${Math.round(v.sum/v.total)}%</strong> (${v.total} asig.)`).join('\n')};
+    }
+
+    if(nq.match(/mejor.*di|di.*mejor|avance.*di|di.*avance|ranking.*di|di.*ranking|por.*di\b/) && !findAsig(q))
+      return rankPorRol('di','DI');
+
+    if(nq.match(/mejor.*jp|jp.*mejor|avance.*jp|jp.*avance|ranking.*jp|jp.*ranking|por.*jp\b/) && !findAsig(q))
+      return rankPorRol('jp','JP');
+
+    if(nq.match(/mejor.*dg|dg.*mejor|avance.*dg|dg.*avance|ranking.*dg|dg.*ranking|por.*dg\b/) && !findAsig(q))
+      return rankPorRol('dg','DG');
+
+    if(nq.match(/mejor.*implementador|implementador.*mejor|avance.*implementador|ranking.*implementador/) && !findAsig(q))
+      return rankPorRol('implementador','Implementador');
 
     // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
 
