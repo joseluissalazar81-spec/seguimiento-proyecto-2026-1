@@ -2894,7 +2894,9 @@ function renderSidebar(){
     if(filters[g.key])html+=`<button class="clear-all" data-ck="${g.key}">Limpiar filtro</button>`;
     html+=`</div>`;
   }
+  html += '<div id="di-progress-bar"></div>';
   document.getElementById('sidebar').innerHTML=html;
+  renderDIProgress();
   function applyFilter(fn){
     const openAsig=selectedIdx!==null&&currentRows[selectedIdx]?currentRows[selectedIdx].asignatura:null;
     fn();
