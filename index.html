@@ -5432,10 +5432,10 @@ window.addEventListener('load', function(){
 #bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:var(--ro);
   border-radius:50%;border:2px solid var(--bg);display:none}
 
-#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:330px;
+#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:375px;
   background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;
   box-shadow:0 8px 32px rgba(0,0,0,.5);display:none;flex-direction:column;overflow:hidden;
-  max-height:480px}
+  max-height:540px}
 #bot-window.open{display:flex}
 
 #bot-header{display:flex;align-items:center;gap:10px;padding:12px 14px;
@@ -5473,10 +5473,11 @@ window.addEventListener('load', function(){
   font-family:inherit;transition:border-color .15s}
 #bot-input::placeholder{color:var(--text-muted)}
 #bot-input:focus{border-color:rgba(26,72,120,.6)}
-#bot-send{background:linear-gradient(135deg,var(--az),var(--tl));border:none;
-  border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:opacity .15s}
-#bot-send:hover{opacity:.85}
+#bot-send{background:linear-gradient(135deg,#6c5ce7,#4a90d9);border:none;
+  border-radius:12px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:opacity .15s,transform .15s;box-shadow:0 2px 8px rgba(108,92,231,.4)}
+#bot-send:hover{opacity:.9;transform:scale(1.06)}
+#bot-disclaimer{padding:3px 12px 7px;font-size:10px;color:var(--text-muted);text-align:center;opacity:.55;letter-spacing:.01em}
 </style>
 
 <button id="bot-btn" title="Asistente del proyecto" onclick="botToggle()">
@@ -5507,6 +5508,7 @@ window.addEventListener('load', function(){
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
+  <div id="bot-disclaimer">Pauli es una IA y puede cometer errores.</div>
 </div>
 
 <script>
@@ -5595,7 +5597,7 @@ window.addEventListener('load', function(){
       return {txt:'¡Hola! Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, horas, programas o el avance de cualquier asignatura.', chips:['¿Qué es el proyecto?','Tipos de recursos','Ayuda']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general', chips:['Tipos de recursos','Los 3 momentos','Ver promedio']};
+      return {txt:'Podés preguntarme sobre:\n• <strong>Avance por facultad / asignatura</strong> (% promedio por área)\n• <strong>Docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Tipos de recursos</strong> T1–T4 (cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Manual DG, Manual Implementador</strong> (nomenclatura, checklist QA)\n• <strong>Fases del proceso</strong> y <strong>roles del equipo</strong>\n• <strong>Co-diseño, Escala de Apreciación, QA planificación</strong>\n• <strong>Colores por facultad</strong>, herramientas, duplas de trabajo\n• <strong>Estadísticas:</strong> promedio, top 5, menor avance, formatos', chips:['Avance por facultad','Tipos de recursos','Fases del proceso']};
 
     // Proyecto general
     if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
@@ -5653,11 +5655,19 @@ window.addEventListener('load', function(){
 
     // Manual DG
     if(nq.match(/manual.*dg|dg.*manual|manual.*grafico|manual.*diseño grafico/))
-      return {txt:'<strong>Manual del Diseñador Gráfico e-Learning UST</strong>\n\nContenido:\n• Identidad visual UST — Brandbook\n• Color por facultad\n• Herramientas institucionales\n• Flujo de trabajo y plazos\n• Dupla DG–DI: cómo trabajar juntos\n• Lineamientos por tipo de recurso\n• Accesibilidad (criterio obligatorio)\n• QA antes de entregar\n• Errores frecuentes y causales de rechazo', chips:['Dupla DI-DG','Tipos de recursos']};
+      return {txt:'<strong>Manual del Diseñador Gráfico — e-Learning UST v2</strong>\n\nEl DG transforma contenido pedagógico en experiencias visuales. Principios: Claridad · Jerarquía · Reducción de carga cognitiva · Coherencia.\n\n<strong>Identidad visual:</strong>\n• Color corporativo: <strong>#284639</strong> (verde UST) — 70–80% de la composición\n• Complementario: <strong>#B7BF10</strong> — 20–30%\n• Tipografía obligatoria: <strong>Arial</strong> en todos los recursos digitales\n• Logo UST: nunca modificar proporciones ni colores\n\n<strong>Herramientas institucionales (licencias vía JP):</strong>\nFreepik (imágenes/íconos) · Canva (video/podcast MP4/MP3) · Genially (SCORM) · Word/PPT · Adobe\n\n<strong>Flujo:</strong> DI deja en Borrador → DG toma, diseña y mueve a Producción → DI aprueba → DG mueve a Validado → Implementador sube al LMS\n\n<strong>Plazos:</strong> 3–5 días hábiles por semana de recursos asignada', chips:['Colores por facultad','Dupla DI-DG','QA del DG']};
 
     // Dupla DI-DG
     if(nq.match(/dupla|di.*dg|dg.*di|trabajan juntos|trabajo con.*dg|trabajo con.*di/))
-      return {txt:'<strong>Dupla DG–DI</strong>\n\n<strong>Recursos donde DG interviene (T1):</strong>\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Videos bienvenida/cierre → DI hace el guion, DG produce la pieza.\n\n<strong>Recursos donde DG NO interviene:</strong>\nGuías de facilitación, Lecturas, Glosarios → DI completa la plantilla y va directo a revisión.\n\n<strong>Flujo:</strong> DI entrega guion completo → DG produce → Revisión → Implementación', chips:['Manual DG','Tipos de recursos']};
+      return {txt:'<strong>Dupla DG–DI</strong>\n\n<strong>Recursos donde DG interviene (T1):</strong>\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Videos bienvenida/cierre → DI hace el guion, DG produce la pieza.\n\n<strong>Recursos donde DG NO interviene:</strong>\nGuías de facilitación, Lecturas, Glosarios → DI completa la plantilla y va directo a revisión.\n\n<strong>Flujo:</strong> DI entrega guion completo → DG produce → DI revisa y comenta en Producción → DG aplica ajustes → DI aprueba → DG mueve a Validado\n\n<strong>Rondas de corrección:</strong> máximo 1 por recurso. Si los cambios son muy extensos = nuevo brief.', chips:['Manual DG','Tipos de recursos']};
+
+    // Colores por facultad (DG)
+    if(nq.match(/color.*facultad|colores.*facultad|que color|hex.*facultad|facultad.*color|brandbook.*color/))
+      return {txt:'<strong>Colores por facultad — Brandbook UST</strong>\nEl color de facultad complementa el verde corporativo (#284639). Uso en íconos, líneas y destacados (20–30% max).\n\n• Ciencias: <strong>#4E0B76</strong>\n• Ingeniería y Negocios: <strong>#6F7A73</strong>\n• Ciencias Sociales y Comunicaciones: <strong>#9F83B3</strong>\n• Derecho: <strong>#852746</strong>\n• Educación: <strong>#5B7AAB</strong>\n• Economía y Negocios: <strong>#97BB5B</strong>\n• Recursos Naturales / Veterinaria: <strong>#A4CCBF</strong>\n• Salud: <strong>#C02B22</strong>\n\nRegla: el color de facultad <em>complementa</em>, nunca reemplaza el verde institucional.', chips:['Manual DG']};
+
+    // QA del DG
+    if(nq.match(/qa.*dg|dg.*qa|checklist.*dg|dg.*checklist|errores.*dg|rechazo.*dg|causal.*rechazo.*dg/))
+      return {txt:'<strong>QA del DG — Causales de rechazo en DI o QA institucional:</strong>\n\n<strong>Identidad visual:</strong>\n• Logo modificado, estirado o recoloreado\n• Color de facultad incorrecto o no aplicado\n• Tipografía no institucional (no Arial en docs digitales)\n\n<strong>Diseño y accesibilidad:</strong>\n• Más de 7 líneas de texto en PPT\n• Contraste texto/fondo menor a 4.5:1 (WCAG AA)\n• Texto incrustado en imagen\n• Íconos sin etiqueta de texto\n• Recursos visualmente inconsistentes entre sí\n\n<strong>Archivos:</strong>\n• Formato incorrecto (SCORM para Genially, MP4 video, MP3 podcast)\n• Archivo en carpeta equivocada del Drive\n• Errores ortográficos o puntuación incorrecta', chips:['Manual DG','Dupla DI-DG']};
 
     // Equipo completo
     if(nq.match(/equipo|integrantes|quienes son|miembros/))
@@ -5693,13 +5703,31 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Manuales y guías disponibles:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> (para ${m.para})`).join('\n'), chips:['Manual del DI','Manual del DG','Manual del Implementador']};
 
     if(nq.match(/manual.*implementador|implementador.*manual|moodle.*manual/))
-      return {txt:'<strong>Manual del Implementador — Moodle UST</strong>\n\nCubre:\n• Configuración de aulas virtuales en Moodle\n• Carga de recursos por tipo\n• Estructura de cursos e-learning\n• Criterios de calidad antes de publicar\n\nDirigido a: Elías Castillo y Antonio Cabrera', chips:['¿Quiénes son los implementadores?','Dupla DI-DG']};
+      return {txt:'<strong>Manual del Implementador — Moodle UST v1.0</strong>\n\nPrincipio: <em>"La planificación es la fuente de verdad. Si no lo indica, no se agrega."</em>\n\n<strong>3 Momentos de publicación:</strong>\n1. <strong>Estructura del aula</strong> — Sección Bienvenida (6 elementos fijos) + todas las sesiones + etiquetas de modalidad + encabezados de los 3 momentos\n2. <strong>Recursos e instrucciones</strong> — PDFs, URLs (nueva pestaña + APA), SCORMs, actividades Moodle configuradas\n3. <strong>Mini QA interno</strong> — Navegar en modo estudiante con checklist A–F antes de notificar a QA DEL\n\n<strong>Nomenclatura:</strong> <code>S[N]_[Tipo][N]_[Título].[ext]</code>\nEj: S1_Apunte1_Introduccion_al_Derecho_Penal.pdf\n\n<strong>Rúbricas: publicación DOBLE obligatoria</strong>\n→ Rúbrica nativa en Moodle + PDF descargable en las instrucciones\n\nDirigido a: Elías Castillo y Antonio Cabrera', chips:['Nomenclatura archivos','Errores críticos Moodle','Checklist QA Moodle']};
 
-    if(nq.match(/guia.*docente|docente.*guia|entregables.*docente|que entrega.*docente/))
-      return {txt:'<strong>Guías para el docente:</strong>\n\n<strong>1. Guía de Revisión de Planificación</strong>\nCómo el docente revisa y aprueba la planificación didáctica elaborada por el DI.\n\n<strong>2. Guía de Producción de Contenidos</strong>\nCómo el docente debe producir y entregar sus materiales (PPT, guiones, lecturas, etc.).\n\n<strong>3. Entregables del docente</strong>\nLista de compromisos y fechas en el proceso de diseño del curso.', chips:['Fases del proceso']};
+    if(nq.match(/nomenclatura|nombre.*archivo|archivo.*nombre|como.*nombrar.*archivo/))
+      return {txt:'<strong>Nomenclatura de archivos — Manual Implementador</strong>\n\nEstructura: <strong>S[N]_[Tipo][N]_[Título].[ext]</strong>\n\n• <strong>S[N]</strong> = Sesión (S1, S2, S12…)\n• <strong>[Tipo]</strong> = Tipo de recurso con mayúscula inicial\n• <strong>[N]</strong> = Correlativo si hay más de uno del mismo tipo\n• <strong>[Título]</strong> = Nombre descriptivo (guion bajo en lugar de espacios, sin tildes ni caracteres especiales)\n\n<strong>Tipos de archivo válidos:</strong> Apunte, Presentacion, Infografia, Resumen, Facilitacion, Ejercicio, Rubrica, Podcast\n\n<strong>URLs</strong> en Moodle → nombre visible: <em>[Tipo]. [Título]</em> + bajada APA en descripción\n<strong>SCORMs</strong> (Genially, Infografía interactiva) → subir sin descomprimir\n\n<strong>Ejemplos correctos:</strong>\n✓ S1_Apunte1_Introduccion_al_Derecho_Penal.pdf\n✓ S3_Rubrica1_Tarea_de_aplicacion.pdf\n✗ apunte semana 1.pdf / presentacion v2 final OK.pdf', chips:['Manual del Implementador']};
+
+    if(nq.match(/errores.*moodle|moodle.*errores|errores.*implementador|rechazo.*qa|causas.*rechazo|criticos.*moodle|criticos.*implementador/))
+      return {txt:'<strong>Errores críticos — Rechazo automático en QA (Implementador)</strong>\n\n<strong>Textos de plantilla visibles al estudiante:</strong>\n• "primera actividad", "segunda actividad", "tercer actividad"\n• "XX horas pedagógicas" / "XX horas cronológicas" sin completar\n• "SESIÓN X SINCRÓNICA" con X sin reemplazar\n\n<strong>Evaluaciones incompletas:</strong>\n• Tarea evaluada sin rúbrica nativa + sin PDF descargable\n• Tarea sin fecha de entrega o puntaje 0\n• Quiz con preguntas incompletas o sin respuestas marcadas\n\n<strong>Recursos y estructura:</strong>\n• URL que no funciona o abre en misma ventana (debe ser NUEVA PESTAÑA siempre)\n• Nombre de archivo interno: borrador, temp, v2, final OK\n• Sesiones fuera del orden de la planificación\n• SCORM que no carga o muestra error', chips:['Manual del Implementador','Checklist QA Moodle']};
+
+    if(nq.match(/checklist.*moodle|checklist.*implementador|checklist.*qa|mini.*qa|qa.*aula/))
+      return {txt:'<strong>Checklist Mini QA — Implementador (Bloques A–F)</strong>\n\n<strong>A — Bienvenida:</strong> 6 elementos publicados y visibles · PDF Planificación aprobada (no Excel) · Foro Avisos tipo "Noticias"\n\n<strong>B — Sesiones:</strong> N° sesiones coincide con planificación · Etiquetas de modalidad con número correcto · 3 momentos con horas completas (sin "XX") · TPE con "horas cronológicas"\n\n<strong>C — Recursos y archivos:</strong> Todos los recursos de la planificación publicados · Nomenclatura correcta · PDFs abren correctamente · SCORMs cargan sin error\n\n<strong>D — URLs:</strong> Todas abren en nueva pestaña · Nombre visible en formato [Tipo]. [Título] · Bajada APA en descripción\n\n<strong>E — Actividades evaluadas:</strong> Todas las tareas con rúbrica nativa + PDF · Fechas y puntajes correctos · Foros con calificación configurada\n\n<strong>F — Modo estudiante:</strong> Recorrí el aula completa · Sin instrucciones internas visibles · Sin texto de plantilla', chips:['Manual del Implementador','Errores críticos Moodle']};
+
+    if(nq.match(/guia.*docente|docente.*guia|entregables.*docente|que entrega.*docente|rol.*docente|docente.*que hace/))
+      return {txt:'<strong>Guías para el docente — UST 2026-1</strong>\n\n<strong>1. Guía de Revisión de Planificación</strong>\nEl DI envía la planificación didáctica y el docente tiene <strong>máx. 5 días hábiles</strong> para revisarla. Debe verificar: datos del programa, RA transcritos textualmente, evaluaciones (suman 100%), secuencia pedagógica y carga de horas. Devuelve observaciones al JP por correo o en comentarios en el Excel.\n\n<strong>2. Guía de Producción de Contenidos (Fase III)</strong>\nEl docente entrega el contenido disciplinar semanal: guión de <strong>3–8 páginas en Word</strong>, mínimo <strong>5 días hábiles antes</strong> de la co-construcción. Incluye: introducción, desarrollo, caso/ejemplo, síntesis, bibliografía completa con URL.\n\n<strong>3. Entregables del docente por fase:</strong>\n• Fase 0: confirmar disponibilidad y leer guía\n• Fase I: entregar programa oficial al JP\n• Fase II: co-diseño con DI (1–3 sesiones 60–90 min)\n• Fase III: guión semanal en Word\n• Fase V: validar el aula completa y enviar observaciones al JP\n\n⚠ El docente consulta dudas de proceso al JP, no al DI. El DI es su colaborador de contenido.', chips:['Co-diseño planificación','Fases del proceso']};
+
+    if(nq.match(/co.?dise[nñ]o|codise[nñ]o|planificacion.*didactica|didactica.*planificacion|planificacion.*aprobada/))
+      return {txt:'<strong>Co-diseño y Planificación Didáctica (Fase II)</strong>\n\nEl DI lidera sesiones con el docente para completar la planificación. Antes de enviarla al equipo QA, aplica el <strong>checklist pre-QA de 14 criterios mínimos</strong>.\n\n<strong>Sin planificación aprobada por QA DEL no puede iniciarse la producción.</strong>\n\n<strong>La planificación tiene dos partes:</strong>\n• Parte 1 — Síntesis: datos del programa, créditos, competencias, RA, evaluaciones\n• Parte 2 — Detalle por unidad: sesión a sesión con 3 momentos, recursos, actividades, horas\n\n<strong>El docente debe completar:</strong>\n• C1: Nombre específico de cada recurso y actividad (no "Recurso 1")\n• C2: Bibliografía con autor, título, año y URL de acceso\n• C3: URLs de imágenes disciplinares específicas\n• C4: Propósito de cada lectura (qué logrará el estudiante)\n\n<strong>QA DEL evalúa con Escala de Apreciación (41 criterios, 5 dimensiones). Máx. 2 rondas.</strong>', chips:['Escala de Apreciación','Guía docente']};
+
+    if(nq.match(/escala.*apreciacion|41.*criterios|instrumento.*qa.*planif|qa.*planif.*instrumento/))
+      return {txt:'<strong>Escala de Apreciación — QA de Planificación</strong>\n\n41 criterios en 5 dimensiones. La planificación debe alcanzar el umbral institucional de aprobación.\n\n<strong>Criterios mínimos de aprobación:</strong>\n• Datos generales completos, coinciden exactamente con el programa oficial\n• RA formulados con verbo de acción, condición y criterio (no paráfrasis genéricas)\n• Porcentajes de evaluación suman 100%\n• Cada RA tiene procedimiento e instrumento de evaluación declarado\n• Carga académica cuadra con el SCT (celda verificación = "Correcto")\n• Cada sesión tiene los 3 momentos completos con actividades específicas\n• Actividades redactadas en imperativo dirigido al estudiante\n• Alineación RA → Actividad → Evaluación verificada\n• Recursos con 5 campos: título, autor/a, tipo, acceso, extensión', chips:['Co-diseño planificación','Fases del proceso']};
 
     if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
-      return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nEl proyecto tiene documentos de capacitación para cada rol:\n• Manual del DI (diseño instruccional e-learning)\n• Manual del DG (lineamientos gráficos UST)\n• Manual del Implementador (Moodle)\n• Guías para el docente (revisión y producción)\n• Presentación de kick-off para reunión de inicio con docentes\n• Guía de recursos didácticos (26 tipos de recursos)', chips:['Manual del DI','Manual del DG','Manual del Implementador']};
+      return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nDocumentos oficiales por rol:\n• <strong>Manual DI</strong> — Diseño instruccional e-learning UST\n• <strong>Manual DG</strong> — Lineamientos gráficos + Brandbook\n• <strong>Manual Implementador</strong> — Moodle, nomenclatura, QA checklist\n• <strong>Manual de Procedimiento</strong> — Flujo completo 6 fases del proceso 2026-1\n• <strong>Flujo de Producción</strong> — Diagrama de carriles por rol (7 roles, 6 fases)\n• <strong>Paso a paso DI</strong> — Guía visual del flujo de trabajo semestral del DI\n• <strong>Guía Docente Revisión</strong> — Cómo revisar la planificación didáctica\n• <strong>Guía Docente Producción</strong> — Cómo entregar el contenido semanal\n• <strong>Capacitación de Equipo</strong> — Visión general, roles, fases y duplas\n\n<strong>Duplas JP–DI 2026-1:</strong>\n• Dupla 1: JP María José + DI Andreina\n• Dupla 2: JP Noelia + DI Cristián\n• Dupla 3: JP José Luis + DI Natalie\n• Dupla 5: JP José Luis + DI Karen\n• DI adicional flexible: José Luis', chips:['Fases del proceso','Duplas de trabajo','Manual DG']};
+
+    if(nq.match(/duplas.*trabajo|duplas.*jp|jp.*dupla|asignacion.*equipo|quien.*trabaja.*con|como.*asignados/))
+      return {txt:'<strong>Duplas JP–DI del proyecto 2026-1</strong>\n\nCada dupla tiene asignados 5–6 cursos (diseños nuevos y rediseños):\n\n• <strong>Dupla 1:</strong> JP María José Suazo + DI Andreina Rodríguez\n• <strong>Dupla 2:</strong> JP Noelia Escalona + DI Cristián Domínguez\n• <strong>Dupla 3:</strong> JP José Luis Salazar + DI Natalie Baeza\n• <strong>Dupla 5:</strong> JP José Luis Salazar + DI Karen Chávez\n• <strong>DI adicional:</strong> José Luis Salazar — apoyo flexible en cursos y rediseños\n\nDG asignados: Francisco Tapia, Giovanni Perini, Jenny García\nImplementadores: Elías Castillo, Antonio Cabrera', chips:['¿Quién es el equipo?','Fases del proceso']};
 
     // Búsqueda de persona por nombre
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
@@ -5727,10 +5755,31 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Menor avance (5):</strong>\n'+bot.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
 
+    if(nq.match(/avance.*facultad|avance.*area|facultad.*avance|area.*avance|por facultad|cada facultad|porcent.*facultad/) && !findAsig(q)){
+      const facs={};
+      (window.DATA||[]).forEach(d=>{
+        if(d.facultad){
+          if(!facs[d.facultad]) facs[d.facultad]={total:0,sum:0};
+          facs[d.facultad].total++;
+          facs[d.facultad].sum+=pct(d);
+        }
+      });
+      if(!Object.keys(facs).length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
+      const lines=Object.entries(facs).sort((a,b)=>(b[1].sum/b[1].total)-(a[1].sum/a[1].total))
+        .map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.total)}%</strong> (${v.total} asig.)`);
+      return {txt:'<strong>Avance promedio por facultad:</strong>\n'+lines.join('\n'), chips:['Top 5','Ver promedio']};
+    }
+
     if(nq.match(/facultad|area|escuela/) && !findAsig(q)){
       const facs={};
-      (window.DATA||[]).forEach(d=>{if(d.facultad){facs[d.facultad]=(facs[d.facultad]||0)+1;}});
-      return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
+      (window.DATA||[]).forEach(d=>{
+        if(d.facultad){
+          if(!facs[d.facultad]) facs[d.facultad]={total:0,sum:0};
+          facs[d.facultad].total++;
+          facs[d.facultad].sum+=pct(d);
+        }
+      });
+      return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,v])=>`• ${f}: ${v.total} asig. · prom. ${Math.round(v.sum/v.total)}%`).join('\n'), chips:['Avance por facultad','Top 5']};
     }
 
     // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
