@@ -5642,8 +5642,20 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Los 3 momentos de aprendizaje UST:</strong>\n\n<strong>1. Preparación</strong>\nEstudiante autónomo se prepara para la clase. Usa TPE (tiempo personal). Sin docente.\n\n<strong>2. Desarrollo</strong>\nContacto directo con el docente. Horas sincrónicas o asincrónicas. Evaluaciones formativas y sumativas.\n\n<strong>3. Trabajo Independiente</strong>\nEstudiante profundiza lo aprendido de manera personal. Practica habilidades y conocimientos. Usa TPE.', chips:['Tipos de recursos','¿Qué es T1?']};
 
     // Plantillas
+    if(nq.match(/plantilla.*t1|t1.*plantilla/))
+      return {txt:'<strong>Plantillas T1 — Audiovisuales e interactivos</strong>\n\n• <em>T1_Plantilla_video.docx</em> → Cápsula y Videoclase\n• <em>T1_Plantilla_podcast.docx</em> → Podcast educativo\n• <em>T1_Plantilla_infografia.docx</em> → Infografía estática\n• <em>T1_Plantilla_infografia_interactiva.pptx</em> → Infografía interactiva\n• <em>T1_Plantilla_Genially_Interactivo.pptx</em> → Genially navegable\n\nTodos los T1 pasan por el DG para producción.', chips:['Plantillas T2','Plantillas T3','Plantillas T4']};
+
+    if(nq.match(/plantilla.*t2|t2.*plantilla/))
+      return {txt:'<strong>Plantillas T2 — Actividades prácticas y evaluativas</strong>\n\n<strong>Documentos académicos (variantes por facultad):</strong>\n• <em>T2_Plantilla_guia_de_estudio.docx</em> (Ing. y Negocios, Salud, Recursos, Formación, Sociales)\n• <em>T2_Plantilla Apunte.docx</em> (Ing. y Negocios, Salud, Recursos, Formación, Sociales)\n\n<strong>Actividades y evaluaciones:</strong>\n• <em>T2_Plantilla_Actividad_de_clase.docx</em>\n• <em>T2_Plantilla_Tarea.docx</em>\n• <em>T2_Plantilla_prueba_desarrollo.docx</em>\n• <em>T2_Plantilla_Lista_Cotejo.docx</em>\n• <em>T2_Plantilla_Pauta_Corrección.docx</em>', chips:['Plantillas T1','Plantillas T3','Plantillas T4']};
+
+    if(nq.match(/plantilla.*t3|t3.*plantilla/))
+      return {txt:'<strong>Plantillas T3 — Materiales sesiones sincrónicas</strong>\n\n• <em>T3_Plantilla_Actividad_Sincrónica.docx</em>\n\nEl DI no interviene el DG en los T3. El DI completa la plantilla y va directo a revisión.', chips:['Plantillas T2','Plantillas T4','Los 3 momentos']};
+
+    if(nq.match(/plantilla.*t4|t4.*plantilla/))
+      return {txt:'<strong>Plantillas T4 — TPE guiado</strong>\n\n• <em>T4_Plantilla_Actividad_TPE.docx</em> (variantes: Formación, Sociales, Recursos Naturales, Ing. y Negocios)\n• <em>T4_Plantilla_Guía_preparación.docx</em>\n• <em>T4_Plantilla_Encuesta_de_interés.docx</em>\n\nRecursos para que el estudiante trabaje de forma autónoma (Trabajo Personal del Estudiante).', chips:['Plantillas T2','Plantillas T3','Los 3 momentos']};
+
     if(nq.match(/plantilla|plantillas/) && !findAsig(q))
-      return {txt:'<strong>Plantillas disponibles por área:</strong>\n• 1. Ingeniería y negocios\n• 2. Recursos naturales\n• 3. Sociales\n• 4. Formación general\n• 5. Salud\n\nAdemás hay plantillas para Planificación Didáctica.\n\nAccedé desde: <em>Carpeta 2. Plantillas</em> en el Drive del proyecto.', chips:['Tipos de recursos','Prompts IA']};
+      return {txt:'<strong>Plantillas del proyecto — organizadas por tipo de recurso</strong>\n\n<strong>T1 — Audiovisuales e interactivos:</strong>\nVideo, Podcast, Infografía, Infografía interactiva, Genially\n\n<strong>T2 — Actividades prácticas y evaluativas:</strong>\nGuía de estudio, Apunte (x5 facultades), Actividad de clase, Tarea, Prueba de desarrollo, Lista Cotejo, Pauta Corrección\n\n<strong>T3 — Materiales sincrónicas:</strong>\nActividad Sincrónica\n\n<strong>T4 — TPE guiado:</strong>\nActividad TPE (x4 facultades), Guía de preparación, Encuesta de interés\n\nAccedé desde: <em>Carpeta 2. Plantillas</em> en el Drive del proyecto.', chips:['Plantillas T1','Plantillas T2','Plantillas T4']};
 
     // Prompts IA
     if(nq.match(/prompt|prompts|ia para recursos|claude para/))
