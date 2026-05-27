@@ -5425,20 +5425,33 @@ window.addEventListener('load', function(){
 <style>
   #pauli-btn{
     position:fixed;bottom:24px;right:24px;z-index:9999;
-    width:52px;height:52px;border-radius:50%;
-    background:linear-gradient(135deg,#050c13,#0d1e2b);
-    border:2px solid var(--gold,#d4943a);
-    color:#fff;font-size:19px;font-weight:800;
-    cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.7);
-    display:flex;align-items:center;justify-content:center;
+    width:56px;height:56px;border-radius:14px;
+    background:linear-gradient(160deg,#0d1f30 0%,#06101a 100%);
+    border:none;
+    box-shadow:
+      0 2px 0 rgba(212,148,58,.6),
+      2px 0 0 rgba(212,148,58,.15),
+      0 6px 24px rgba(0,0,0,.75),
+      inset 0 1px 0 rgba(255,255,255,.07);
+    color:#fff;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     transition:transform .15s,box-shadow .15s;
     font-family:'Inter',sans-serif;
   }
-  #pauli-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,0,0,.8)}
+  #pauli-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      0 4px 0 rgba(212,148,58,.7),
+      2px 0 0 rgba(212,148,58,.2),
+      0 10px 32px rgba(0,0,0,.85),
+      inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  #pauli-btn-icon{font-size:20px;line-height:1}
+  #pauli-btn-label{font-size:8px;font-weight:800;letter-spacing:.06em;color:rgba(255,255,255,.55);text-transform:uppercase}
   #pauli-badge{
-    position:absolute;top:-4px;right:-4px;
-    width:16px;height:16px;border-radius:50%;
-    background:var(--ro,#c0392b);border:2px solid #050c13;
+    position:absolute;top:-5px;right:-5px;
+    width:17px;height:17px;border-radius:5px;
+    background:var(--ro,#c0392b);border:2px solid #06101a;
     font-size:9px;font-weight:800;color:#fff;
     display:flex;align-items:center;justify-content:center;
   }
@@ -5535,7 +5548,14 @@ window.addEventListener('load', function(){
 </style>
 
 <button id="pauli-btn" onclick="pauliToggle()" title="Preguntale a Pauli">
-  P
+  <div id="pauli-btn-icon">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <line x1="9" y1="10" x2="15" y2="10"/>
+      <line x1="9" y1="14" x2="13" y2="14"/>
+    </svg>
+  </div>
+  <div id="pauli-btn-label">Pauli</div>
   <div id="pauli-badge">1</div>
 </button>
 
