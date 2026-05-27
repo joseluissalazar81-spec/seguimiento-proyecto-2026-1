@@ -362,6 +362,21 @@
       box-shadow:0 1px 4px rgba(30,45,61,.07);
     }
 
+    /* ── ESTADO SEGUIMIENTO DI (stepper) ── */
+    .seg-stepper{display:flex;flex-direction:column;gap:6px}
+    .seg-step{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;border:1px solid rgba(0,0,0,.07);background:#f8f9fb;opacity:.45;transition:opacity .2s}
+    .seg-step.has-val{opacity:1;background:#fff;border-color:rgba(59,110,140,.2);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    .seg-step.is-current{border-color:var(--az);background:rgba(26,72,120,.05)}
+    .seg-step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'DM Mono',monospace;flex-shrink:0;background:rgba(0,0,0,.08);color:var(--text-muted)}
+    .seg-step.has-val .seg-step-num{background:var(--az);color:#fff}
+    .seg-step.is-current .seg-step-num{background:var(--az);color:#fff}
+    .seg-step-info{flex:1}
+    .seg-step-label{font-size:11.5px;font-weight:600;color:var(--text-muted)}
+    .seg-step.has-val .seg-step-label{color:var(--text)}
+    .seg-step-count{font-size:15px;font-weight:800;font-family:'DM Mono',monospace;color:var(--text-muted)}
+    .seg-step.has-val .seg-step-count{color:var(--az)}
+    .seg-step.is-current .seg-step-count{color:var(--az)}
+
     /* ── DONA ── */
     .dona-wrap{display:flex;align-items:center;gap:18px;margin-bottom:14px}
     .dona-canvas{width:110px;height:110px;flex-shrink:0}
@@ -2011,6 +2026,12 @@
       </div>
     </div>
 
+    <!-- SEGUIMIENTO DI — stepper de estados -->
+    <div class="panel-section">
+      <div class="ps-title">Estado de Seguimiento</div>
+      <div class="seg-stepper" id="p-seg-stepper"></div>
+    </div>
+
     <!-- DONA + ESTADO RECURSOS -->
     <div class="panel-section">
       <div class="ps-title">Estado de Recursos</div>
@@ -3105,6 +3126,26 @@ function openPanel(idx){
     </div>`).join('');
 
   // TABLA RECURSOS
+  // STEPPER SEGUIMIENTO
+  const segSteps=[
+    {label:'No iniciado',           val:p.sc},
+    {label:'En producción (borrador)', val:p.di},
+    {label:'Validado',              val:p.vd},
+    {label:'En producción DM',      val:p.dm},
+    {label:'En implementación',     val:p.qa},
+    {label:'Cargado en Aula',       val:p.ter},
+  ];
+  const lastActive=segSteps.reduce((li,s,i)=>s.val>0?i:li,-1);
+  document.getElementById('p-seg-stepper').innerHTML=segSteps.map((s,i)=>{
+    const hasVal=s.val>0;
+    const isCurrent=i===lastActive;
+    return `<div class="seg-step${hasVal?' has-val':''}${isCurrent?' is-current':''}">
+      <div class="seg-step-num">${i+1}</div>
+      <div class="seg-step-info"><div class="seg-step-label">${s.label}</div></div>
+      <div class="seg-step-count">${s.val}</div>
+    </div>`;
+  }).join('');
+
   const rcDefs=[
     {label:'Sin comenzar',cls:'rc0',val:p.sc},
     {label:'En prod. DI', cls:'rc1',val:p.di},
