@@ -107,27 +107,24 @@ function parsearHoja(sheet, diNombre) {
     const fila = data[i].map(c => String(c || '').toLowerCase().replace(/\s+/g, ' ').trim());
     if (!fila.some(c => c === 'semana')) continue;
 
-    fila.forEach((h, j) => {
-      if (h === 'semana')                                           cols.semana   = j;
-      // Borrador: col H — cualquier encabezado que contenga 'borrador'
-      if (h.includes('borrador'))                                   cols.borrador = j;
-      // Validado: col J — contiene 'validado' pero no 'borrador'
-      if (h.includes('validado') && !h.includes('borrador'))        cols.validado = j;
-      // DM: col L — contiene 'dm' o 'diseño' cerca de 'producto' o 'link'
-      if (h.includes('producto dm') || (h.includes('link') && h.includes(' dm')))
-                                                                    cols.dm       = j;
-      // Implementación: col N
-      if (h.includes('producto impl') || h.includes('implementa'))  cols.impl     = j;
-      // Cargado en aula: col Q
-      if (h.includes('cargado'))                                    cols.cargado  = j;
-    });
+    // Posiciones fijas confirmadas: H=7 borrador, J=9 validado, L=11 DM, N=13 impl, Q=16 cargado
+    if (fila.length > 16) {
+      cols.borrador = 7;
+      cols.validado = 9;
+      cols.dm       = 11;
+      cols.impl     = 13;
+      cols.cargado  = 16;
+    }
 
-    // Fallback por posición si los encabezados no matchearon (H=7, J=9, L=11, N=13, Q=16)
-    if (cols.borrador === -1 && fila.length > 7)  cols.borrador = 7;
-    if (cols.validado === -1 && fila.length > 9)  cols.validado = 9;
-    if (cols.dm       === -1 && fila.length > 11) cols.dm       = 11;
-    if (cols.impl     === -1 && fila.length > 13) cols.impl     = 13;
-    if (cols.cargado  === -1 && fila.length > 16) cols.cargado  = 16;
+    // Detección por nombre como refinamiento (puede override las posiciones fijas)
+    fila.forEach((h, j) => {
+      if (h === 'semana')                                                    cols.semana   = j;
+      if (h.includes('borrador'))                                            cols.borrador = j;
+      if (h.includes('validado') && !h.includes('borrador'))                 cols.validado = j;
+      if (h.includes('producto dm') || (h.includes('link') && / dm/.test(h))) cols.dm     = j;
+      if (h.includes('producto impl') || h.includes('implementa'))           cols.impl     = j;
+      if (h.includes('cargado'))                                             cols.cargado  = j;
+    });
 
     hdrIdx = i;
     break;
