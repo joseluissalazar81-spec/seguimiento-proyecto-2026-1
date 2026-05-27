@@ -2419,6 +2419,34 @@ const PROD = {
 };
 
 
+// ─── API de seguimiento DI (Apps Script web app) ─────────────────────────────
+// Pega aquí la URL de tu web app después de publicarla en Apps Script
+const SEG_API_URL = '';  // ← REEMPLAZAR con tu URL de Apps Script
+
+let SEG_API_DATA = null; // cache de la respuesta
+
+async function cargarSegAPI() {
+  if (!SEG_API_URL) return;
+  try {
+    const res = await fetch(SEG_API_URL);
+    const json = await res.json();
+    if (json.ok) SEG_API_DATA = json.data;
+  } catch(e) { console.warn('SEG_API:', e.message); }
+}
+
+function getSegAPIData(asignatura) {
+  if (!SEG_API_DATA) return null;
+  const key = asignatura.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+  let d = SEG_API_DATA[key];
+  if (!d) {
+    const w = key.split(' ').slice(0,4).join(' ');
+    for (const [k,v] of Object.entries(SEG_API_DATA)) {
+      if (k.startsWith(w) || w.startsWith(k.split(' ').slice(0,4).join(' '))) { d=v; break; }
+    }
+  }
+  return d || null;
+}
+
 // ─── GOOGLE SHEETS EN TIEMPO REAL ───────────────────────────────────────────
 // ─── IDs de hojas Google ───────────────────────────────────────────────────────
 const SHEET_ID    = '14_TBWnenZiLAH0J6Y1dq-UcD3oSA2U2iK-WDtuqfFPY';
@@ -3013,7 +3041,10 @@ function renderTable(){
 function openPanel(idx){
   selectedIdx=idx;
   const d=currentRows[idx];
-  const p=getProd(d.asignatura, d.docente);
+  const _apiD = getSegAPIData(d.asignatura);
+  const p = _apiD
+    ? { ...getProd(d.asignatura, d.docente), sc: _apiD.sc, di: _apiD.bor, vd: _apiD.vd, dm: _apiD.dm, qa: _apiD.qa, ter: _apiD.ter }
+    : getProd(d.asignatura, d.docente);
   const av=AVANCE[d.asignatura]||{avance:0,obs:'',hitos:{}};
   const total=p.sc+p.di+p.vd+p.dm+p.qa+p.ter;
   const avPct=av.avance||0;
@@ -3263,6 +3294,7 @@ document.getElementById('search').addEventListener('input',e=>{
   await loadDashboardData();
   await cargarAvanceDashboard();
   await loadReunionData();
+  cargarSegAPI();
   // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
   requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
 
