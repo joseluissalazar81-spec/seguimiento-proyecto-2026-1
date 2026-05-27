@@ -5424,59 +5424,67 @@ window.addEventListener('load', function(){
 <!-- ─── CHATBOT ─────────────────────────────────────────────────────────── -->
 <style>
 /* ── PAULI BOT ─────────────────────────────────────── */
-#bot-btn{position:fixed;bottom:24px;right:24px;z-index:9000;width:52px;height:52px;border-radius:50%;
-  background:#284639;border:none;cursor:pointer;
-  box-shadow:0 4px 16px #0003;display:flex;align-items:center;justify-content:center;
+#bot-btn{position:fixed;bottom:24px;right:24px;z-index:9000;width:54px;height:54px;border-radius:50%;
+  background:#1a3a5c;border:3px solid #d4943a;cursor:pointer;
+  box-shadow:0 4px 20px #0005;display:flex;align-items:center;justify-content:center;
   transition:transform .2s}
-#bot-btn:hover{transform:scale(1.08)}
+#bot-btn:hover{transform:scale(1.1)}
 #bot-btn svg{pointer-events:none}
-#bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:#b03030;
-  border-radius:50%;border:2px solid #f0f4f8;display:none}
+#bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:#c0392b;
+  border-radius:50%;border:2px solid #fff;display:none}
 
-#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:370px;
-  background:#ffffff;border:1px solid #c8d0d8;border-radius:14px;
-  box-shadow:0 8px 32px #0003;display:none;flex-direction:column;overflow:hidden;max-height:550px}
+#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:375px;
+  background:#ffffff;border:2px solid #1a3a5c;border-radius:16px;
+  box-shadow:0 12px 48px #0006;display:none;flex-direction:column;overflow:hidden;max-height:555px}
 #bot-window.open{display:flex}
 
-#bot-header{display:flex;align-items:center;gap:10px;padding:12px 14px;
-  background:#1e3328;border-bottom:1px solid #2d5a74}
-#bot-header-icon{width:32px;height:32px;border-radius:50%;background:#2d5a74;
+#bot-header{display:flex;align-items:center;gap:10px;padding:13px 14px;
+  background:#1a3a5c;border-bottom:3px solid #d4943a}
+#bot-header-icon{width:34px;height:34px;border-radius:50%;background:#d4943a;
   display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #bot-title{flex:1}
-#bot-title strong{font-size:13px;font-weight:700;color:#ffffff;display:block}
-#bot-title span{font-size:10px;color:#9ab8c4}
-#bot-close{background:none;border:none;cursor:pointer;color:#9ab8c4;padding:4px;
+#bot-title strong{font-size:14px;font-weight:800;color:#ffffff;display:block;letter-spacing:.02em}
+#bot-title span{font-size:11px;color:#a8c8e0;font-weight:400}
+#bot-close{background:none;border:none;cursor:pointer;color:#a8c8e0;padding:5px;
   border-radius:6px;display:flex;align-items:center}
-#bot-close:hover{color:#ffffff}
+#bot-close:hover{color:#ffffff;background:#ffffff22}
 
-#bot-msgs{flex:1;overflow-y:auto;padding:12px;background:#f0f4f8;
-  display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+#bot-msgs{flex:1;overflow-y:auto;padding:14px 12px;background:#eef2f8;
+  display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+#bot-msgs::-webkit-scrollbar{width:5px}
+#bot-msgs::-webkit-scrollbar-thumb{background:#b0bcc8;border-radius:4px}
 
-.bot-msg{max-width:86%;padding:9px 12px;border-radius:14px;font-size:13px;
-  line-height:1.5;white-space:pre-wrap;word-break:break-word;font-family:inherit}
-.bot-msg.bot{background:#ffffff;color:#1a1a2e;align-self:flex-start;
-  border-bottom-left-radius:3px;border:1px solid #d0d8e4;
-  box-shadow:0 1px 4px #0001}
-.bot-msg.bot strong{color:#1a4878;font-weight:700}
-.bot-msg.bot a{color:#1a6090;text-decoration:underline}
-.bot-msg.user{background:#1e3328;color:#ffffff;align-self:flex-end;border-bottom-right-radius:3px}
-.bot-msg.user strong{color:#7de8b8}
+.bot-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:13.5px;
+  line-height:1.55;white-space:pre-wrap;word-break:break-word;font-family:inherit;font-weight:400}
+
+/* Pauli — fondo azul claro fuerte, texto negro */
+.bot-msg.bot{background:#dbeafe;color:#0a1628;align-self:flex-start;
+  border-bottom-left-radius:4px;border-left:4px solid #1a3a5c}
+.bot-msg.bot strong{color:#1a3a5c;font-weight:700}
+.bot-msg.bot a{color:#1558a0;font-weight:600;text-decoration:underline}
+
+/* Usuario — azul marino fuerte, texto blanco */
+.bot-msg.user{background:#1a3a5c;color:#ffffff;align-self:flex-end;
+  border-bottom-right-radius:4px;font-weight:500}
+.bot-msg.user strong{color:#fbbf24}
 .bot-msg.typing{opacity:.5}
 
-.bot-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;align-self:flex-start}
-.bot-chip{background:#ffffff;border:1px solid #3b6e8c;border-radius:20px;
-  padding:4px 11px;font-size:11.5px;color:#1a4878;font-weight:600;cursor:pointer}
-.bot-chip:hover{background:#3b6e8c;color:#ffffff}
+.bot-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;align-self:flex-start}
+.bot-chip{background:#1a3a5c;border:none;border-radius:20px;
+  padding:5px 13px;font-size:12px;color:#ffffff;font-weight:600;cursor:pointer;
+  transition:background .15s}
+.bot-chip:hover{background:#d4943a;color:#ffffff}
 
-#bot-input-row{display:flex;gap:6px;padding:10px 12px;border-top:1px solid #d0d8e4;background:#ffffff}
-#bot-input{flex:1;background:#f0f4f8;border:1px solid #b8c4d0;
-  border-radius:20px;padding:8px 13px;color:#1a1a2e;font-size:13px;outline:none;font-family:inherit}
-#bot-input::placeholder{color:#8898a8}
-#bot-input:focus{border-color:#3b6e8c;background:#ffffff}
-#bot-send{background:#6c5ce7;border:none;border-radius:10px;width:36px;height:36px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#bot-input-row{display:flex;gap:7px;padding:10px 12px;border-top:2px solid #dde4ee;background:#ffffff}
+#bot-input{flex:1;background:#eef2f8;border:2px solid #b0bcc8;
+  border-radius:22px;padding:8px 14px;color:#0a1628;font-size:13px;outline:none;font-family:inherit;font-weight:500}
+#bot-input::placeholder{color:#7a90a8}
+#bot-input:focus{border-color:#1a3a5c;background:#ffffff}
+#bot-send{background:#6c5ce7;border:none;border-radius:11px;width:38px;height:38px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 2px 8px #6c5ce755}
 #bot-send:hover{background:#5a4bd1}
-#bot-disclaimer{padding:4px 12px 7px;font-size:10px;color:#7a8898;text-align:center;background:#ffffff}
+#bot-disclaimer{padding:4px 12px 8px;font-size:10.5px;color:#5a6878;text-align:center;background:#ffffff;font-style:italic}
 </style>
 
 <button id="bot-btn" title="Asistente del proyecto" onclick="botToggle()">
