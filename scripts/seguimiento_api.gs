@@ -108,13 +108,27 @@ function parsearHoja(sheet, diNombre) {
     if (!fila.some(c => c === 'semana')) continue;
 
     fila.forEach((h, j) => {
-      if (h === 'semana')                                         cols.semana   = j;
-      if (h.includes('link recurso') && h.includes('borrador'))  cols.borrador = j;
-      if (h.includes('link recurso') && h.includes('validado'))  cols.validado = j;
-      if (h.includes('link') && h.includes('producto dm'))       cols.dm       = j;
-      if (h.includes('link') && h.includes('producto impl'))     cols.impl     = j;
-      if (h.includes('cargado'))                                  cols.cargado  = j;
+      if (h === 'semana')                                           cols.semana   = j;
+      // Borrador: col H — cualquier encabezado que contenga 'borrador'
+      if (h.includes('borrador'))                                   cols.borrador = j;
+      // Validado: col J — contiene 'validado' pero no 'borrador'
+      if (h.includes('validado') && !h.includes('borrador'))        cols.validado = j;
+      // DM: col L — contiene 'dm' o 'diseño' cerca de 'producto' o 'link'
+      if (h.includes('producto dm') || (h.includes('link') && h.includes(' dm')))
+                                                                    cols.dm       = j;
+      // Implementación: col N
+      if (h.includes('producto impl') || h.includes('implementa'))  cols.impl     = j;
+      // Cargado en aula: col Q
+      if (h.includes('cargado'))                                    cols.cargado  = j;
     });
+
+    // Fallback por posición si los encabezados no matchearon (H=7, J=9, L=11, N=13, Q=16)
+    if (cols.borrador === -1 && fila.length > 7)  cols.borrador = 7;
+    if (cols.validado === -1 && fila.length > 9)  cols.validado = 9;
+    if (cols.dm       === -1 && fila.length > 11) cols.dm       = 11;
+    if (cols.impl     === -1 && fila.length > 13) cols.impl     = 13;
+    if (cols.cargado  === -1 && fila.length > 16) cols.cargado  = 16;
+
     hdrIdx = i;
     break;
   }
@@ -128,14 +142,14 @@ function parsearHoja(sheet, diNombre) {
     const semana = String(row[cols.semana] || '').trim().toUpperCase();
     if (!semana.match(/^S\d+$/)) continue;
 
-    const tieneBor = cols.borrador >= 0 && String(row[cols.borrador] || '').trim().length > 5;
-    const tieneVd  = cols.validado >= 0 && String(row[cols.validado] || '').trim().length > 5;
-    const tieneDm  = cols.dm       >= 0 && String(row[cols.dm]       || '').trim().length > 5;
-    const tieneImpl = cols.impl    >= 0 && String(row[cols.impl]      || '').trim().length > 5;
-    const cargado  = cols.cargado  >= 0 &&
-                     String(row[cols.cargado] || '').trim().toLowerCase() === 'sí';
+    const tieneBor  = cols.borrador >= 0 && String(row[cols.borrador] || '').trim().length > 5;
+    const tieneVd   = cols.validado >= 0 && String(row[cols.validado] || '').trim().length > 5;
+    const tieneDm   = cols.dm       >= 0 && String(row[cols.dm]       || '').trim().length > 5;
+    const tieneImpl = cols.impl     >= 0 && String(row[cols.impl]      || '').trim().length > 5;
+    const cargadoV  = cols.cargado  >= 0 ? String(row[cols.cargado] || '').trim().toLowerCase() : '';
+    const cargado   = cargadoV === 'sí' || cargadoV === 'si' || cargadoV.includes('observac');
 
-    if (cargado)      ter++;
+    if (cargado)        ter++;
     else if (tieneImpl) qa++;
     else if (tieneDm)   dm++;
     else if (tieneVd)   vd++;
