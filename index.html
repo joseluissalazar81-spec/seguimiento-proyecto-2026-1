@@ -5948,7 +5948,8 @@ window.addEventListener('load', function(){
       const filas=conRiesgo.map(({d,sinReun,av})=>{
         const tags=[`${av}%`];
         if(sinReun) tags.push('sin reunión');
-        return `• ${d.asignatura} — ${tags.join(' · ')}`;
+        const docente=d.docente?` · ${d.docente}`:'';
+        return `• ${d.asignatura}${docente} — ${tags.join(' · ')}`;
       }).join('\n');
       return {txt:`⚠️ <strong>Alertas (${conRiesgo.length} asignaturas):</strong>\nCriterios: avance < 25% o reunión sin respuesta\n\n${filas}`, chips:['Top 5 avance','Reuniones realizadas']};
     }
