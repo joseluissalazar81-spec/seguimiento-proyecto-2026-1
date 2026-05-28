@@ -5721,8 +5721,7 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Dupla DG–DI</strong>\n\n<strong>Recursos donde DG interviene (T1):</strong>\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Videos bienvenida/cierre → DI hace el guion, DG produce la pieza.\n\n<strong>Recursos donde DG NO interviene:</strong>\nGuías de facilitación, Lecturas, Glosarios → DI completa la plantilla y va directo a revisión.\n\n<strong>Flujo:</strong> DI entrega guion completo → DG produce → Revisión → Implementación', chips:['Manual DG','Tipos de recursos']};
 
     // Equipo completo
-    if(nq.match(/equipo|integrantes|quienes son|miembros/))
-      const conAsig=['DI','JP','DG','Implementador','JP / DI','JP / DI','Coordinadora QA'];
+    if(nq.match(/equipo|integrantes|quienes son|miembros/)){
       const filas=PROYECTO.equipo.map(p=>{
         const primer=p.nombre.split(' ')[0];
         const query=p.rol.match(/DI|JP|DG|Implementador/)?`Asignaturas de ${primer}`:primer;
@@ -5730,6 +5729,7 @@ window.addEventListener('load', function(){
         return `• ${nombre} — ${p.rol}`;
       }).join('\n');
       return {txt:`<strong>Equipo del proyecto:</strong>\n${filas}\n\n→ Tocá un nombre para ver sus asignaturas.`};
+    }
 
     // Rol JP
     if(nq.match(/que hace.*jp|rol.*jp|jp.*rol|jefe.*proyecto.*hace|para que.*jp/) && !findAsig(q))
@@ -5862,9 +5862,9 @@ window.addEventListener('load', function(){
     // ── REUNIONES — estadísticas globales ────────────────────────────────────
     if(nq.match(/\breunion\b|estado.*reunion|sin.*respuesta|reuniones.*agendada|reuniones.*realizada/) && !findAsig(q)){
       const data=DATA||[];
-      const real=data.filter(d=>d.reunion==='Realizada');
-      const agen=data.filter(d=>d.reunion==='Agendada');
-      const sinR=data.filter(d=>d.reunion==='Sin respuesta');
+      const real=data.filter(d=>/^realizada$/i.test((d.reunion||'').trim()));
+      const agen=data.filter(d=>/^agendada$/i.test((d.reunion||'').trim()));
+      const sinR=data.filter(d=>/^sin respuesta$/i.test((d.reunion||'').trim()));
       if(nq.match(/sin.*respuesta/))
         return {txt:`<strong>Sin respuesta (${sinR.length}):</strong>\n`+sinR.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}`).slice(0,15).join('\n')+(sinR.length>15?`\n…y ${sinR.length-15} más.`:''), chips:['Reuniones realizadas','Reuniones agendadas']};
       if(nq.match(/agendada/)){
@@ -5986,7 +5986,7 @@ window.addEventListener('load', function(){
     // Planificaciones validadas (s0 = Validada)
     if(nq.match(/planificaci[oó]n.*valid|valid.*planificaci[oó]n|planif.*valid|valid.*planif|planificaciones/) && !findAsig(q)){
       const arr=DATA||[];
-      const validadas=arr.filter(d=>(AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||(d.planif||'').toLowerCase().includes('valid'));
+      const validadas=arr.filter(d=>(AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||/^validada$/i.test((d.planif||'').trim()));
       const enviadas=arr.filter(d=>(d.planif||'').includes('Enviada'));
       const enConst=arr.filter(d=>(d.planif||'').includes('construcción')||(d.planif||'').includes('construccion'));
       if(nq.match(/facultad|por area|por escuela/)){
