@@ -5933,7 +5933,7 @@ window.addEventListener('load', function(){
 
     if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada|mejor docente/) && !nq.match(/alerta/)){
       const top=[...(DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}: <strong>${pct(d)}%</strong>`).join('\n'), chips:['Docentes en riesgo']};
+      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>{const doc=d.docente&&!/ajuste|sin asignar|^\s*del\s*$/i.test(d.docente)?' — '+d.docente:'';return `• ${d.asignatura}${doc}: <strong>${pct(d)}%</strong>`;}).join('\n'), chips:['Docentes en riesgo']};
     }
 
     if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance|alerta|en riesgo|critica/)){
@@ -5948,7 +5948,8 @@ window.addEventListener('load', function(){
       const filas=conRiesgo.map(({d,sinReun,av})=>{
         const tags=[`${av}%`];
         if(sinReun) tags.push('sin reunión');
-        const docente=d.docente?` · ${d.docente}`:'';
+        const docRaw=d.docente||'';
+        const docente=docRaw&&!/ajuste|sin asignar|^\s*del\s*$/i.test(docRaw)?` · ${docRaw}`:'';
         return `• ${d.asignatura}${docente} — ${tags.join(' · ')}`;
       }).join('\n');
       return {txt:`⚠️ <strong>Alertas (${conRiesgo.length} asignaturas):</strong>\nCriterios: avance < 25% o reunión sin respuesta\n\n${filas}`, chips:['Top 5 avance','Reuniones realizadas']};
