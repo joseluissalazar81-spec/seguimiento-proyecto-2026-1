@@ -2227,7 +2227,11 @@ const MOODLE_URLS = {
   'Electivo FP: Factores fisiológicos y psicológicos del ejercicio': 'https://aulasvirtuales.santotomas.cl/course/view.php?id=769012',
 };
 function getMoodleUrl(asignatura, facultad){
-  return MOODLE_URLS[asignatura+'|'+facultad] || MOODLE_URLS[asignatura] || null;
+  const exact=MOODLE_URLS[asignatura+'|'+facultad]||MOODLE_URLS[asignatura];
+  if(exact)return exact;
+  const kF=(asignatura+'|'+(facultad||'')).toLowerCase(), k2=asignatura.toLowerCase();
+  for(const k of Object.keys(MOODLE_URLS)){const kl=k.toLowerCase();if(kl===kF||kl===k2)return MOODLE_URLS[k];}
+  return null;
 }
 
 // ── Programas de asignatura (PDFs) ───────────────────────────────────────────
@@ -2268,7 +2272,11 @@ const PROGRAMA_URLS = {
   'Taller de Pronóstico IA':                  '/reportes/programas/flat/taller-pronostico-ia.pdf',   'Bases del comportamiento alimentario': '/reportes/programas/flat/bases-comportamiento-alimentario.pdf',   'Componentes bioactivos en alimentos': '/reportes/programas/flat/componentes-bioactivos-alimentos.pdf',   'Mercado IDI I': '/reportes/programas/flat/mercado-idi-i.pdf',
 };
 function getProgramaUrl(asignatura, facultad){
-  return PROGRAMA_URLS[asignatura+'|'+facultad] || PROGRAMA_URLS[asignatura] || null;
+  const exact=PROGRAMA_URLS[asignatura+'|'+facultad]||PROGRAMA_URLS[asignatura];
+  if(exact)return exact;
+  const kF=(asignatura+'|'+(facultad||'')).toLowerCase(), k2=asignatura.toLowerCase();
+  for(const k of Object.keys(PROGRAMA_URLS)){const kl=k.toLowerCase();if(kl===kF||kl===k2)return PROGRAMA_URLS[k];}
+  return null;
 }
 
 // ── Seguimiento DI — URLs por DI (fallback) ───────────────────────────────────
