@@ -5635,7 +5635,7 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, horas, programas o el avance de cualquier asignatura.', chips:['¿Qué es el proyecto?','Tipos de recursos','Ayuda']};
+      return {txt:'¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Ver promedio','Resumen reuniones','¿Quién es el equipo?']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
       return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general\n• <strong>Reuniones:</strong> cuántas realizadas, agendadas, sin respuesta', chips:['Tipos de recursos','Resumen reuniones','Ver promedio']};
@@ -5958,7 +5958,7 @@ window.addEventListener('load', function(){
       b.style.display='none';
       if(!botGreeted){
         botGreeted=true;
-        setTimeout(()=>addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, equipo, o el avance de cualquier asignatura.','bot',['Tipos de recursos','Los 3 momentos','Ver promedio']),300);
+        setTimeout(()=>addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Resumen reuniones','¿Quién es el equipo?']),300);
       }
       setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
     } else {
@@ -5973,7 +5973,7 @@ window.addEventListener('load', function(){
     ctxPersona=null;
     setTimeout(()=>{
       botGreeted=true;
-      addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, equipo, o el avance de cualquier asignatura.','bot',['Tipos de recursos','Resumen reuniones','Ver promedio']);
+      addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Resumen reuniones','¿Quién es el equipo?']);
     },200);
   };
 })();
