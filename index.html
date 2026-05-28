@@ -5742,8 +5742,32 @@ window.addEventListener('load', function(){
 
     // Búsqueda de persona por nombre
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+
+    // ── Asignaturas de un DI / JP / DG específico ─────────────────────────
+    if(personaMatch && nq.match(/cuantas|asignaturas|tiene|asig|curso|materia|lista|listado/)){
+      const nombreCorto = personaMatch.nombre.split(' ')[0];
+      const rol = personaMatch.rol;
+      const campo = rol==='DI'?'di': rol==='JP'||rol==='JP / DI'?'jp': rol==='DG'?'dg': rol==='Implementador'?'implementador': null;
+      const matches = (window.DATA||[]).filter(d=>{
+        if(!campo) return false;
+        const val = nrm(d[campo]||'');
+        return nrm(personaMatch.nombre).split(' ').filter(w=>w.length>3).some(w=>val.includes(w));
+      });
+      if(!matches.length){
+        return {txt:`No encontré asignaturas asignadas a <strong>${personaMatch.nombre}</strong> en los datos cargados.`};
+      }
+      const avgs = matches.map(d=>pct(d));
+      const promedio = Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length);
+      const lista = matches.slice(0,10).map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+      const extra = matches.length>10 ? `\n…y ${matches.length-10} más.` : '';
+      return {
+        txt:`<strong>${personaMatch.nombre}</strong> (${rol})\nAsignaturas: <strong>${matches.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${lista}${extra}`,
+        chips:[`Avance ${nombreCorto}`]
+      };
+    }
+
     if(personaMatch && !findAsig(q))
-      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`};
+      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`, chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
 
     // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
