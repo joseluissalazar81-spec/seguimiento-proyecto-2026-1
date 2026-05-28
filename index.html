@@ -5520,8 +5520,8 @@ window.addEventListener('load', function(){
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;transition:background .15s}
 #bot-send:hover{background:#1a4530}
-.bot-lupa{cursor:pointer;opacity:.7;font-size:13px;user-select:none;transition:opacity .15s}
-.bot-lupa:hover{opacity:1}
+.bot-link{cursor:pointer;color:#2d6e4e;text-decoration:underline;text-underline-offset:2px;font-weight:500}
+.bot-link:hover{color:#1a4530}
 </style>
 
 <button id="bot-btn" title="Chat Online — Vio" onclick="botToggle()">
@@ -5850,8 +5850,8 @@ window.addEventListener('load', function(){
         const filas=Object.entries(dis).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
           .map(([di,v])=>{
             const primer=di.split(' ')[0];
-            const lupa=di==='Sin asignar'?'':` <span class="bot-lupa" onclick="botAsk('Asignaturas de ${primer}')" title="Ver asignaturas">🔍</span>`;
-            return `• ${di}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)${lupa}`;
+            const nombre=di==='Sin asignar'?di:`<span class="bot-link" onclick="botAsk('Asignaturas de ${primer}')">${di}</span>`;
+            return `• ${nombre}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`;
           }).join('\n');
         return {txt:`<strong>Avance promedio por DI:</strong>\n\n${filas}`, chips:['Avance por facultad','Avance por JP']};
       }
@@ -5863,8 +5863,8 @@ window.addEventListener('load', function(){
         const filas=Object.entries(jps).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
           .map(([jp,v])=>{
             const primer=jp.split(' ')[0];
-            const lupa=jp==='Sin asignar'?'':` <span class="bot-lupa" onclick="botAsk('Asignaturas de ${primer}')" title="Ver asignaturas">🔍</span>`;
-            return `• ${jp}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)${lupa}`;
+            const nombre=jp==='Sin asignar'?jp:`<span class="bot-link" onclick="botAsk('Asignaturas de ${primer}')">${jp}</span>`;
+            return `• ${nombre}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`;
           }).join('\n');
         return {txt:`<strong>Avance promedio por JP:</strong>\n\n${filas}`, chips:['Avance por facultad','Avance por DI']};
       }
