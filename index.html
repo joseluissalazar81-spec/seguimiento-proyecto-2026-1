@@ -5634,7 +5634,7 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Ver promedio','Reuniones realizadas','¿Quién es el equipo?']};
+      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
       return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general\n• <strong>Reuniones:</strong> cuántas realizadas, agendadas, sin respuesta', chips:['Tipos de recursos','Reuniones realizadas','Ver promedio']};
@@ -5836,7 +5836,7 @@ window.addEventListener('load', function(){
       }
     }
 
-    if(nq.match(/promedio|avance general|avance total|avance del proyecto|ver promedio|avance por/) && !findAsig(q)){
+    if(nq.match(/promedio|avance general|avance total|avance del proyecto|ver promedio|avance por|rendimiento/) && !findAsig(q)){
       const arr=DATA||[];
       if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
       const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
@@ -5921,9 +5921,9 @@ window.addEventListener('load', function(){
               chips:['Planificaciones validadas por facultad','Ver promedio']};
     }
 
-    if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada/) && !nq.match(/alerta/)){
+    if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada|mejor docente/) && !nq.match(/alerta/)){
       const top=[...(DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>`• ${d.asignatura}: <strong>${pct(d)}%</strong>`).join('\n'), chips:['Top 5 alerta']};
+      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}: <strong>${pct(d)}%</strong>`).join('\n'), chips:['Docentes en riesgo']};
     }
 
     if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance|alerta|en riesgo|critica/)){
@@ -6081,7 +6081,7 @@ window.addEventListener('load', function(){
       b.style.display='none';
       if(!botGreeted){
         botGreeted=true;
-        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Reuniones realizadas','¿Quién es el equipo?']),300);
+        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?']),300);
       }
       setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
     } else {
