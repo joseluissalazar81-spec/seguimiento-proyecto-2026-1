@@ -5567,7 +5567,7 @@ window.addEventListener('load', function(){
     (DATA||[]).forEach(d=>{
       const na = nrm(d.asignatura);
       if(nq.includes(na)){ bestScore=999; best=d; return; }
-      const words = na.split(' ').filter(w=>w.length>3);
+      const words = na.split(' ').filter(w=>w.length>4);
       let sc = words.filter(w=>nq.includes(w)).length;
       if(sc>bestScore){ bestScore=sc; best=d; }
     });
