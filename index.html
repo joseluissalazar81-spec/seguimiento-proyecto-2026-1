@@ -5629,16 +5629,16 @@ window.addEventListener('load', function(){
     const nq = nrm(q);
 
     if(nq.match(/como te llamas|quien eres|tu nombre|eres vio|por que vio|de donde.*nombre|violetta/))
-      return {txt:'Soy <strong>Vio</strong>, la asistente virtual del proyecto UST 2026-1.\n\n'+PROYECTO.botOrigen+'\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.', chips:['Ver promedio','Resumen reuniones','Ayuda']};
+      return {txt:'Soy <strong>Vio</strong>, la asistente virtual del proyecto UST 2026-1.\n\n'+PROYECTO.botOrigen+'\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.', chips:['Ver promedio','Estado reuniones','Ayuda']};
 
     if(nq.match(/paulina|directora/))
       return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Ver promedio','Resumen reuniones','¿Quién es el equipo?']};
+      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Ver promedio','Estado reuniones','¿Quién es el equipo?']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general\n• <strong>Reuniones:</strong> cuántas realizadas, agendadas, sin respuesta', chips:['Tipos de recursos','Resumen reuniones','Ver promedio']};
+      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general\n• <strong>Reuniones:</strong> cuántas realizadas, agendadas, sin respuesta', chips:['Tipos de recursos','Estado reuniones','Ver promedio']};
 
     // Proyecto general
     if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
@@ -5784,30 +5784,61 @@ window.addEventListener('load', function(){
               chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
 
     // ── REUNIONES — estadísticas globales ────────────────────────────────────
-    if(nq.match(/reunion|sin.*respuesta|agendada|realizada/) && !findAsig(q)){
+    if(nq.match(/\breunion\b|estado.*reunion|sin.*respuesta|reuniones.*agendada|reuniones.*realizada/) && !findAsig(q)){
       const data=DATA||[];
       const real=data.filter(d=>d.reunion==='Realizada');
       const agen=data.filter(d=>d.reunion==='Agendada');
       const sinR=data.filter(d=>d.reunion==='Sin respuesta');
       if(nq.match(/sin.*respuesta/))
-        return {txt:`<strong>Sin respuesta (${sinR.length}):</strong>\n`+sinR.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}`).slice(0,15).join('\n')+(sinR.length>15?`\n…y ${sinR.length-15} más.`:''), chips:['Resumen reuniones','Agendadas']};
+        return {txt:`<strong>Sin respuesta (${sinR.length}):</strong>\n`+sinR.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}`).slice(0,15).join('\n')+(sinR.length>15?`\n…y ${sinR.length-15} más.`:''), chips:['Estado reuniones','Reuniones agendadas']};
       if(nq.match(/agendada/))
-        return {txt:`<strong>Agendadas (${agen.length}):</strong>\n`+agen.map(d=>`• ${d.asignatura}${d.planif?' — '+d.planif:''}`).slice(0,15).join('\n')+(agen.length>15?`\n…y ${agen.length-15} más.`:''), chips:['Resumen reuniones','Sin respuesta']};
+        return {txt:`<strong>Agendadas (${agen.length}):</strong>\n`+agen.map(d=>`• ${d.asignatura}${d.planif?' — '+d.planif:''}`).slice(0,15).join('\n')+(agen.length>15?`\n…y ${agen.length-15} más.`:''), chips:['Estado reuniones','Reuniones sin respuesta']};
       if(nq.match(/realizada/))
-        return {txt:`<strong>Realizadas (${real.length}):</strong>\n`+real.slice(0,15).map(d=>`• ${d.asignatura}`).join('\n')+(real.length>15?`\n…y ${real.length-15} más.`:''), chips:['Resumen reuniones']};
+        return {txt:`<strong>Realizadas (${real.length}):</strong>\n`+real.slice(0,15).map(d=>`• ${d.asignatura}`).join('\n')+(real.length>15?`\n…y ${real.length-15} más.`:''), chips:['Estado reuniones']};
       return {txt:`<strong>Estado de reuniones:</strong>\n✅ Realizadas: <strong>${real.length}</strong>\n📅 Agendadas: <strong>${agen.length}</strong>\n❓ Sin respuesta: <strong>${sinR.length}</strong>`,
-              chips:['Sin respuesta','Agendadas','Realizadas']};
+              chips:['Reuniones sin respuesta','Reuniones agendadas','Reuniones realizadas']};
     }
 
     // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
       return {txt:`Hay <strong>${(DATA||[]).length} asignaturas</strong> en el proyecto.`};
 
-    if(nq.match(/promedio|avance general|avance total|avance del proyecto/) && !findAsig(q)){
+    if(nq.match(/promedio|avance general|avance total|avance del proyecto|ver promedio/) && !findAsig(q)){
       const arr=DATA||[];
       if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
       const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
-      return {txt:`El <strong>avance promedio</strong> del proyecto es <strong>${avg}%</strong>.`};
+      const facs={};
+      arr.forEach(d=>{
+        if(!d.facultad) return;
+        if(!facs[d.facultad]) facs[d.facultad]={sum:0,n:0};
+        facs[d.facultad].sum+=pct(d); facs[d.facultad].n++;
+      });
+      const porFac=Object.entries(facs).sort((a,b)=>b[1].sum/b[1].n - a[1].sum/a[1].n)
+        .map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n})`).join('\n');
+      return {txt:`<strong>Avance promedio del proyecto: ${avg}%</strong>\n\n<strong>Por facultad:</strong>\n${porFac}`, chips:['Planificaciones validadas','Top 5 avance']};
+    }
+
+    // Planificaciones validadas (s0 = Validada)
+    if(nq.match(/planificaci[oó]n.*valid|valid.*planificaci[oó]n|planif.*valid|valid.*planif|planificaciones/) && !findAsig(q)){
+      const arr=DATA||[];
+      const validadas=arr.filter(d=>(AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||(d.planif||'').toLowerCase().includes('valid'));
+      const enviadas=arr.filter(d=>(d.planif||'').includes('Enviada'));
+      const enConst=arr.filter(d=>(d.planif||'').includes('construcción')||(d.planif||'').includes('construccion'));
+      if(nq.match(/facultad|por area|por escuela/)){
+        const facs={};
+        arr.forEach(d=>{
+          if(!d.facultad) return;
+          if(!facs[d.facultad]) facs[d.facultad]={valid:0,total:0};
+          facs[d.facultad].total++;
+          if((AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||(d.planif||'').toLowerCase().includes('valid'))
+            facs[d.facultad].valid++;
+        });
+        const filas=Object.entries(facs).sort((a,b)=>b[1].valid-a[1].valid)
+          .map(([f,v])=>`• ${f}: <strong>${v.valid}</strong>/${v.total}`).join('\n');
+        return {txt:`<strong>Planificaciones validadas por facultad:</strong>\nTotal: <strong>${validadas.length}</strong>/${arr.length}\n\n${filas}`, chips:['Ver promedio','Estado reuniones']};
+      }
+      return {txt:`<strong>Planificaciones:</strong>\n✅ Validadas: <strong>${validadas.length}</strong>\n📤 Enviadas a DEL: <strong>${enviadas.length}</strong>\n🔨 En construcción: <strong>${enConst.length}</strong>\n\nTotal asignaturas: ${arr.length}`,
+              chips:['Planificaciones validadas por facultad','Ver promedio']};
     }
 
     if(nq.match(/mayor avance|mas avanzada|mejor avance|top|mas adelantada/)){
@@ -5958,7 +5989,7 @@ window.addEventListener('load', function(){
       b.style.display='none';
       if(!botGreeted){
         botGreeted=true;
-        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Resumen reuniones','¿Quién es el equipo?']),300);
+        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Estado reuniones','¿Quién es el equipo?']),300);
       }
       setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
     } else {
@@ -5973,7 +6004,7 @@ window.addEventListener('load', function(){
     ctxPersona=null;
     setTimeout(()=>{
       botGreeted=true;
-      addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Resumen reuniones','¿Quién es el equipo?']);
+      addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Ver promedio','Estado reuniones','¿Quién es el equipo?']);
     },200);
   };
 })();
