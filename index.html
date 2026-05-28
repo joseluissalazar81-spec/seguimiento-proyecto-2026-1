@@ -5669,7 +5669,7 @@ window.addEventListener('load', function(){
     // ── MENÚ DE CONOCIMIENTO — chip "Manuales" ─────────────────────────────────
     if(nq==='manuales' || nq.match(/^menu|^categorias|^que sabe|^que conoces|^que temas/))
       return {txt:'📚 <strong>¿Sobre qué querés saber?</strong>\n\nElegí una categoría:',
-              chips:['Manual del DI','Manual del DG','Manual del Implementador','Plantillas','Tipos de recursos','Prompts IA','Los 3 momentos','Dupla DI-DG','Plazos DEL','Fases del proyecto']};
+              chips:['¿Cómo hacer una planificación?','Manual del DI','Manual del DG','Manual del Implementador','Plantillas','Tipos de recursos','Prompts IA','Los 3 momentos','Dupla DI-DG','Plazos DEL']};
 
     // ── RECURSOS ──────────────────────────────────────────────────────────────
 
@@ -5715,7 +5715,11 @@ window.addEventListener('load', function(){
 
     // Manual DI
     if(nq.match(/manual.*di|di.*manual|manual.*instruccional|manual.*diseño instruccional/))
-      return {txt:'<strong>Manual de Diseño Instruccional en e-Learning UST</strong>\nAprobado por Resolución N°481/24 (Vicerrectoría Académica).\n\nContenido principal:\n• Pilares del Marco Institucional e-Learning (interacción, autonomía, flexibilidad, calidad)\n• Planificación didáctica: cómo crearla y completarla\n• Tipos de herramientas y recursos\n• Diseño de evaluaciones (diagnóstica, formativa)\n• Retroalimentación en entornos virtuales\n\nArchivo: <em>Aprueba Manual De Diseño Instruccional En E-Learning.pdf</em>', chips:['Los 3 momentos','Tipos de recursos']};
+      return {txt:'<strong>Manual de Diseño Instruccional en e-Learning UST</strong>\nAprobado por Resolución N°481/24 (Vicerrectoría Académica).\n\nContenido principal:\n• Pilares del Marco Institucional e-Learning (interacción, autonomía, flexibilidad, calidad)\n• Planificación didáctica: cómo crearla y completarla\n• Tipos de herramientas y recursos\n• Diseño de evaluaciones (diagnóstica, formativa)\n• Retroalimentación en entornos virtuales\n\nArchivo: <em>Aprueba Manual De Diseño Instruccional En E-Learning.pdf</em>\n\n📐 <a class="bot-a" href="https://view.genially.com/69b8285205580fd47e45ebc5" target="_blank">Ver tutorial: ¿Cómo hacer una planificación?</a>', chips:['¿Cómo hacer una planificación?','Los 3 momentos','Tipos de recursos']};
+
+    // Planificación didáctica — cómo hacerla
+    if(nq.match(/como.*planif|planif.*como|hacer.*planif|planif.*hacer|que es.*planif|planif.*didac|tutorial.*planif|planif.*tutorial|elaborar.*planif/))
+      return {txt:'<strong>¿Cómo hacer una planificación didáctica?</strong>\n\nLa planificación es el documento base del curso virtual. El DI la elabora junto al docente antes de diseñar cualquier recurso.\n\nIncluye:\n• Competencias y resultados de aprendizaje\n• Distribución de horas (sincrónicas / asincrónicas / TPE)\n• Selección de recursos por semana (T1-T4)\n• Evaluaciones formativas y sumativas\n• Retroalimentación planificada\n\n📐 <a class="bot-a" href="https://view.genially.com/69b8285205580fd47e45ebc5" target="_blank">Ver tutorial interactivo: ¿Cómo hacer una planificación?</a>', chips:['Tipos de recursos','Los 3 momentos','Plazos DEL']};
 
     // Manual DG
     if(nq.match(/manual.*dg|dg.*manual|manual.*grafico|manual.*diseño grafico/))
