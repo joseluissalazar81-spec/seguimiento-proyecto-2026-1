@@ -5744,6 +5744,16 @@ window.addEventListener('load', function(){
     if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
       return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nEl proyecto tiene documentos de capacitación para cada rol:\n• Manual del DI (diseño instruccional e-learning)\n• Manual del DG (lineamientos gráficos UST)\n• Manual del Implementador (Moodle)\n• Guías para el docente (revisión y producción)\n• Presentación de kick-off para reunión de inicio con docentes\n• Guía de recursos didácticos (26 tipos de recursos)', chips:['Manual del DI','Manual del DG','Manual del Implementador']};
 
+    // Guard: si DATA aún no cargó, intentar cargar y avisar
+    if(!DATA.length){
+      if(!window._botLoadingData){
+        window._botLoadingData = true;
+        if(typeof loadSheetData==='function')
+          loadSheetData().catch(()=>{}).finally(()=>{ window._botLoadingData=false; });
+      }
+      return {txt:'⏳ Los datos del proyecto aún están cargando desde el servidor.\n\nEsperá unos segundos y volvé a preguntar — la próxima vez va a responder.', chips:['Ayuda','¿Quién es el equipo?']};
+    }
+
     // Búsqueda de persona por nombre (o usar contexto previo)
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
     if(personaMatch) ctxPersona = personaMatch;
@@ -5916,6 +5926,19 @@ window.addEventListener('load', function(){
     setTimeout(()=>{
       const r=botRespond(q);
       addMsg(r.txt,'bot',r.chips);
+      // Si avisó que está cargando, reintenta automáticamente cuando DATA esté listo
+      if(!DATA.length){
+        let tries=0;
+        const poll=setInterval(()=>{
+          tries++;
+          if(tries>15){ clearInterval(poll); return; }
+          if(DATA.length){
+            clearInterval(poll);
+            addMsg('✅ Datos cargados. Repitiendo tu consulta...','bot');
+            setTimeout(()=>{ const r2=botRespond(q); addMsg(r2.txt,'bot',r2.chips); },400);
+          }
+        },1000);
+      }
     },220);
   }
 
