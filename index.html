@@ -5809,6 +5809,20 @@ window.addEventListener('load', function(){
       return {txt:'⏳ Los datos del proyecto aún están cargando desde el servidor.\n\nEsperá unos segundos y volvé a preguntar — la próxima vez va a responder.', chips:['Ayuda','¿Quién es el equipo?']};
     }
 
+    // Búsqueda de docente por nombre en DATA (campo docente de la planilla)
+    const docenteEnData=(DATA||[]).find(d=>{
+      const doc=nrm(d.docente||'');
+      if(!doc||/ajuste|sin asignar|^\s*del\s*$/i.test(d.docente||''))return false;
+      return doc.split(' ').filter(w=>w.length>3).some(w=>nq.includes(w));
+    });
+    if(docenteEnData && !PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)))){
+      const todas=(DATA||[]).filter(d=>nrm(d.docente||'')===nrm(docenteEnData.docente));
+      const av=todas.length?Math.round(todas.reduce((s,d)=>s+pct(d),0)/todas.length):0;
+      const items=todas.map(d=>`• <span class="bot-link" onclick="botAsk('${d.asignatura.replace(/'/g,'\\\'')}')">${d.asignatura}</span> — ${pct(d)}%`).join('\n');
+      return {txt:`<strong>${docenteEnData.docente}</strong>\nDocente en ${todas.length} asignatura${todas.length!==1?'s':''} · Promedio: <strong>${av}%</strong>\n\n${items}`,
+              chips:['Docentes en riesgo']};
+    }
+
     // Búsqueda de persona por nombre (o usar contexto previo)
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
     if(personaMatch) ctxPersona = personaMatch;
@@ -5856,7 +5870,7 @@ window.addEventListener('load', function(){
     }
 
     if(personaMatch && !findAsig(q))
-      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`,
+      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?`\n📧 <a class="bot-a" href="mailto:${personaMatch.mail}">${personaMatch.mail}</a>`:''}`,
               chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
 
     // ── REUNIONES — estadísticas globales ────────────────────────────────────
@@ -5900,12 +5914,13 @@ window.addEventListener('load', function(){
         });
         if(_matchFac && _bestSc>=1){
           const asigsFac=_arr.filter(d=>d.facultad===_matchFac);
-          const avgFac=Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length);
+          const avgFac=asigsFac.length?Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length):0;
           const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-          const alertas=asigsFac.filter(d=>pct(d)<20||d.reunion==='Sin respuesta');
-          const topTxt=top.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+          const alertas=asigsFac.filter(d=>pct(d)<20||/^sin respuesta$/i.test((d.reunion||'').trim()));
+          const lnk=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,'\\\'')}')">${a}</span>`;
+          const topTxt=top.map(d=>`• ${lnk(d.asignatura)} — ${pct(d)}%`).join('\n');
           const alertTxt=alertas.length
-            ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${d.asignatura} — ${pct(d)}%${d.reunion==='Sin respuesta'?' (sin reunión)':''}`).join('\n')
+            ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${lnk(d.asignatura)} — ${pct(d)}%${/^sin respuesta$/i.test((d.reunion||'').trim())?' (sin reunión)':''}`).join('\n')
             : '\n\n✅ Sin alertas críticas.';
           return {txt:`<strong>${_matchFac}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Top 5 más avanzadas:</strong>\n${topTxt}${alertTxt}`,
                   chips:['Avance por facultad','Avance por DI']};
@@ -5922,7 +5937,7 @@ window.addEventListener('load', function(){
       if(nq.match(/\bdi\b|diseñador instruccional|instruccional/)){
         const dis={};
         arr.forEach(d=>{const k=d.di||'Sin asignar';if(!dis[k])dis[k]={sum:0,n:0};dis[k].sum+=pct(d);dis[k].n++;});
-        const filas=Object.entries(dis).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
+        const filas=Object.entries(dis).filter(([,v])=>v.n>0).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
           .map(([di,v])=>{
             const primer=di.split(' ')[0];
             const nombre=di==='Sin asignar'?di:`<span class="bot-link" onclick="botAsk('Asignaturas de ${primer}')">${di}</span>`;
@@ -5935,7 +5950,7 @@ window.addEventListener('load', function(){
       if(nq.match(/\bjp\b|jefe de proyecto|jefe proyecto/)){
         const jps={};
         arr.forEach(d=>{const k=d.jp||'Sin asignar';if(!jps[k])jps[k]={sum:0,n:0};jps[k].sum+=pct(d);jps[k].n++;});
-        const filas=Object.entries(jps).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
+        const filas=Object.entries(jps).filter(([,v])=>v.n>0).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
           .map(([jp,v])=>{
             const primer=jp.split(' ')[0];
             const nombre=jp==='Sin asignar'?jp:`<span class="bot-link" onclick="botAsk('Asignaturas de ${primer}')">${jp}</span>`;
@@ -5958,12 +5973,13 @@ window.addEventListener('load', function(){
       const facEspecifica = !nq.match(/facultad|area|escuela|di\b|jp\b|promedio|general/) ? facMatch(nq) : null;
       if(facEspecifica){
         const asigsFac=arr.filter(d=>d.facultad===facEspecifica);
-        const avgFac=Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length);
+        const avgFac=asigsFac.length?Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length):0;
         const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-        const alertas=asigsFac.filter(d=>pct(d)<20||d.reunion==='Sin respuesta');
-        const topTxt=top.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+        const alertas=asigsFac.filter(d=>pct(d)<20||/^sin respuesta$/i.test((d.reunion||'').trim()));
+        const lnk2=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,'\\\'')}')">${a}</span>`;
+        const topTxt=top.map(d=>`• ${lnk2(d.asignatura)} — ${pct(d)}%`).join('\n');
         const alertTxt=alertas.length
-          ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${d.asignatura} — ${pct(d)}%${d.reunion==='Sin respuesta'?' (sin reunión)':''}`).join('\n')
+          ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${lnk2(d.asignatura)} — ${pct(d)}%${/^sin respuesta$/i.test((d.reunion||'').trim())?' (sin reunión)':''}`).join('\n')
           : '\n\n✅ Sin alertas críticas.';
         return {txt:`<strong>${facEspecifica}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Top 5 más avanzadas:</strong>\n${topTxt}${alertTxt}`,
                 chips:['Avance por facultad','Avance por DI']};
