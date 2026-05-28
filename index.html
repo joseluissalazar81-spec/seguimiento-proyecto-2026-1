@@ -5427,26 +5427,26 @@ window.addEventListener('load', function(){
 #bot-btn{
   position:fixed;bottom:28px;right:32px;z-index:9000;
   width:56px;height:56px;border-radius:8px 8px 2px 8px;
-  background:#22573f;border:none;cursor:pointer;
+  background:#4a8c6a;border:none;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   /* Caras del cubo con box-shadow escalonado */
   box-shadow:
-    1px 1px 0 #1e4f38,2px 2px 0 #1a4632,3px 3px 0 #163d2c,
-    4px 4px 0 #133526,5px 5px 0 #102d20,6px 6px 0 #0d251a,
-    8px 8px 18px rgba(0,0,0,.5);
+    1px 1px 0 #428060,2px 2px 0 #3c7357,3px 3px 0 #35674d,
+    4px 4px 0 #2e5a43,5px 5px 0 #274e3a,6px 6px 0 #204131,
+    8px 8px 18px rgba(0,0,0,.4);
   transition:transform .1s,box-shadow .1s;
   color:#fff;font-family:inherit}
 #bot-btn:hover{
   transform:translate(-2px,-2px);
   box-shadow:
-    1px 1px 0 #1e4f38,2px 2px 0 #1a4632,3px 3px 0 #163d2c,
-    4px 4px 0 #133526,5px 5px 0 #102d20,6px 6px 0 #0d251a,
-    7px 7px 0 #0a1e14,8px 8px 0 #07160f,10px 10px 22px rgba(0,0,0,.6)}
-#bot-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #0d251a,4px 4px 10px rgba(0,0,0,.4)}
+    1px 1px 0 #428060,2px 2px 0 #3c7357,3px 3px 0 #35674d,
+    4px 4px 0 #2e5a43,5px 5px 0 #274e3a,6px 6px 0 #204131,
+    7px 7px 0 #193428,8px 8px 0 #12281f,10px 10px 22px rgba(0,0,0,.5)}
+#bot-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #204131,4px 4px 10px rgba(0,0,0,.3)}
 #bot-btn svg{pointer-events:none}
 #bot-btn-label{font-size:8px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:uppercase;line-height:1}
 #bot-badge{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:var(--ro);
-  border-radius:50%;border:2px solid #22573f;display:none;
+  border-radius:50%;border:2px solid #4a8c6a;display:none;
   align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff}
 
 /* ── Ventana chat estilo UST Chat Online ── */
@@ -5461,7 +5461,7 @@ window.addEventListener('load', function(){
 /* Header verde UST */
 #bot-header{
   display:flex;align-items:center;gap:10px;padding:12px 14px;
-  background:#1c4535;border-bottom:none;flex-shrink:0}
+  background:#3a7a5c;border-bottom:none;flex-shrink:0}
 #bot-header-icon{
   width:34px;height:34px;border-radius:50%;
   background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);
@@ -5490,7 +5490,7 @@ window.addEventListener('load', function(){
   align-self:flex-start;border-radius:2px 14px 14px 14px;
   box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e5e7eb}
 .bot-msg.user{
-  background:#1c4535 !important;color:#ffffff !important;
+  background:#3a7a5c !important;color:#ffffff !important;
   align-self:flex-end;border-radius:14px 2px 14px 14px}
 .bot-msg strong{color:#1c6b4a !important;font-weight:700}
 .bot-msg.user strong{color:#a8e6c0 !important}
@@ -5500,9 +5500,9 @@ window.addEventListener('load', function(){
 .bot-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;align-self:flex-start}
 .bot-chip{
   background:#fff;border:1px solid #d1d5db;
-  border-radius:20px;padding:5px 11px;font-size:11px;color:#22573f;cursor:pointer;
+  border-radius:20px;padding:5px 11px;font-size:11px;color:#3a7a5c;cursor:pointer;
   transition:all .12s;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.bot-chip:hover{background:#22573f;color:#fff;border-color:#22573f}
+.bot-chip:hover{background:#4a8c6a;color:#fff;border-color:#4a8c6a}
 
 /* Input */
 #bot-input-row{
@@ -5513,9 +5513,9 @@ window.addEventListener('load', function(){
   border-radius:20px;padding:8px 14px;color:#111 !important;font-size:12.5px;outline:none;
   font-family:inherit;transition:border-color .15s}
 #bot-input::placeholder{color:#aab0ba}
-#bot-input:focus{border-color:#22573f;background:#fff}
+#bot-input:focus{border-color:#4a8c6a;background:#fff}
 #bot-send{
-  background:#22573f;border:none;
+  background:#4a8c6a;border:none;
   border-radius:50%;width:34px;height:34px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;transition:background .15s}
