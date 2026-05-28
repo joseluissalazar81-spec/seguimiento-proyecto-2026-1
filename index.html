@@ -5791,10 +5791,18 @@ window.addEventListener('load', function(){
       const sinR=data.filter(d=>d.reunion==='Sin respuesta');
       if(nq.match(/sin.*respuesta/))
         return {txt:`<strong>Sin respuesta (${sinR.length}):</strong>\n`+sinR.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}`).slice(0,15).join('\n')+(sinR.length>15?`\n…y ${sinR.length-15} más.`:''), chips:['Reuniones realizadas','Reuniones agendadas']};
-      if(nq.match(/agendada/))
-        return {txt:`<strong>Agendadas (${agen.length}):</strong>\n`+agen.map(d=>`• ${d.asignatura}${d.planif?' — '+d.planif:''}`).slice(0,15).join('\n')+(agen.length>15?`\n…y ${agen.length-15} más.`:''), chips:['Reuniones realizadas','Reuniones sin respuesta']};
-      if(nq.match(/realizada/))
-        return {txt:`<strong>Realizadas (${real.length}):</strong>\n`+real.slice(0,15).map(d=>`• ${d.asignatura}`).join('\n')+(real.length>15?`\n…y ${real.length-15} más.`:''), chips:['Reuniones realizadas']};
+      if(nq.match(/agendada/)){
+        const byJP={};
+        agen.forEach(d=>{const k=d.jp||'Sin JP';if(!byJP[k])byJP[k]=0;byJP[k]++;});
+        const filasA=Object.entries(byJP).sort((a,b)=>b[1]-a[1]).map(([jp,c])=>`• ${jp}: ${c}`).join('\n');
+        return {txt:`📅 <strong>Reuniones agendadas: ${agen.length}</strong>\n\nPor JP:\n${filasA}`, chips:['Reuniones realizadas','Reuniones sin respuesta']};
+      }
+      if(nq.match(/realizada/)){
+        const byFacR={};
+        real.forEach(d=>{const k=d.facultad||'Sin facultad';if(!byFacR[k])byFacR[k]=0;byFacR[k]++;});
+        const filasR=Object.entries(byFacR).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n');
+        return {txt:`✅ <strong>Reuniones realizadas: ${real.length}</strong>\n\nPor facultad:\n${filasR}`, chips:['Reuniones agendadas','Reuniones sin respuesta']};
+      }
       return {txt:`<strong>Estado de reuniones:</strong>\n✅ Realizadas: <strong>${real.length}</strong>\n📅 Agendadas: <strong>${agen.length}</strong>\n❓ Sin respuesta: <strong>${sinR.length}</strong>`,
               chips:['Reuniones sin respuesta','Reuniones agendadas','Reuniones realizadas']};
     }
@@ -5802,6 +5810,32 @@ window.addEventListener('load', function(){
     // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
       return {txt:`Hay <strong>${(DATA||[]).length} asignaturas</strong> en el proyecto.`};
+
+    // ── DETALLE DE FACULTAD — handler independiente para chips de facultad ───
+    if(!nq.match(/avance por|ver promedio|avance general|avance total|\bdi\b|\bjp\b|planif|cuantas|total.*asig|reunion|manual|equipo|tipo/)){
+      const _arr=DATA||[];
+      if(_arr.length){
+        const _facets=[...new Set(_arr.map(d=>d.facultad).filter(Boolean))];
+        let _matchFac=null,_bestSc=0;
+        _facets.forEach(f=>{
+          const words=nrm(f).split(' ').filter(w=>w.length>4);
+          const sc=words.filter(w=>nq.includes(w)).length;
+          if(sc>_bestSc){_bestSc=sc;_matchFac=f;}
+        });
+        if(_matchFac && _bestSc>=1){
+          const asigsFac=_arr.filter(d=>d.facultad===_matchFac);
+          const avgFac=Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length);
+          const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,5);
+          const alertas=asigsFac.filter(d=>pct(d)<20||d.reunion==='Sin respuesta');
+          const topTxt=top.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+          const alertTxt=alertas.length
+            ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${d.asignatura} — ${pct(d)}%${d.reunion==='Sin respuesta'?' (sin reunión)':''}`).join('\n')
+            : '\n\n✅ Sin alertas críticas.';
+          return {txt:`<strong>${_matchFac}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Top 5 más avanzadas:</strong>\n${topTxt}${alertTxt}`,
+                  chips:['Avance por facultad','Avance por DI']};
+        }
+      }
+    }
 
     if(nq.match(/promedio|avance general|avance total|avance del proyecto|ver promedio|avance por/) && !findAsig(q)){
       const arr=DATA||[];
@@ -5841,13 +5875,13 @@ window.addEventListener('load', function(){
       if(facEspecifica){
         const asigsFac=arr.filter(d=>d.facultad===facEspecifica);
         const avgFac=Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length);
-        const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,3);
+        const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,5);
         const alertas=asigsFac.filter(d=>pct(d)<20||d.reunion==='Sin respuesta');
         const topTxt=top.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
         const alertTxt=alertas.length
-          ? '\n\n⚠️ <strong>Alertas:</strong>\n'+alertas.slice(0,6).map(d=>`• ${d.asignatura} — ${pct(d)}%${d.reunion==='Sin respuesta'?' (sin reunión)':''}`).join('\n')
+          ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${d.asignatura} — ${pct(d)}%${d.reunion==='Sin respuesta'?' (sin reunión)':''}`).join('\n')
           : '\n\n✅ Sin alertas críticas.';
-        return {txt:`<strong>${facEspecifica}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Más avanzadas:</strong>\n${topTxt}${alertTxt}`,
+        return {txt:`<strong>${facEspecifica}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Top 5 más avanzadas:</strong>\n${topTxt}${alertTxt}`,
                 chips:['Avance por facultad','Avance por DI']};
       }
 
@@ -5856,9 +5890,9 @@ window.addEventListener('load', function(){
         const facs={};
         arr.forEach(d=>{if(!d.facultad)return;if(!facs[d.facultad])facs[d.facultad]={sum:0,n:0};facs[d.facultad].sum+=pct(d);facs[d.facultad].n++;});
         const sorted=Object.entries(facs).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n);
-        const filas=sorted.map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n})`).join('\n');
-        const topFacs=sorted.slice(0,2).map(([f])=>f.split(' ').slice(0,2).join(' '));
-        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}`, chips:[...topFacs,'Avance por DI']};
+        const filas=sorted.map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`).join('\n');
+        const facChips=sorted.map(([f])=>f.split(' ').slice(0,2).join(' '));
+        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}\n\n→ Tocá una facultad para ver detalle, top 3 y alertas.`, chips:[...facChips,'Avance por DI']};
       }
 
       // General — ofrecer desglose
