@@ -6061,7 +6061,8 @@ window.addEventListener('load', function(){
 
     if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada|mejor docente/) && !nq.match(/alerta/)){
       const top=[...(DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>{const doc=d.docente&&!/ajuste|sin asignar|^\s*del\s*$/i.test(d.docente)?' — '+d.docente:'';return `• ${d.asignatura}${doc}: <strong>${pct(d)}%</strong>`;}).join('\n'), chips:['Docentes en riesgo']};
+      const lnkT=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>{const doc=d.docente&&!/ajuste|sin asignar|^\s*del\s*$/i.test(d.docente)?' — '+d.docente:'';return `• ${lnkT(d.asignatura)}${doc}: <strong>${pct(d)}%</strong>`;}).join('\n'), chips:['Docentes en riesgo']};
     }
 
     if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance|alerta|en riesgo|critica/)){
@@ -6073,12 +6074,13 @@ window.addEventListener('load', function(){
         .sort((a,b)=>(a.av+(!a.sinReun?0:-10))-(b.av+(!b.sinReun?0:-10)))
         .slice(0,7);
       if(!conRiesgo.length) return {txt:'✅ No hay asignaturas en situación crítica actualmente.', chips:['Top 5 avance']};
+      const lnkR=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
       const filas=conRiesgo.map(({d,sinReun,av})=>{
         const tags=[`${av}%`];
         if(sinReun) tags.push('sin reunión');
         const docRaw=d.docente||'';
         const docente=docRaw&&!/ajuste|sin asignar|^\s*del\s*$/i.test(docRaw)?` · ${docRaw}`:'';
-        return `• ${d.asignatura}${docente} — ${tags.join(' · ')}`;
+        return `• ${lnkR(d.asignatura)}${docente} — ${tags.join(' · ')}`;
       }).join('\n');
       return {txt:`⚠️ <strong>Alertas (${conRiesgo.length} asignaturas):</strong>\nCriterios: avance < 25% o reunión sin respuesta\n\n${filas}`, chips:['Top 5 avance','Reuniones realizadas']};
     }
@@ -6187,7 +6189,11 @@ window.addEventListener('load', function(){
     const reunIcon=asig.reunion==='Realizada'?'✅':asig.reunion==='Agendada'?'📅':'❓';
     const moodleUrl=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
     const moodleLink=moodleUrl?`\n🔗 <a class="bot-a" href="${moodleUrl}" target="_blank">Aula Moodle</a>`:'';
-    return {txt:`<strong>${asig.asignatura}</strong>\n📊 Avance: <strong>${av}%</strong> · ${asig.facultad||'—'}\n👤 Docente: ${asig.docente||'—'}\n👥 JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}\n${reunIcon} Reunión: <strong>${asig.reunion||'—'}</strong> · Planif: <strong>${asig.planif||'—'}</strong>\n\n<strong>Hitos:</strong>\n${hitos}${moodleLink}`,
+    const pdfUrl=typeof getProgramaUrl==='function'?getProgramaUrl(asig.asignatura,asig.facultad):null;
+    const pdfLink=pdfUrl?`\n📋 <a class="bot-a" href="${pdfUrl}" target="_blank">Ver programa PDF</a>`:'';
+    const prod=typeof getProd==='function'?getProd(asig.asignatura,asig.docente):null;
+    const horasLine=prod?`\n⏱ Sincrónica: <strong>${prod.pres}h</strong> · Asincrónica: <strong>${prod.asin}h</strong>`:'';
+    return {txt:`<strong>${asig.asignatura}</strong>\n📊 Avance: <strong>${av}%</strong> · ${asig.facultad||'—'}\n👤 Docente: ${asig.docente||'—'}\n👥 JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}${horasLine}\n${reunIcon} Reunión: <strong>${asig.reunion||'—'}</strong> · Planif: <strong>${asig.planif||'—'}</strong>\n\n<strong>Hitos:</strong>\n${hitos}${moodleLink}${pdfLink}`,
             chips:[`Seguimiento ${asig.asignatura.split(' ')[0]}`]};
   }
 
