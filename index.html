@@ -5423,85 +5423,124 @@ window.addEventListener('load', function(){
 
 <!-- ─── CHATBOT ─────────────────────────────────────────────────────────── -->
 <style>
-#bot-btn{position:fixed;bottom:24px;right:24px;z-index:9000;width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,var(--az),var(--tl));border:none;cursor:pointer;
-  box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
-  transition:transform .2s,box-shadow .2s}
-#bot-btn:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(0,0,0,.5)}
+/* ── Botón cubo 3D UST ── */
+#bot-btn{
+  position:fixed;bottom:28px;right:32px;z-index:9000;
+  width:56px;height:56px;border-radius:8px 8px 2px 8px;
+  background:#22573f;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  /* Caras del cubo con box-shadow escalonado */
+  box-shadow:
+    1px 1px 0 #1e4f38,2px 2px 0 #1a4632,3px 3px 0 #163d2c,
+    4px 4px 0 #133526,5px 5px 0 #102d20,6px 6px 0 #0d251a,
+    8px 8px 18px rgba(0,0,0,.5);
+  transition:transform .1s,box-shadow .1s;
+  color:#fff;font-family:inherit}
+#bot-btn:hover{
+  transform:translate(-2px,-2px);
+  box-shadow:
+    1px 1px 0 #1e4f38,2px 2px 0 #1a4632,3px 3px 0 #163d2c,
+    4px 4px 0 #133526,5px 5px 0 #102d20,6px 6px 0 #0d251a,
+    7px 7px 0 #0a1e14,8px 8px 0 #07160f,10px 10px 22px rgba(0,0,0,.6)}
+#bot-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #0d251a,4px 4px 10px rgba(0,0,0,.4)}
 #bot-btn svg{pointer-events:none}
-#bot-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;background:var(--ro);
-  border-radius:50%;border:2px solid var(--bg);display:none}
+#bot-btn-label{font-size:8px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:uppercase;line-height:1}
+#bot-badge{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:var(--ro);
+  border-radius:50%;border:2px solid #22573f;display:none;
+  align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff}
 
-#bot-window{position:fixed;bottom:86px;right:24px;z-index:9001;width:330px;
-  background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);display:none;flex-direction:column;overflow:hidden;
-  max-height:480px}
+/* ── Ventana chat estilo UST Chat Online ── */
+#bot-window{
+  position:fixed;bottom:94px;right:28px;z-index:9001;width:340px;
+  background:#fff !important;color:#111 !important;
+  border:1px solid rgba(0,0,0,.1);border-radius:14px;
+  box-shadow:0 8px 40px rgba(0,0,0,.3);display:none;flex-direction:column;overflow:hidden;
+  max-height:510px}
 #bot-window.open{display:flex}
 
-#bot-header{display:flex;align-items:center;gap:10px;padding:12px 14px;
-  background:linear-gradient(135deg,rgba(26,72,120,.6),rgba(19,95,93,.4));
-  border-bottom:1px solid rgba(255,255,255,.06)}
-#bot-header-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--az),var(--tl));
-  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Header verde UST */
+#bot-header{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:#1c4535;border-bottom:none;flex-shrink:0}
+#bot-header-icon{
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
 #bot-title{flex:1}
-#bot-title strong{font-size:13px;color:var(--text);display:block}
-#bot-title span{font-size:10px;color:var(--text-muted)}
-#bot-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;
-  border-radius:6px;display:flex;align-items:center;transition:color .15s}
-#bot-close:hover{color:var(--text)}
+#bot-title strong{font-size:13px;color:#fff !important;display:block;font-weight:700}
+#bot-title span{font-size:10px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px}
+#bot-title span::before{content:'';width:6px;height:6px;border-radius:50%;background:#4cde8c;display:inline-block}
+#bot-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);padding:4px;
+  border-radius:6px;display:flex;align-items:center;transition:color .15s;font-size:20px;line-height:1}
+#bot-close:hover{color:#fff}
 
-#bot-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+/* Área mensajes — fondo gris claro */
+#bot-msgs{
+  flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;
+  scroll-behavior:smooth;background:#f0f2f4 !important;color:#111 !important}
 #bot-msgs::-webkit-scrollbar{width:4px}
 #bot-msgs::-webkit-scrollbar-track{background:transparent}
-#bot-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+#bot-msgs::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
 
-.bot-msg{max-width:88%;padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.5;white-space:pre-wrap}
-.bot-msg.bot{background:rgba(26,72,120,.35);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
-.bot-msg.user{background:rgba(19,95,93,.5);color:var(--text);align-self:flex-end;border-bottom-right-radius:4px}
-.bot-msg strong{color:#90caf9;font-weight:700}
+/* Burbujas con colores explícitos */
+.bot-msg{max-width:88%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.55;white-space:pre-wrap}
+.bot-msg.bot{
+  background:#ffffff !important;color:#111111 !important;
+  align-self:flex-start;border-radius:2px 14px 14px 14px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e5e7eb}
+.bot-msg.user{
+  background:#1c4535 !important;color:#ffffff !important;
+  align-self:flex-end;border-radius:14px 2px 14px 14px}
+.bot-msg strong{color:#1c6b4a !important;font-weight:700}
+.bot-msg.user strong{color:#a8e6c0 !important}
 .bot-msg.typing{opacity:.6}
 
+/* Chips */
 .bot-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;align-self:flex-start}
-.bot-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;
-  transition:background .15s,color .15s}
-.bot-chip:hover{background:rgba(26,72,120,.4);color:var(--text)}
+.bot-chip{
+  background:#fff;border:1px solid #d1d5db;
+  border-radius:20px;padding:5px 11px;font-size:11px;color:#22573f;cursor:pointer;
+  transition:all .12s;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.bot-chip:hover{background:#22573f;color:#fff;border-color:#22573f}
 
-#bot-input-row{display:flex;gap:6px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.06)}
-#bot-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  border-radius:20px;padding:7px 12px;color:var(--text);font-size:12.5px;outline:none;
+/* Input */
+#bot-input-row{
+  display:flex;gap:8px;padding:10px 12px;
+  border-top:1px solid #e5e7eb;background:#fff !important;flex-shrink:0}
+#bot-input{
+  flex:1;background:#f5f6f7;border:1px solid #e0e3e8;
+  border-radius:20px;padding:8px 14px;color:#111 !important;font-size:12.5px;outline:none;
   font-family:inherit;transition:border-color .15s}
-#bot-input::placeholder{color:var(--text-muted)}
-#bot-input:focus{border-color:rgba(26,72,120,.6)}
-#bot-send{background:linear-gradient(135deg,var(--az),var(--tl));border:none;
-  border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:opacity .15s}
-#bot-send:hover{opacity:.85}
+#bot-input::placeholder{color:#aab0ba}
+#bot-input:focus{border-color:#22573f;background:#fff}
+#bot-send{
+  background:#22573f;border:none;
+  border-radius:50%;width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background .15s}
+#bot-send:hover{background:#1a4530}
 </style>
 
-<button id="bot-btn" title="Asistente del proyecto" onclick="botToggle()">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<button id="bot-btn" title="Chat Online — Pauli" onclick="botToggle()">
+  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
   </svg>
+  <div id="bot-btn-label">Chat</div>
   <div id="bot-badge"></div>
 </button>
 
 <div id="bot-window">
   <div id="bot-header">
-    <div id="bot-header-icon">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-    </div>
+    <div id="bot-header-icon">🤖</div>
     <div id="bot-title">
-      <strong>Pauli — UST 2026-1</strong>
-      <span>Tu asistente del proyecto</span>
+      <strong>Chat Online</strong>
+      <span>En línea ahora</span>
     </div>
-    <button id="bot-close" onclick="botToggle()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+    <button id="bot-close" onclick="botToggle()">−</button>
   </div>
   <div id="bot-msgs"></div>
   <div id="bot-input-row">
-    <input id="bot-input" type="text" placeholder="Preguntame algo..." autocomplete="off"
+    <input id="bot-input" type="text" placeholder="Escribe aquí..." autocomplete="off"
       onkeydown="if(event.key==='Enter')botSend()">
     <button id="bot-send" onclick="botSend()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
