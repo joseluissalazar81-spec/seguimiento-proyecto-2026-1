@@ -5656,7 +5656,7 @@ window.addEventListener('load', function(){
       return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general\n• <strong>Reuniones:</strong> cuántas realizadas, agendadas, sin respuesta', chips:['Tipos de recursos','Reuniones realizadas','Ver promedio']};
+      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / reunión</strong> de una asignatura\n• <strong>Aula Moodle</strong> o <strong>seguimiento</strong> de una asignatura\n• <strong>Plazos DEL</strong> por facultad\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Reportes semanales</strong> por facultad\n• <strong>Estadísticas</strong> de avance general, alertas, rendimiento', chips:['Rendimiento','Docentes en riesgo','Reportes']};
 
     // Proyecto general
     if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
@@ -5752,6 +5752,24 @@ window.addEventListener('load', function(){
     // Manuales
     if(nq.match(/que manuales|listado.*manual|todos.*manual|manuales disponibles/) && !findAsig(q))
       return {txt:'<strong>Manuales y guías disponibles:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> (para ${m.para})`).join('\n'), chips:['Manual del DI','Manual del DG','Manual del Implementador']};
+
+    // Plazos DEL por facultad
+    if(nq.match(/plazo.*del|plazo.*planif|plazo.*entrega|cuando.*del|fecha.*del|deadline/) && !findAsig(q)){
+      const fmt=d=>d.toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+      const custom=Object.entries(PLANIF_DEADLINES).filter(([f])=>f!=='default')
+        .map(([f,d])=>`• ${f}: <strong>${fmt(d)}</strong>`).join('\n');
+      return {txt:`<strong>Plazos de entrega de planificación al DEL:</strong>\n\n${custom}\n• Resto de facultades: <strong>${fmt(PLANIF_DEADLINES.default)}</strong>`, chips:['Contacto DEL']};
+    }
+
+    // Seguimiento por DI (planilla individual)
+    if(nq.match(/seguimiento|seg\b|planilla/) && !findAsig(q)){
+      const persona=PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+      if(persona && typeof DI_SEG_URLS!=='undefined'){
+        const primer=persona.nombre.split(' ')[0];
+        const url=DI_SEG_URLS[primer]||DI_SEG_URLS[persona.nombre];
+        if(url) return {txt:`<strong>Seguimiento de ${persona.nombre}</strong>\n📊 <a class="bot-a" href="${url}" target="_blank">Ver planilla de seguimiento</a>`};
+      }
+    }
 
     if(nq.match(/manual.*implementador|implementador.*manual|moodle.*manual/))
       return {txt:'<strong>Manual del Implementador — Moodle UST</strong>\n\nCubre:\n• Configuración de aulas virtuales en Moodle\n• Carga de recursos por tipo\n• Estructura de cursos e-learning\n• Criterios de calidad antes de publicar\n\nDirigido a: Elías Castillo y Antonio Cabrera', chips:['¿Quiénes son los implementadores?','Dupla DI-DG']};
@@ -6049,6 +6067,18 @@ window.addEventListener('load', function(){
 
     if(nq.match(/implementador|quien implementa/))
       return {txt:`<strong>${asig.asignatura}</strong>\nImplementador: <strong>${asig.implementador||'—'}</strong>`};
+
+    if(nq.match(/moodle|aula virtual|link.*aula|url.*aula|enlace.*aula/)){
+      const url=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
+      if(url) return {txt:`<strong>${asig.asignatura}</strong>\n🔗 <a class="bot-a" href="${url}" target="_blank">Abrir aula Moodle</a>`};
+      return {txt:`No encontré el link Moodle de <strong>${asig.asignatura}</strong>.`};
+    }
+
+    if(nq.match(/seguimiento|seg\b|planilla/)){
+      const url=typeof getSegUrl==='function'?getSegUrl(asig.asignatura,asig.facultad,asig.di):null;
+      if(url) return {txt:`<strong>${asig.asignatura}</strong>\n📊 <a class="bot-a" href="${url}" target="_blank">Ver planilla de seguimiento</a>`};
+      return {txt:`No encontré la planilla de seguimiento de <strong>${asig.asignatura}</strong>.`};
+    }
 
     if(nq.match(/observ|obs\b|nota/))
       return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
