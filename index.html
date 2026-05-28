@@ -5862,7 +5862,7 @@ window.addEventListener('load', function(){
       }
 
       // General — ofrecer desglose
-      return {txt:`<strong>Avance promedio del proyecto: ${avg}%</strong>\n(${arr.length} asignaturas)\n\n¿Querés ver el desglose?`, chips:['Avance por facultad','Avance por DI','Avance por JP']};
+      return {txt:`<strong>Avance promedio del proyecto: ${avg}%</strong>\n(${arr.length} asignaturas)\n\n¿Querés ver el desglose?`, chips:['Avance por facultad','Avance por DI','Avance por JP','Top 5 alerta']};
     }
 
     // Planificaciones validadas (s0 = Validada)
@@ -5888,14 +5888,26 @@ window.addEventListener('load', function(){
               chips:['Planificaciones validadas por facultad','Ver promedio']};
     }
 
-    if(nq.match(/mayor avance|mas avanzada|mejor avance|top|mas adelantada/)){
+    if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada/) && !nq.match(/alerta/)){
       const top=[...(DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-      return {txt:'<strong>Top 5 asignaturas:</strong>\n'+top.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>`• ${d.asignatura}: <strong>${pct(d)}%</strong>`).join('\n'), chips:['Top 5 alerta']};
     }
 
-    if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance/)){
-      const bot=[...(DATA||[])].sort((a,b)=>pct(a)-pct(b)).slice(0,5);
-      return {txt:'<strong>Menor avance (5):</strong>\n'+bot.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+    if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance|alerta|en riesgo|critica/)){
+      const arr=DATA||[];
+      // Alertas: bajo avance + sin respuesta, ordenadas por riesgo
+      const conRiesgo=arr.map(d=>({
+        d, sinReun:d.reunion==='Sin respuesta', av:pct(d)
+      })).filter(x=>x.av<25||x.sinReun)
+        .sort((a,b)=>(a.av+(!a.sinReun?0:-10))-(b.av+(!b.sinReun?0:-10)))
+        .slice(0,7);
+      if(!conRiesgo.length) return {txt:'✅ No hay asignaturas en situación crítica actualmente.', chips:['Top 5 avance']};
+      const filas=conRiesgo.map(({d,sinReun,av})=>{
+        const tags=[`${av}%`];
+        if(sinReun) tags.push('sin reunión');
+        return `• ${d.asignatura} — ${tags.join(' · ')}`;
+      }).join('\n');
+      return {txt:`⚠️ <strong>Alertas (${conRiesgo.length} asignaturas):</strong>\nCriterios: avance < 25% o reunión sin respuesta\n\n${filas}`, chips:['Top 5 avance','Reuniones realizadas']};
     }
 
     if(nq.match(/facultad|area|escuela/) && !findAsig(q)){
