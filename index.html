@@ -5551,6 +5551,8 @@ window.addEventListener('load', function(){
 <script>
 (function(){
   let botOpen = false, botGreeted = false;
+  let ctxPersona = null;  // última persona mencionada en la conversación
+  let ctxAsig = null;     // última asignatura mencionada
 
   function nrm(s){
     return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
@@ -5740,34 +5742,34 @@ window.addEventListener('load', function(){
     if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
       return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nEl proyecto tiene documentos de capacitación para cada rol:\n• Manual del DI (diseño instruccional e-learning)\n• Manual del DG (lineamientos gráficos UST)\n• Manual del Implementador (Moodle)\n• Guías para el docente (revisión y producción)\n• Presentación de kick-off para reunión de inicio con docentes\n• Guía de recursos didácticos (26 tipos de recursos)', chips:['Manual del DI','Manual del DG','Manual del Implementador']};
 
-    // Búsqueda de persona por nombre
+    // Búsqueda de persona por nombre (o usar contexto previo)
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+    if(personaMatch) ctxPersona = personaMatch;
 
-    // ── Asignaturas de un DI / JP / DG específico ─────────────────────────
-    if(personaMatch && nq.match(/cuantas|asignaturas|tiene|asig|curso|materia|lista|listado/)){
-      const nombreCorto = personaMatch.nombre.split(' ')[0];
-      const rol = personaMatch.rol;
-      const campo = rol==='DI'?'di': rol==='JP'||rol==='JP / DI'?'jp': rol==='DG'?'dg': rol==='Implementador'?'implementador': null;
-      const matches = (window.DATA||[]).filter(d=>{
-        if(!campo) return false;
-        const val = nrm(d[campo]||'');
-        return nrm(personaMatch.nombre).split(' ').filter(w=>w.length>3).some(w=>val.includes(w));
-      });
-      if(!matches.length){
-        return {txt:`No encontré asignaturas asignadas a <strong>${personaMatch.nombre}</strong> en los datos cargados.`};
-      }
-      const avgs = matches.map(d=>pct(d));
-      const promedio = Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length);
-      const lista = matches.slice(0,10).map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
-      const extra = matches.length>10 ? `\n…y ${matches.length-10} más.` : '';
-      return {
-        txt:`<strong>${personaMatch.nombre}</strong> (${rol})\nAsignaturas: <strong>${matches.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${lista}${extra}`,
-        chips:[`Avance ${nombreCorto}`]
-      };
+    // Helper: listar asignaturas de una persona
+    function asigDePersona(p){
+      const campos = p.rol==='DI'?['di']: p.rol==='JP'?['jp']: p.rol==='JP / DI'?['jp','di']: p.rol==='DG'?['dg']: p.rol==='Implementador'?['implementador']:[];
+      const palabras = nrm(p.nombre).split(' ').filter(w=>w.length>3);
+      return (window.DATA||[]).filter(d=>campos.some(c=>palabras.some(w=>nrm(d[c]||'').includes(w))));
+    }
+
+    // Follow-up: "cuántas tiene?" sin repetir el nombre → usa contexto previo
+    const esFollowUp = nq.match(/cuantas|tiene|sus asig|sus cursos|cuales|listado|listar|muestra/) && !personaMatch;
+    const personaCtx = personaMatch || (esFollowUp ? ctxPersona : null);
+
+    if(personaCtx && nq.match(/cuantas|asignaturas|tiene|asig|curso|materia|lista|listado|cuales|muestra/)){
+      const lista = asigDePersona(personaCtx);
+      if(!lista.length) return {txt:`No encontré asignaturas asignadas a <strong>${personaCtx.nombre}</strong> en los datos cargados.`};
+      const promedio = Math.round(lista.reduce((s,d)=>s+pct(d),0)/lista.length);
+      const items = lista.slice(0,12).map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+      const extra = lista.length>12?`\n…y ${lista.length-12} más.`:'';
+      return {txt:`<strong>${personaCtx.nombre}</strong> (${personaCtx.rol})\nAsignaturas: <strong>${lista.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${items}${extra}`,
+              chips:[`Avance ${personaCtx.nombre.split(' ')[0]}`]};
     }
 
     if(personaMatch && !findAsig(q))
-      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`, chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
+      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`,
+              chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
 
     // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
