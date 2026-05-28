@@ -5817,12 +5817,33 @@ window.addEventListener('load', function(){
     const esFollowUp = nq.match(/cuantas|tiene|sus asig|sus cursos|cuales|listado|listar|muestra/) && !personaMatch;
     const personaCtx = personaMatch || (esFollowUp ? ctxPersona : null);
 
-    if(personaCtx && nq.match(/cuantas|asignaturas|tiene|asig|curso|materia|lista|listado|cuales|muestra/)){
+    // "Soy [nombre]" → registrar identidad y ofrecer sus asignaturas
+    if(nq.match(/^soy\b|yo soy\b/)){
+      if(personaMatch){
+        ctxPersona=personaMatch;
+        return {txt:`¡Hola, <strong>${personaMatch.nombre}</strong>! (${personaMatch.rol})\n¿Querés ver tus asignaturas asignadas?`, chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
+      }
+      return {txt:'No encontré tu nombre en el equipo. Intentá con tu nombre completo.'};
+    }
+
+    // "Mis asignaturas" sin nombre → pedir identificación o usar contexto
+    if(nq.match(/mis asig|mis cursos|mis materias|a diseñar|que.*diseñar|a cargo/) && !personaMatch){
+      if(ctxPersona){
+        const lista=asigDePersona(ctxPersona);
+        if(lista.length){
+          const items=lista.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+          return {txt:`<strong>${ctxPersona.nombre}</strong> (${ctxPersona.rol})\n${lista.length} asignaturas:\n\n${items}`, chips:[`Avance ${ctxPersona.nombre.split(' ')[0]}`]};
+        }
+      }
+      return {txt:'Para ver tus asignaturas, decime tu nombre primero.\nEjemplo: <em>"Soy Jenny"</em> o <em>"Asignaturas de Jenny"</em>', chips:['¿Quién es el equipo?']};
+    }
+
+    if(personaCtx && nq.match(/cuantas|asignaturas|tiene|asig|curso|materia|lista|listado|cuales|muestra|diseñar/)){
       const lista = asigDePersona(personaCtx);
-      if(!lista.length) return {txt:`No encontré asignaturas asignadas a <strong>${personaCtx.nombre}</strong> en los datos cargados.`};
+      if(!lista.length) return {txt:`No encontré asignaturas asignadas a <strong>${personaCtx.nombre}</strong> en los datos cargados.\n\nVerificá que su nombre figure en la planilla de seguimiento.`};
       const promedio = Math.round(lista.reduce((s,d)=>s+pct(d),0)/lista.length);
-      const items = lista.slice(0,12).map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
-      const extra = lista.length>12?`\n…y ${lista.length-12} más.`:'';
+      const items = lista.slice(0,15).map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+      const extra = lista.length>15?`\n…y ${lista.length-15} más.`:'';
       return {txt:`<strong>${personaCtx.nombre}</strong> (${personaCtx.rol})\nAsignaturas: <strong>${lista.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${items}${extra}`,
               chips:[`Avance ${personaCtx.nombre.split(' ')[0]}`]};
     }
