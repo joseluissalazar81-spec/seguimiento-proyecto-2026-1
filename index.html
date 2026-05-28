@@ -5564,7 +5564,7 @@ window.addEventListener('load', function(){
   function findAsig(q){
     const nq = nrm(q);
     let best = null, bestScore = 0;
-    (window.DATA||[]).forEach(d=>{
+    (DATA||[]).forEach(d=>{
       const na = nrm(d.asignatura);
       if(nq.includes(na)){ bestScore=999; best=d; return; }
       const words = na.split(' ').filter(w=>w.length>3);
@@ -5574,7 +5574,7 @@ window.addEventListener('load', function(){
     return bestScore>=1 ? best : null;
   }
 
-  function pct(asig){ return (window.AVANCE||{})[asig?.asignatura]?.avance||0; }
+  function pct(asig){ return (AVANCE||{})[asig?.asignatura]?.avance||0; }
 
   // Conocimiento del proyecto UST 2026-1
   const PROYECTO = {
@@ -5752,7 +5752,7 @@ window.addEventListener('load', function(){
     function asigDePersona(p){
       const campos = p.rol==='DI'?['di']: p.rol==='JP'?['jp']: p.rol==='JP / DI'?['jp','di']: p.rol==='DG'?['dg']: p.rol==='Implementador'?['implementador']:[];
       const palabras = nrm(p.nombre).split(' ').filter(w=>w.length>3);
-      return (window.DATA||[]).filter(d=>campos.some(c=>palabras.some(w=>nrm(d[c]||'').includes(w))));
+      return (DATA||[]).filter(d=>campos.some(c=>palabras.some(w=>nrm(d[c]||'').includes(w))));
     }
 
     // Follow-up: "cuántas tiene?" sin repetir el nombre → usa contexto previo
@@ -5775,7 +5775,7 @@ window.addEventListener('load', function(){
 
     // ── REUNIONES — estadísticas globales ────────────────────────────────────
     if(nq.match(/reunion|sin.*respuesta|agendada|realizada/) && !findAsig(q)){
-      const data=window.DATA||[];
+      const data=DATA||[];
       const real=data.filter(d=>d.reunion==='Realizada');
       const agen=data.filter(d=>d.reunion==='Agendada');
       const sinR=data.filter(d=>d.reunion==='Sin respuesta');
@@ -5791,35 +5791,35 @@ window.addEventListener('load', function(){
 
     // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
-      return {txt:`Hay <strong>${(window.DATA||[]).length} asignaturas</strong> en el proyecto.`};
+      return {txt:`Hay <strong>${(DATA||[]).length} asignaturas</strong> en el proyecto.`};
 
     if(nq.match(/promedio|avance general|avance total|avance del proyecto/) && !findAsig(q)){
-      const arr=window.DATA||[];
+      const arr=DATA||[];
       if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
       const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
       return {txt:`El <strong>avance promedio</strong> del proyecto es <strong>${avg}%</strong>.`};
     }
 
     if(nq.match(/mayor avance|mas avanzada|mejor avance|top|mas adelantada/)){
-      const top=[...(window.DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
+      const top=[...(DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
       return {txt:'<strong>Top 5 asignaturas:</strong>\n'+top.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
 
     if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance/)){
-      const bot=[...(window.DATA||[])].sort((a,b)=>pct(a)-pct(b)).slice(0,5);
+      const bot=[...(DATA||[])].sort((a,b)=>pct(a)-pct(b)).slice(0,5);
       return {txt:'<strong>Menor avance (5):</strong>\n'+bot.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
 
     if(nq.match(/facultad|area|escuela/) && !findAsig(q)){
       const facs={};
-      (window.DATA||[]).forEach(d=>{if(d.facultad){facs[d.facultad]=(facs[d.facultad]||0)+1;}});
+      (DATA||[]).forEach(d=>{if(d.facultad){facs[d.facultad]=(facs[d.facultad]||0)+1;}});
       return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
     }
 
     // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
 
     function listarFmt(label, fn){
-      const lista=(window.DATA||[]).filter(fn);
+      const lista=(DATA||[]).filter(fn);
       if(!lista.length) return {txt:`No encontré asignaturas de tipo <strong>${label}</strong>.`};
       return {txt:`<strong>${label}</strong> (${lista.length}):\n`+lista.map(d=>`• ${d.asignatura}${d.jp?' · JP: '+d.jp:''}`).join('\n')};
     }
@@ -5841,14 +5841,14 @@ window.addEventListener('load', function(){
 
     if(nq.match(/tipos.*formato|formatos.*asig|que formatos|cuantos.*formato/) && !findAsig(q)){
       const fmts={};
-      (window.DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      (DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
       return {txt:'<strong>Asignaturas por tipo de trabajo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n'), chips:['Diseños nuevos','Rediseños','Adecuaciones']};
     }
 
     if(nq.match(/\bformato\b|tipo.*trabajo/) && findAsig(q)){/* handled below */}
     else if(nq.match(/\bformato\b|tipo.*trabajo/) && !findAsig(q)){
       const fmts={};
-      (window.DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      (DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
       return {txt:'<strong>Asignaturas por tipo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
     }
 
@@ -5877,7 +5877,7 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${asig.asignatura}</strong>\nImplementador: <strong>${asig.implementador||'—'}</strong>`};
 
     if(nq.match(/observ|obs\b|nota/))
-      return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(window.AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
+      return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
 
     if(nq.match(/reunion|reunión|kick.?off/))
       return {txt:`<strong>${asig.asignatura}</strong>\nReunión de inicio: <strong>${asig.reunion||'—'}</strong>\nPlanificación: <strong>${asig.planif||'—'}</strong>`};
