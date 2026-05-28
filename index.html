@@ -5889,7 +5889,8 @@ window.addEventListener('load', function(){
       if(ctxPersona){
         const lista=asigDePersona(ctxPersona);
         if(lista.length){
-          const items=lista.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+          const lnkP=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+          const items=lista.map(d=>`• ${lnkP(d.asignatura)} — ${pct(d)}%`).join('\n');
           return {txt:`<strong>${ctxPersona.nombre}</strong> (${ctxPersona.rol})\n${lista.length} asignaturas:\n\n${items}`, chips:[`Avance ${ctxPersona.nombre.split(' ')[0]}`]};
         }
       }
@@ -5900,9 +5901,9 @@ window.addEventListener('load', function(){
       const lista = asigDePersona(personaCtx);
       if(!lista.length) return {txt:`No encontré asignaturas asignadas a <strong>${personaCtx.nombre}</strong> en los datos cargados.\n\nVerificá que su nombre figure en la planilla de seguimiento.`};
       const promedio = Math.round(lista.reduce((s,d)=>s+pct(d),0)/lista.length);
-      const items = lista.slice(0,15).map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
-      const extra = lista.length>15?`\n…y ${lista.length-15} más.`:'';
-      return {txt:`<strong>${personaCtx.nombre}</strong> (${personaCtx.rol})\nAsignaturas: <strong>${lista.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${items}${extra}`,
+      const lnkPA=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+      const items = lista.map(d=>`• ${lnkPA(d.asignatura)} — ${pct(d)}%`).join('\n');
+      return {txt:`<strong>${personaCtx.nombre}</strong> (${personaCtx.rol})\nAsignaturas: <strong>${lista.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${items}`,
               chips:[`Avance ${personaCtx.nombre.split(' ')[0]}`]};
     }
 
