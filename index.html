@@ -5928,7 +5928,7 @@ window.addEventListener('load', function(){
       }
     }
 
-    if(nq.match(/promedio|avance general|avance total|avance del proyecto|ver promedio|avance por|rendimiento/) && !findAsig(q)){
+    if(nq.match(/promedio|avance general|avance global|avance total|avance del proyecto|ver promedio|avance por|rendimiento/) && !findAsig(q)){
       const arr=DATA||[];
       if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
       const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
@@ -5995,8 +5995,16 @@ window.addEventListener('load', function(){
         return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}\n\n→ Tocá una facultad para ver detalle, top 3 y alertas.`, chips:[...facChips,'Avance por DI']};
       }
 
-      // General — ofrecer desglose
-      return {txt:`<strong>Avance promedio del proyecto: ${avg}%</strong>\n(${arr.length} asignaturas)\n\n¿Querés ver el desglose?`, chips:['Avance por facultad','Avance por DI','Avance por JP','Top 5 alerta']};
+      // General — resumen ejecutivo
+      const real=arr.filter(d=>/^realizada$/i.test((d.reunion||'').trim())).length;
+      const valids=arr.filter(d=>/^validada$/i.test((d.planif||'').trim())).length;
+      const enRiesgo=arr.filter(d=>pct(d)<20).length;
+      const facs2={};
+      arr.forEach(d=>{if(!d.facultad)return;if(!facs2[d.facultad])facs2[d.facultad]={sum:0,n:0};facs2[d.facultad].sum+=pct(d);facs2[d.facultad].n++;});
+      const facResumen=Object.entries(facs2).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
+        .map(([f,v])=>`• ${f.split(' ').slice(0,3).join(' ')}: <strong>${Math.round(v.sum/v.n)}%</strong>`).join('\n');
+      return {txt:`📊 <strong>Avance del proyecto: ${avg}%</strong>\n(${arr.length} asignaturas en total)\n\n<strong>Por facultad:</strong>\n${facResumen}\n\n📋 Planificaciones validadas: <strong>${valids}</strong>\n✅ Reuniones realizadas: <strong>${real}</strong>\n⚠️ En riesgo (<20%): <strong>${enRiesgo}</strong>`,
+              chips:['Docentes en riesgo','Avance por DI','Avance por facultad','Mejor docente']};
     }
 
     // Planificaciones validadas (s0 = Validada)
