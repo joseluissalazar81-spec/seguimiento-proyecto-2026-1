@@ -5757,8 +5757,8 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Implementadores:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol==='Implementador').map(p=>`• ${p.nombre}${p.mail?' — '+p.mail:''}`).join('\n')+'\n\nSe encargan de cargar y configurar los recursos en el aula virtual Moodle.', chips:['Manual del Implementador']};
 
     // Manuales
-    if(nq.match(/que manuales|listado.*manual|todos.*manual|manuales disponibles/) && !findAsig(q))
-      return {txt:'<strong>Manuales y guías disponibles:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> (para ${m.para})`).join('\n'), chips:['Manual del DI','Manual del DG','Manual del Implementador']};
+    if(nq.match(/que manuales|listado.*manual|todos.*manual|manuales disponibles|\bmanual\b|procedimiento|proceso del proyecto|flujo de trabajo/) && !findAsig(q))
+      return {txt:'<strong>Manuales y guías del proyecto:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> — para ${m.para}`).join('\n')+'\n\n¿Cuál querés ver en detalle?', chips:['Manual del DI','Manual del DG','Manual del Implementador','Plantillas']};
 
     // Plazos DEL por facultad
     if(nq.match(/plazo.*del|plazo.*planif|plazo.*entrega|cuando.*del|fecha.*del|deadline/) && !findAsig(q)){
