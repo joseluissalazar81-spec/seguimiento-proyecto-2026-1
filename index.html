@@ -6113,7 +6113,22 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>${pdfLink}`};
     }
 
-    return {txt:`<strong>${asig.asignatura}</strong>\n• Avance: ${av}%\n• Área: ${asig.facultad||'—'}\n• Formato: ${asig.fmt||'—'}\n• Docente: ${asig.docente||'—'}\n• JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}\n• DG: ${asig.dg||'—'} · Impl: ${asig.implementador||'—'}`, chips:[`Avance ${asig.asignatura.split(' ')[0]}`]};
+    // Rendimiento completo (respuesta por defecto)
+    const _av=(AVANCE||{})[asig.asignatura];
+    const _h=_av?.hitos||{};
+    function _hi(v){if(!v||v==='—')return '⚪';if(v==='Validada'||v==='Cargada en aula')return '✅';if(v==='Enviada')return '📤';if(v==='En construcción')return '🔨';if(v==='No aplica')return '—';return '⚪';}
+    const hitos=[
+      `S0: ${_hi(_h.s0)} ${_h.s0||'—'}`,
+      `S1-S2: ${_hi(_h.s1s2)} ${_h.s1s2||'—'}`,
+      `S3-S4: ${_hi(_h.s3s4)} ${_h.s3s4||'—'}`,
+      `S5-S6: ${_hi(_h.s5s6)} ${_h.s5s6||'—'}`,
+      `S7-S8: ${_hi(_h.s7s8)} ${_h.s7s8||'—'}`,
+    ].join('\n');
+    const reunIcon=asig.reunion==='Realizada'?'✅':asig.reunion==='Agendada'?'📅':'❓';
+    const moodleUrl=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
+    const moodleLink=moodleUrl?`\n🔗 <a class="bot-a" href="${moodleUrl}" target="_blank">Aula Moodle</a>`:'';
+    return {txt:`<strong>${asig.asignatura}</strong>\n📊 Avance: <strong>${av}%</strong> · ${asig.facultad||'—'}\n👤 Docente: ${asig.docente||'—'}\n👥 JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}\n${reunIcon} Reunión: <strong>${asig.reunion||'—'}</strong> · Planif: <strong>${asig.planif||'—'}</strong>\n\n<strong>Hitos:</strong>\n${hitos}${moodleLink}`,
+            chips:[`Seguimiento ${asig.asignatura.split(' ')[0]}`]};
   }
 
   function addMsg(txt, who, chips){
