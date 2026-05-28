@@ -5653,7 +5653,7 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?']};
+      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
       return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / reunión</strong> de una asignatura\n• <strong>Aula Moodle</strong> o <strong>seguimiento</strong> de una asignatura\n• <strong>Plazos DEL</strong> por facultad\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Reportes semanales</strong> por facultad\n• <strong>Estadísticas</strong> de avance general, alertas, rendimiento', chips:['Rendimiento','Docentes en riesgo','Reportes']};
@@ -5665,6 +5665,11 @@ window.addEventListener('load', function(){
     // Fases
     if(nq.match(/fases|etapas|proceso|flujo de trabajo/))
       return {txt:'<strong>Fases del proceso:</strong>\n'+PROYECTO.fases.map((f,i)=>`${i+1}. <strong>${f.nombre}</strong>: ${f.desc}`).join('\n')};
+
+    // ── MENÚ DE CONOCIMIENTO — chip "Manuales" ─────────────────────────────────
+    if(nq==='manuales' || nq.match(/^menu|^categorias|^que sabe|^que conoces|^que temas/))
+      return {txt:'📚 <strong>¿Sobre qué querés saber?</strong>\n\nElegí una categoría:',
+              chips:['Manual del DI','Manual del DG','Manual del Implementador','Plantillas','Tipos de recursos','Prompts IA','Los 3 momentos','Dupla DI-DG','Plazos DEL','Fases del proyecto']};
 
     // ── RECURSOS ──────────────────────────────────────────────────────────────
 
@@ -6224,7 +6229,7 @@ window.addEventListener('load', function(){
       b.style.display='none';
       if(!botGreeted){
         botGreeted=true;
-        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?']),300);
+        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']),300);
       }
       setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
     } else {
@@ -6239,7 +6244,7 @@ window.addEventListener('load', function(){
     ctxPersona=null;
     setTimeout(()=>{
       botGreeted=true;
-      addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?']);
+      addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']);
     },200);
   };
 })();
