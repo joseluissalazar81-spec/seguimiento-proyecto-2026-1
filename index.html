@@ -5636,7 +5636,7 @@ window.addEventListener('load', function(){
       return {txt:'¡Hola! Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, horas, programas o el avance de cualquier asignatura.', chips:['¿Qué es el proyecto?','Tipos de recursos','Ayuda']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general', chips:['Tipos de recursos','Los 3 momentos','Ver promedio']};
+      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Horas</strong> de una asignatura (TPE, sincrónica, asincrónica)\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Estadísticas</strong> de avance general\n• <strong>Reuniones:</strong> cuántas realizadas, agendadas, sin respuesta', chips:['Tipos de recursos','Resumen reuniones','Ver promedio']};
 
     // Proyecto general
     if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
@@ -5770,6 +5770,22 @@ window.addEventListener('load', function(){
     if(personaMatch && !findAsig(q))
       return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`,
               chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
+
+    // ── REUNIONES — estadísticas globales ────────────────────────────────────
+    if(nq.match(/reunion|sin.*respuesta|agendada|realizada/) && !findAsig(q)){
+      const data=window.DATA||[];
+      const real=data.filter(d=>d.reunion==='Realizada');
+      const agen=data.filter(d=>d.reunion==='Agendada');
+      const sinR=data.filter(d=>d.reunion==='Sin respuesta');
+      if(nq.match(/sin.*respuesta/))
+        return {txt:`<strong>Sin respuesta (${sinR.length}):</strong>\n`+sinR.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}`).slice(0,15).join('\n')+(sinR.length>15?`\n…y ${sinR.length-15} más.`:''), chips:['Resumen reuniones','Agendadas']};
+      if(nq.match(/agendada/))
+        return {txt:`<strong>Agendadas (${agen.length}):</strong>\n`+agen.map(d=>`• ${d.asignatura}${d.planif?' — '+d.planif:''}`).slice(0,15).join('\n')+(agen.length>15?`\n…y ${agen.length-15} más.`:''), chips:['Resumen reuniones','Sin respuesta']};
+      if(nq.match(/realizada/))
+        return {txt:`<strong>Realizadas (${real.length}):</strong>\n`+real.slice(0,15).map(d=>`• ${d.asignatura}`).join('\n')+(real.length>15?`\n…y ${real.length-15} más.`:''), chips:['Resumen reuniones']};
+      return {txt:`<strong>Estado de reuniones:</strong>\n✅ Realizadas: <strong>${real.length}</strong>\n📅 Agendadas: <strong>${agen.length}</strong>\n❓ Sin respuesta: <strong>${sinR.length}</strong>`,
+              chips:['Sin respuesta','Agendadas','Realizadas']};
+    }
 
     // Stats generales
     if(nq.match(/cuantas|total.*asig|asig.*total/))
