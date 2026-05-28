@@ -5826,13 +5826,39 @@ window.addEventListener('load', function(){
         return {txt:`<strong>Avance promedio por JP:</strong>\n\n${filas}`, chips:['Avance por facultad','Avance por DI']};
       }
 
+      // Detalle de una facultad específica
+      function facMatch(nq){
+        const facets=[...new Set(arr.map(d=>d.facultad).filter(Boolean))];
+        let best=null,bestSc=0;
+        facets.forEach(f=>{
+          const words=nrm(f).split(' ').filter(w=>w.length>4);
+          const sc=words.filter(w=>nq.includes(w)).length;
+          if(sc>bestSc){bestSc=sc;best=f;}
+        });
+        return bestSc>=1?best:null;
+      }
+      const facEspecifica = !nq.match(/facultad|area|escuela|di\b|jp\b|promedio|general/) ? facMatch(nq) : null;
+      if(facEspecifica){
+        const asigsFac=arr.filter(d=>d.facultad===facEspecifica);
+        const avgFac=Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length);
+        const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,3);
+        const alertas=asigsFac.filter(d=>pct(d)<20||d.reunion==='Sin respuesta');
+        const topTxt=top.map(d=>`• ${d.asignatura} — ${pct(d)}%`).join('\n');
+        const alertTxt=alertas.length
+          ? '\n\n⚠️ <strong>Alertas:</strong>\n'+alertas.slice(0,6).map(d=>`• ${d.asignatura} — ${pct(d)}%${d.reunion==='Sin respuesta'?' (sin reunión)':''}`).join('\n')
+          : '\n\n✅ Sin alertas críticas.';
+        return {txt:`<strong>${facEspecifica}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Más avanzadas:</strong>\n${topTxt}${alertTxt}`,
+                chips:['Avance por facultad','Avance por DI']};
+      }
+
       // Desglose por facultad
       if(nq.match(/facultad|area|escuela/)){
         const facs={};
         arr.forEach(d=>{if(!d.facultad)return;if(!facs[d.facultad])facs[d.facultad]={sum:0,n:0};facs[d.facultad].sum+=pct(d);facs[d.facultad].n++;});
-        const filas=Object.entries(facs).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
-          .map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n})`).join('\n');
-        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}`, chips:['Avance por DI','Avance por JP']};
+        const sorted=Object.entries(facs).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n);
+        const filas=sorted.map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n})`).join('\n');
+        const topFacs=sorted.slice(0,2).map(([f])=>f.split(' ').slice(0,2).join(' '));
+        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}`, chips:[...topFacs,'Avance por DI']};
       }
 
       // General — ofrecer desglose
