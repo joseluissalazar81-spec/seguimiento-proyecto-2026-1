@@ -6019,9 +6019,8 @@ window.addEventListener('load', function(){
         const facs={};
         arr.forEach(d=>{if(!d.facultad)return;if(!facs[d.facultad])facs[d.facultad]={sum:0,n:0};facs[d.facultad].sum+=pct(d);facs[d.facultad].n++;});
         const sorted=Object.entries(facs).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n);
-        const filas=sorted.map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`).join('\n');
-        const facChips=sorted.map(([f])=>f.split(' ').slice(0,2).join(' '));
-        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}\n\n→ Tocá una facultad para ver detalle, top 3 y alertas.`, chips:[...facChips,'Avance por DI']};
+        const filas=sorted.map(([f,v])=>`• <span class="bot-link" onclick="botAsk('${f.replace(/'/g,"\\'")}')">` + f + `</span>: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`).join('\n');
+        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}\n\n→ Tocá una facultad para ver detalle, top 3 y alertas.`, chips:['Avance por DI']};
       }
 
       // General — resumen ejecutivo
@@ -6031,7 +6030,7 @@ window.addEventListener('load', function(){
       const facs2={};
       arr.forEach(d=>{if(!d.facultad)return;if(!facs2[d.facultad])facs2[d.facultad]={sum:0,n:0};facs2[d.facultad].sum+=pct(d);facs2[d.facultad].n++;});
       const facResumen=Object.entries(facs2).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
-        .map(([f,v])=>`• ${f.split(' ').slice(0,3).join(' ')}: <strong>${Math.round(v.sum/v.n)}%</strong>`).join('\n');
+        .map(([f,v])=>`• <span class="bot-link" onclick="botAsk('${f.replace(/'/g,"\\'")}')">` + f.split(' ').slice(0,3).join(' ') + `</span>: <strong>${Math.round(v.sum/v.n)}%</strong>`).join('\n');
       return {txt:`📊 <strong>Avance del proyecto: ${avg}%</strong>\n(${arr.length} asignaturas en total)\n\n<strong>Por facultad:</strong>\n${facResumen}\n\n📋 Planificaciones validadas: <strong>${valids}</strong>\n✅ Reuniones realizadas: <strong>${real}</strong>\n⚠️ En riesgo (<20%): <strong>${enRiesgo}</strong>`,
               chips:['Docentes en riesgo','Avance por DI','Avance por facultad','Mejor docente']};
     }
@@ -6193,7 +6192,10 @@ window.addEventListener('load', function(){
     const pdfLink=pdfUrl?`\n📋 <a class="bot-a" href="${pdfUrl}" target="_blank">Ver programa PDF</a>`:'';
     const prod=typeof getProd==='function'?getProd(asig.asignatura,asig.docente):null;
     const horasLine=prod?`\n⏱ Sincrónica: <strong>${prod.pres}h</strong> · Asincrónica: <strong>${prod.asin}h</strong>`:'';
-    return {txt:`<strong>${asig.asignatura}</strong>\n📊 Avance: <strong>${av}%</strong> · ${asig.facultad||'—'}\n👤 Docente: ${asig.docente||'—'}\n👥 JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}${horasLine}\n${reunIcon} Reunión: <strong>${asig.reunion||'—'}</strong> · Planif: <strong>${asig.planif||'—'}</strong>\n\n<strong>Hitos:</strong>\n${hitos}${moodleLink}${pdfLink}`,
+    const teamLnk=n=>{if(!n||n==='—')return n||'—';return `<span class="bot-link" onclick="botAsk('Asignaturas de ${n.split(' ')[0]}')">` + n + '</span>';};
+    const docLnk=d=>{if(!d||/ajuste|sin asignar|^\s*del\s*$/i.test(d))return d||'—';return `<span class="bot-link" onclick="botAsk('${d.replace(/'/g,"\\'")}')">` + d + '</span>';};
+    const facLnk=f=>{if(!f)return '—';return `<span class="bot-link" onclick="botAsk('${f.replace(/'/g,"\\'")}')">` + f + '</span>';};
+    return {txt:`<strong>${asig.asignatura}</strong>\n📊 Avance: <strong>${av}%</strong> · ${facLnk(asig.facultad)}\n👤 Docente: ${docLnk(asig.docente||'—')}\n👥 JP: ${teamLnk(asig.jp||'—')} · DI: ${teamLnk(asig.di||'—')} · DG: ${teamLnk(asig.dg||'—')}${horasLine}\n${reunIcon} Reunión: <strong>${asig.reunion||'—'}</strong> · Planif: <strong>${asig.planif||'—'}</strong>\n\n<strong>Hitos:</strong>\n${hitos}${moodleLink}${pdfLink}`,
             chips:[`Seguimiento ${asig.asignatura.split(' ')[0]}`]};
   }
 
