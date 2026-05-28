@@ -5722,7 +5722,14 @@ window.addEventListener('load', function(){
 
     // Equipo completo
     if(nq.match(/equipo|integrantes|quienes son|miembros/))
-      return {txt:'<strong>Equipo del proyecto:</strong>\n'+PROYECTO.equipo.map(p=>`• ${p.nombre} — ${p.rol}`).join('\n')};
+      const conAsig=['DI','JP','DG','Implementador','JP / DI','JP / DI','Coordinadora QA'];
+      const filas=PROYECTO.equipo.map(p=>{
+        const primer=p.nombre.split(' ')[0];
+        const query=p.rol.match(/DI|JP|DG|Implementador/)?`Asignaturas de ${primer}`:primer;
+        const nombre=`<span class="bot-link" onclick="botAsk('${query}')">${p.nombre}</span>`;
+        return `• ${nombre} — ${p.rol}`;
+      }).join('\n');
+      return {txt:`<strong>Equipo del proyecto:</strong>\n${filas}\n\n→ Tocá un nombre para ver sus asignaturas.`};
 
     // Rol JP
     if(nq.match(/que hace.*jp|rol.*jp|jp.*rol|jefe.*proyecto.*hace|para que.*jp/) && !findAsig(q))
