@@ -5470,9 +5470,10 @@ window.addEventListener('load', function(){
 #bot-title strong{font-size:13px;color:#fff !important;display:block;font-weight:700}
 #bot-title span{font-size:10px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px}
 #bot-title span::before{content:'';width:6px;height:6px;border-radius:50%;background:#4cde8c;display:inline-block}
-#bot-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);padding:4px;
+#bot-close,#bot-clear{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);padding:4px;
   border-radius:6px;display:flex;align-items:center;transition:color .15s;font-size:20px;line-height:1}
-#bot-close:hover{color:#fff}
+#bot-close:hover,#bot-clear:hover{color:#fff}
+#bot-clear{font-size:16px}
 
 /* Área mensajes — fondo gris claro */
 #bot-msgs{
@@ -5536,6 +5537,7 @@ window.addEventListener('load', function(){
       <strong>Chat Online</strong>
       <span>En línea ahora</span>
     </div>
+    <button id="bot-clear" onclick="botClear()" title="Limpiar chat">↺</button>
     <button id="bot-close" onclick="botToggle()">−</button>
   </div>
   <div id="bot-msgs"></div>
@@ -5939,6 +5941,17 @@ window.addEventListener('load', function(){
     } else {
       w.classList.remove('open');
     }
+  };
+
+  window.botClear=function(){
+    const msgs=document.getElementById('bot-msgs');
+    if(msgs) msgs.innerHTML='';
+    botGreeted=false;
+    ctxPersona=null;
+    setTimeout(()=>{
+      botGreeted=true;
+      addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, equipo, o el avance de cualquier asignatura.','bot',['Tipos de recursos','Resumen reuniones','Ver promedio']);
+    },200);
   };
 })();
 </script>
