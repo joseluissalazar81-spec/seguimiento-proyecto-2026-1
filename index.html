@@ -5522,6 +5522,8 @@ window.addEventListener('load', function(){
 #bot-send:hover{background:#1a4530}
 .bot-link{cursor:pointer;color:#2d6e4e;text-decoration:underline;text-underline-offset:2px;font-weight:500}
 .bot-link:hover{color:#1a4530}
+.bot-a{color:#2d6e4e;text-underline-offset:2px}
+.bot-a:hover{color:#1a4530}
 </style>
 
 <button id="bot-btn" title="Chat Online — Vio" onclick="botToggle()">
@@ -5623,7 +5625,22 @@ window.addEventListener('load', function(){
       DG:   'El Diseñador Gráfico produce los recursos multimedia y visuales del curso.',
       impl:'El Implementador carga y configura los recursos en el aula virtual Moodle.',
       qa:  'La Coordinadora de Calidad (QA) revisa que los recursos cumplan los estándares antes de publicarse.',
-    }
+    },
+    reportes: [
+      {facultad:'Ingeniería y Negocios',                         url:'/reportes/ingenieria.html'},
+      {facultad:'Ciencias Sociales y Educación',                 url:'/reportes/ciencias-sociales.html'},
+      {facultad:'Recursos Naturales y Medicina Veterinaria',     url:'/reportes/recursos-naturales.html'},
+      {facultad:'Economía y Negocios',                           url:'/reportes/economia.html'},
+    ],
+    contactosDEL: [
+      {facultad:'Ingeniería y Negocios (Ing. Industrial / Minas)', nombre:'Karen Kanzur',      mail:'kkanzua@santotomas.cl'},
+      {facultad:'Ingeniería y Negocios (Ing. Comercial)',          nombre:'Catherine Korn',    mail:'kkorn@santotomas.cl'},
+      {facultad:'Ciencias Sociales y Educación',                  nombre:'Verónica Rubio',    mail:'vrubioa@santotomas.cl'},
+      {facultad:'Recursos Naturales y Medicina Veterinaria',      nombre:'Álvaro Reyes',      mail:'areyes@santotomas.cl'},
+      {facultad:'Salud — Nutrición y Dietética',                  nombre:'Jenny Arteaga',     mail:'jarteaga@santotomas.cl'},
+      {facultad:'Salud — Terapia Ocupacional',                    nombre:'Alicia Marcoleta',  mail:'amarcoleta@santotomas.cl'},
+      {facultad:'Salud — Kinesiología',                           nombre:'Alexis Espinoza',   mail:'alexisespinozasa@santotomas.cl'},
+    ],
   };
 
   function botRespond(q){
@@ -5741,6 +5758,18 @@ window.addEventListener('load', function(){
 
     if(nq.match(/guia.*docente|docente.*guia|entregables.*docente|que entrega.*docente/))
       return {txt:'<strong>Guías para el docente:</strong>\n\n<strong>1. Guía de Revisión de Planificación</strong>\nCómo el docente revisa y aprueba la planificación didáctica elaborada por el DI.\n\n<strong>2. Guía de Producción de Contenidos</strong>\nCómo el docente debe producir y entregar sus materiales (PPT, guiones, lecturas, etc.).\n\n<strong>3. Entregables del docente</strong>\nLista de compromisos y fechas en el proceso de diseño del curso.', chips:['Fases del proceso']};
+
+    // Reportes semanales
+    if(nq.match(/reporte|informe.*semanal|semanal.*informe/) && !findAsig(q)){
+      const links=PROYECTO.reportes.map(r=>`• <a class="bot-a" href="${r.url}" target="_blank">${r.facultad}</a>`).join('\n');
+      return {txt:`<strong>Reportes semanales por facultad:</strong>\n${links}\n\nSe actualizan automáticamente con datos del sistema de seguimiento.`};
+    }
+
+    // Contactos DEL
+    if(nq.match(/contacto.*del|del.*contacto|coordinador.*del|del.*quien|quien.*del|encargado.*del|del de/) && !findAsig(q)){
+      const lista=PROYECTO.contactosDEL.map(c=>`• <strong>${c.facultad}</strong>\n  ${c.nombre} — <a class="bot-a" href="mailto:${c.mail}">${c.mail}</a>`).join('\n');
+      return {txt:`<strong>Contactos DEL por facultad:</strong>\n\n${lista}`};
+    }
 
     if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
       return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nEl proyecto tiene documentos de capacitación para cada rol:\n• Manual del DI (diseño instruccional e-learning)\n• Manual del DG (lineamientos gráficos UST)\n• Manual del Implementador (Moodle)\n• Guías para el docente (revisión y producción)\n• Presentación de kick-off para reunión de inicio con docentes\n• Guía de recursos didácticos (26 tipos de recursos)', chips:['Manual del DI','Manual del DG','Manual del Implementador']};
@@ -6027,8 +6056,11 @@ window.addEventListener('load', function(){
     if(nq.match(/reunion|reunión|kick.?off/))
       return {txt:`<strong>${asig.asignatura}</strong>\nReunión de inicio: <strong>${asig.reunion||'—'}</strong>\nPlanificación: <strong>${asig.planif||'—'}</strong>`};
 
-    if(nq.match(/programa|formato|plan\b/))
-      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>`};
+    if(nq.match(/programa|silabo|syllabus|formato|plan\b/)){
+      const pdfUrl=typeof getProgramaUrl==='function'?getProgramaUrl(asig.asignatura,asig.facultad):null;
+      const pdfLink=pdfUrl?`\n📄 <a class="bot-a" href="${pdfUrl}" target="_blank">Ver programa PDF</a>`:'';
+      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>${pdfLink}`};
+    }
 
     return {txt:`<strong>${asig.asignatura}</strong>\n• Avance: ${av}%\n• Área: ${asig.facultad||'—'}\n• Formato: ${asig.fmt||'—'}\n• Docente: ${asig.docente||'—'}\n• JP: ${asig.jp||'—'} · DI: ${asig.di||'—'}\n• DG: ${asig.dg||'—'} · Impl: ${asig.implementador||'—'}`, chips:[`Avance ${asig.asignatura.split(' ')[0]}`]};
   }
