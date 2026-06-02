@@ -4691,16 +4691,39 @@ document.getElementById('pdf-btn').addEventListener('click',()=>{ window.print()
 document.getElementById('informe-btn').addEventListener('click', generarInforme);
 
 function generarInforme(){
-  const hoy = new Date();
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
   const fechaStr = hoy.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const fechaCorta = hoy.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
 
-  // ── Calcular métricas globales ──
-  let totalAsig=DATA.length, sumAv=0, nAv=0;
-  let nValid=0, nDEL=0, nEscala=0, nConstr=0, nNoInicia=0, nAtras=0, nObs=0, nEscalPend=0;
+  // ── Avance esperado según cronograma (misma lógica que el dashboard) ──
+  let currentWeek=0, currentBlockIdx=-1;
+  GANTT_HITOS.forEach((h,i)=>{ if(hoy>=h.fecha){currentWeek=h.weeksDone;currentBlockIdx=i;} });
+  if(currentBlockIdx===-1) currentWeek=Math.max(0,Math.round((hoy-GANTT_HITOS[0].fecha+14*86400000)/86400000/7));
+  const pctEsperado=Math.round(currentWeek/18*100);
+  const semActual=currentBlockIdx>=0?GANTT_HITOS[currentBlockIdx].label:'Inicio';
+  const proxHito=currentBlockIdx<GANTT_HITOS.length-1?GANTT_HITOS[currentBlockIdx+1]:null;
+
+  // ── Avance real global ──
+  const src=DATA_ALL.length?DATA_ALL:DATA;
+  const avSrc=DATA_ALL.length?AVANCE_ALL:AVANCE;
+  const totalAsig=src.length||1;
+  let validated=0,inProd=0;
+  src.forEach(d=>{
+    const av=avSrc[d.asignatura]||{};
+    const hv=Object.values(av.hitos||{});
+    const allV=hv.length&&hv.every(h=>!h||h==='Validada'||h==='No aplica'||h==='—'||h==='No inicia');
+    if(av.avance>=100||allV) validated++;
+    else if(av.avance>0||hv.some(h=>h&&h!=='No aplica'&&h!=='—'&&h!=='No inicia')) inProd++;
+  });
+  const pctReal=Math.round((validated+inProd*0.5)/totalAsig*100);
+  const diff=pctReal-pctEsperado;
+  const semClass=diff>=-5?'verde':diff>=-20?'amarillo':'rojo';
+  const semLabel=diff>=-5?'A tiempo':diff>=-20?'En riesgo':'Atrasado';
+  const semColor=diff>=-5?'#27a06e':diff>=-20?'#d4a820':'#c04848';
+
+  // ── Métricas planificación ──
+  let nValid=0,nDEL=0,nEscala=0,nConstr=0,nNoInicia=0,nAtras=0,nObs=0,nEscalPend=0;
   DATA.forEach(d=>{
-    const av=(AVANCE[d.asignatura]||{}).avance||0;
-    sumAv+=av; nAv++;
     const s=planifStepIndex(d.planif||'');
     const dl=planifDeadline(d.facultad);
     if(s>=4) nValid++;
@@ -4710,23 +4733,19 @@ function generarInforme(){
     else nNoInicia++;
     if(s<1.5&&hoy>dl) nAtras++;
     const o=(AVANCE[d.asignatura]||{}).obs||d.obs||'';
-    if(o.trim()){
-      nObs++;
-      if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3)nEscalPend++;}
-    }
+    if(o.trim()){nObs++;if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3)nEscalPend++;}}
   });
-  const avGlobal=nAv?Math.round(sumAv/nAv):0;
 
   // ── Por facultad ──
   const facData={};
-  FAC_ORDER.forEach(f=>{facData[f]={n:0,valid:0,del:0,escala:0,constr:0,noInicia:0,atras:0,sumAv:0,obs:[]};});
+  FAC_ORDER.forEach(f=>{facData[f]={n:0,valid:0,del:0,escala:0,constr:0,noInicia:0,atras:0,sumAv:0,nAv:0,obs:[]};});
   DATA.forEach(d=>{
-    const fd=facData[d.facultad];if(!fd)return;
+    const fd=facData[d.facultad]; if(!fd)return;
     fd.n++;
     const s=planifStepIndex(d.planif||'');
     const dl=planifDeadline(d.facultad);
     const av=(AVANCE[d.asignatura]||{}).avance||0;
-    fd.sumAv+=av;
+    fd.sumAv+=av; fd.nAv++;
     if(s>=4) fd.valid++;
     else if(s>=2) fd.del++;
     else if(s===1.5) fd.escala++;
@@ -4736,99 +4755,133 @@ function generarInforme(){
     const o=(AVANCE[d.asignatura]||{}).obs||d.obs||'';
     if(o.trim()){
       let escalMsg='';
-      if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}escalMsg=` — ⚠ ${ds}d sin respuesta → escalar a ${lv}`;}}
+      if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}escalMsg=` ⚠ ${ds}d → ${lv}`;}}
       fd.obs.push({asig:d.asignatura,doc:d.docente,txt:o.trim(),escal:escalMsg});
     }
   });
 
   const facRows=FAC_ORDER.filter(f=>facData[f]&&facData[f].n>0).map(f=>{
     const fd=facData[f];
-    const pct=fd.n?Math.round(fd.sumAv/fd.n):0;
-    const bar=`<div style="background:#e8eef4;border-radius:4px;height:8px;width:100%;margin-top:3px"><div style="background:${pct>=70?'#27a06e':pct>=40?'#d4a820':'#c04848'};height:8px;border-radius:4px;width:${pct}%"></div></div>`;
-    const atCol=fd.atras>0?'color:#c04848;font-weight:700':'';
-    const obsCol=fd.obs.length>0?'color:#d4a820':''
+    const pct=fd.nAv?Math.round(fd.sumAv/fd.nAv):0;
+    const facDiff=pct-pctEsperado;
+    const facColor=facDiff>=-5?'#27a06e':facDiff>=-20?'#d4a820':'#c04848';
+    const facLabel=facDiff>=-5?'✓ A tiempo':facDiff>=-20?'⚡ En riesgo':'✗ Atrasada';
+    const barBg=`<div style="background:#e8eef4;border-radius:3px;height:7px;width:100%"><div style="background:${facColor};height:7px;border-radius:3px;width:${pct}%"></div></div>`;
+    const espBar=`<div style="background:transparent;border-radius:3px;height:7px;width:100%;border:1px dashed #aaa;margin-top:2px"><div style="background:rgba(0,0,0,.2);height:5px;border-radius:2px;margin:1px;width:${pctEsperado}%"></div></div>`;
+    const atCol=fd.atras>0?'color:#c04848;font-weight:700':'color:#888';
     return `<tr>
-      <td style="font-weight:600;padding:8px 10px;border-bottom:1px solid #e8eef4">${f}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e8eef4;font-weight:600;font-size:12.5px">${f}</td>
       <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4">${fd.n}</td>
       <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;color:#27a06e;font-weight:600">${fd.valid}</td>
-      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;color:#d4a820">${fd.del}</td>
-      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;${atCol}">${fd.atras>0?'⚠ ':''} ${fd.atras}</td>
-      <td style="padding:8px;border-bottom:1px solid #e8eef4;min-width:90px">${pct}%${bar}</td>
-      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;${obsCol}">${fd.obs.length>0?'💬 '+fd.obs.length:'-'}</td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;color:#d4a820">${fd.del+fd.escala}</td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;${atCol}">${fd.atras>0?'⚠ '+fd.atras:fd.atras}</td>
+      <td style="padding:8px;border-bottom:1px solid #e8eef4;min-width:110px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-weight:700;color:${facColor};min-width:32px">${pct}%</span>
+          <div style="flex:1">${barBg}${espBar}</div>
+        </div>
+        <div style="font-size:10px;color:#888;margin-top:2px">Esperado: ${pctEsperado}% · Dif: <span style="color:${facColor};font-weight:700">${facDiff>=0?'+':''}${facDiff}pp</span></div>
+      </td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;font-size:12px;font-weight:700;color:${facColor}">${facLabel}</td>
     </tr>`;
   }).join('');
 
   const obsRows=DATA.filter(d=>{const o=(AVANCE[d.asignatura]||{}).obs||d.obs||'';return o.trim();}).map(d=>{
     const o=((AVANCE[d.asignatura]||{}).obs||d.obs||'').trim();
-    let escalMsg='';
-    if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}escalMsg=`<br><span style="color:#c04848;font-size:11px;font-weight:600">⚠ ${ds}d sin respuesta — escalar a ${lv}</span>`;}}
+    let escalHtml='';
+    if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}escalHtml=`<br><span style="color:#c04848;font-size:11px;font-weight:600">⚠ ${ds}d sin respuesta — escalar a ${lv}</span>`;}}
     return `<tr>
       <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;font-weight:600">${d.asignatura}</td>
       <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px">${d.docente}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:11px">${d.facultad}</td>
-      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px">${o}${escalMsg}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:11px;color:#5a7080">${d.facultad}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px">${o}${escalHtml}</td>
     </tr>`;
   }).join('');
+
+  // ── Barra visual real vs esperado ──
+  const barReal=`<div style="position:relative;background:#e8eef4;border-radius:6px;height:22px;margin:8px 0">
+    <div style="background:${semColor};height:22px;border-radius:6px;width:${pctReal}%;transition:width .3s"></div>
+    <div style="position:absolute;top:0;left:${pctEsperado}%;height:22px;width:2px;background:rgba(0,0,0,.35);border-radius:1px"></div>
+    <div style="position:absolute;top:3px;left:${Math.min(pctEsperado+1,95)}%;font-size:9px;color:rgba(0,0,0,.5);font-weight:600">Esp.</div>
+  </div>`;
 
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
   <title>Informe Avance e-Learning 2026-1 — ${fechaCorta}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#1a2a3a;background:#fff;padding:30px 40px}
-    h1{font-size:20px;color:#1a3a6b;margin-bottom:4px}
-    h2{font-size:14px;color:#1a3a6b;margin:22px 0 8px;border-bottom:2px solid #1a3a6b;padding-bottom:4px}
-    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #1a3a6b}
-    .header-left .sub{font-size:11.5px;color:#5a7080;margin-top:3px}
-    .header-right{text-align:right;font-size:11.5px;color:#5a7080}
-    .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 18px}
-    .kpi{flex:1;min-width:100px;background:#f4f7fa;border-radius:8px;padding:10px 14px;border-left:4px solid #1a3a6b}
-    .kpi .val{font-size:22px;font-weight:700;color:#1a3a6b}
-    .kpi .lbl{font-size:10.5px;color:#5a7080;margin-top:2px}
-    .kpi.verde{border-left-color:#27a06e}.kpi.verde .val{color:#27a06e}
-    .kpi.amarillo{border-left-color:#d4a820}.kpi.amarillo .val{color:#d4a820}
-    .kpi.rojo{border-left-color:#c04848}.kpi.rojo .val{color:#c04848}
-    .kpi.purple{border-left-color:#7c3aed}.kpi.purple .val{color:#7c3aed}
+    body{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#1a2a3a;background:#fff;padding:28px 36px}
+    h1{font-size:19px;color:#1a3a6b;margin-bottom:3px}
+    h2{font-size:13.5px;color:#1a3a6b;margin:20px 0 8px;border-bottom:2px solid #1a3a6b;padding-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:3px solid #1a3a6b}
+    .sub{font-size:11px;color:#5a7080;margin-top:3px}
+    .header-right{text-align:right;font-size:11px;color:#5a7080}
+    /* Real vs esperado hero */
+    .rvse{display:flex;gap:16px;background:#f4f7fa;border-radius:10px;padding:16px 20px;margin:10px 0 18px;align-items:center;border-left:5px solid ${semColor}}
+    .rvse-main{flex:1}
+    .rvse-title{font-size:11px;font-weight:700;color:#5a7080;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+    .rvse-nums{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+    .rvse-real{font-size:36px;font-weight:800;color:${semColor};line-height:1}
+    .rvse-esp{font-size:14px;color:#5a7080}
+    .rvse-diff{font-size:13px;font-weight:700;color:${semColor}}
+    .rvse-badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;background:${semColor};color:#fff;white-space:nowrap;align-self:center}
+    .kpi-row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+    .kpi{flex:1;min-width:90px;background:#f4f7fa;border-radius:7px;padding:9px 12px;border-top:3px solid #1a3a6b}
+    .kpi .val{font-size:20px;font-weight:700;color:#1a3a6b}
+    .kpi .lbl{font-size:10px;color:#5a7080;margin-top:1px}
+    .kpi.verde .val{color:#27a06e}.kpi.verde{border-top-color:#27a06e}
+    .kpi.amarillo .val{color:#d4a820}.kpi.amarillo{border-top-color:#d4a820}
+    .kpi.rojo .val{color:#c04848}.kpi.rojo{border-top-color:#c04848}
     table{width:100%;border-collapse:collapse}
-    thead th{background:#1a3a6b;color:#fff;padding:8px 10px;font-size:11.5px;text-align:left}
-    .firma-section{margin-top:48px;display:flex;justify-content:flex-end}
+    thead th{background:#1a3a6b;color:#fff;padding:7px 10px;font-size:11px;text-align:left}
+    .firma-section{margin-top:44px;display:flex;justify-content:flex-end}
     .firma-box{text-align:center;min-width:220px}
-    .firma-line{border-top:1.5px solid #1a3a6b;margin-bottom:6px}
-    .firma-nombre{font-size:13px;font-weight:700;color:#1a3a6b}
-    .firma-cargo{font-size:11.5px;color:#5a7080}
-    .nota{font-size:10.5px;color:#7a9080;margin-top:28px;border-top:1px solid #e0e8f0;padding-top:8px}
-    @media print{body{padding:15px 20px}button{display:none}}
+    .firma-line{border-top:1.5px solid #1a3a6b;margin-bottom:5px}
+    .nota{font-size:10px;color:#7a9080;margin-top:24px;border-top:1px solid #e0e8f0;padding-top:7px}
+    @media print{body{padding:12px 18px}button{display:none}}
   </style></head><body>
   <div class="header">
-    <div class="header-left">
-      <div style="font-size:11px;font-weight:700;color:#7a9080;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Universidad Santo Tomás — Dirección e-Learning</div>
-      <h1>Informe de Avance Proyecto e-Learning 2026-1</h1>
-      <div class="sub">Seguimiento de virtualización de cursos · Generado el ${fechaStr}</div>
+    <div>
+      <div style="font-size:10.5px;font-weight:700;color:#7a9080;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">Universidad Santo Tomás — Dirección e-Learning</div>
+      <h1>Informe de Avance — Proyecto e-Learning 2026-1</h1>
+      <div class="sub">Seguimiento virtualización de cursos · ${fechaStr}</div>
     </div>
-    <div class="header-right">
-      <div style="font-size:11px;font-weight:700;margin-bottom:2px">CONFIDENCIAL</div>
-      <div>${fechaCorta}</div>
-      <div style="margin-top:4px;color:#1a3a6b;font-weight:600">Uso interno</div>
-    </div>
+    <div class="header-right"><div style="font-weight:700;color:#1a3a6b">CONFIDENCIAL</div><div>${fechaCorta}</div><div style="color:#1a3a6b;margin-top:3px">Uso interno</div></div>
   </div>
 
-  <h2>Resumen Ejecutivo</h2>
+  <h2>Avance Real vs Esperado según Cronograma</h2>
+  <div class="rvse">
+    <div class="rvse-main">
+      <div class="rvse-title">📍 Semana actual del proyecto: ${semActual} (semana ${currentWeek} de 18)${proxHito?` · Próximo hito: ${proxHito.label} (${proxHito.fecha.toLocaleDateString('es-CL',{day:'numeric',month:'short'})})`:''}</div>
+      <div class="rvse-nums">
+        <div><div style="font-size:11px;color:#5a7080;margin-bottom:2px">Avance real (producción)</div><div class="rvse-real">${pctReal}%</div></div>
+        <div style="align-self:center;color:#aaa;font-size:20px">vs</div>
+        <div><div style="font-size:11px;color:#5a7080;margin-bottom:2px">Esperado según cronograma</div><div style="font-size:36px;font-weight:800;color:#5a7080;line-height:1">${pctEsperado}%</div></div>
+        <div style="align-self:center;margin-left:8px"><div style="font-size:11px;color:#5a7080;margin-bottom:2px">Diferencia</div><div class="rvse-diff" style="font-size:24px">${diff>=0?'+':''}${diff} pp</div></div>
+      </div>
+      ${barReal}
+      <div style="font-size:10.5px;color:#5a7080">▌ Barra sólida = avance real &nbsp;|&nbsp; línea vertical = avance esperado</div>
+    </div>
+    <div class="rvse-badge">${semLabel}</div>
+  </div>
+
+  <h2>Estado de Planificaciones DEL</h2>
   <div class="kpi-row">
-    <div class="kpi"><div class="val">${totalAsig}</div><div class="lbl">Asignaturas totales</div></div>
-    <div class="kpi verde"><div class="val">${nValid}</div><div class="lbl">Planificaciones validadas</div></div>
+    <div class="kpi verde"><div class="val">${nValid}</div><div class="lbl">Validadas</div></div>
     <div class="kpi amarillo"><div class="val">${nDEL}</div><div class="lbl">En revisión DEL</div></div>
-    <div class="kpi"><div class="val">${nConstr+nEscala}</div><div class="lbl">En construcción / ajustes</div></div>
+    <div class="kpi"><div class="val">${nEscala}</div><div class="lbl">Ajustes según Escala</div></div>
+    <div class="kpi"><div class="val">${nConstr}</div><div class="lbl">En construcción</div></div>
+    <div class="kpi"><div class="val">${nNoInicia}</div><div class="lbl">No iniciadas</div></div>
     ${nAtras>0?`<div class="kpi rojo"><div class="val">${nAtras}</div><div class="lbl">Atrasadas (plazo vencido)</div></div>`:''}
-    <div class="kpi purple"><div class="val">${avGlobal}%</div><div class="lbl">Avance global producción</div></div>
-    ${nObs>0?`<div class="kpi amarillo"><div class="val">${nObs}</div><div class="lbl">Con observaciones activas</div></div>`:''}
+    <div class="kpi"><div class="val">${totalAsig}</div><div class="lbl">Total asignaturas</div></div>
   </div>
 
-  <h2>Avance por Facultad</h2>
+  <h2>Avance por Facultad (real vs esperado ${pctEsperado}%)</h2>
   <table>
-    <thead><tr><th>Facultad</th><th>Total</th><th>Validadas</th><th>En DEL</th><th>Atrasadas</th><th>% Avance</th><th>Obs.</th></tr></thead>
+    <thead><tr><th>Facultad</th><th>Total</th><th>Valid.</th><th>En DEL</th><th>Atras.</th><th>Avance real / esperado</th><th>Estado</th></tr></thead>
     <tbody>${facRows}</tbody>
   </table>
 
-  ${nObs>0?`<h2>Observaciones Activas</h2>
+  ${nObs>0?`<h2>Observaciones Activas (${nObs} asignaturas)${nEscalPend>0?` — ⚠ ${nEscalPend} con escalamiento pendiente`:''}</h2>
   <table>
     <thead><tr><th>Asignatura</th><th>Docente</th><th>Facultad</th><th>Observación</th></tr></thead>
     <tbody>${obsRows}</tbody>
@@ -4836,20 +4889,18 @@ function generarInforme(){
 
   <div class="firma-section">
     <div class="firma-box">
-      <div style="height:36px"></div>
+      <div style="height:32px"></div>
       <div class="firma-line"></div>
-      <div class="firma-nombre">Paulina Vera B.</div>
-      <div class="firma-cargo">Directora e-Learning</div>
-      <div class="firma-cargo">Universidad Santo Tomás</div>
+      <div style="font-size:13px;font-weight:700;color:#1a3a6b">Paulina Vera B.</div>
+      <div style="font-size:11.5px;color:#5a7080">Directora e-Learning</div>
+      <div style="font-size:11.5px;color:#5a7080">Universidad Santo Tomás</div>
     </div>
   </div>
-
-  <div class="nota">Datos extraídos del sistema de seguimiento e-Learning UST 2026-1 · ${fechaStr} · Los porcentajes de avance corresponden a producción de recursos digitales.</div>
-
+  <div class="nota">Informe generado automáticamente desde el sistema de seguimiento e-Learning UST 2026-1 · ${fechaStr} · El avance esperado se calcula en base al cronograma de 18 semanas aprobado (inicio 2 mar 2026). El avance real corresponde al promedio ponderado de producción de recursos digitales por asignatura.</div>
   <script>window.onload=()=>window.print();<\/script>
   </body></html>`;
 
-  const w=window.open('','_blank','width=900,height=700');
+  const w=window.open('','_blank','width=960,height=750');
   w.document.write(html);
   w.document.close();
 }
