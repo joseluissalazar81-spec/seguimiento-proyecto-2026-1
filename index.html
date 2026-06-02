@@ -265,8 +265,9 @@
     tbody tr.selected td{background:rgba(176,184,204,.1)}
     tbody tr.selected{box-shadow:inset 3px 0 0 var(--am)}
     td{padding:10px 14px;font-size:13px;vertical-align:middle}
-    td.asig-col{font-weight:500;max-width:220px}
+    td.asig-col{font-weight:500;max-width:240px}
     .row-obs{font-size:10.5px;color:var(--am);font-weight:400;margin-top:3px;line-height:1.3;white-space:normal;opacity:.9}
+    .row-escal-pill{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(200,80,60,.15);border:1px solid rgba(200,80,60,.4);color:#e05a40;white-space:nowrap}
 
     /* ── CHIPS ── */
     .chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid transparent}
@@ -3055,7 +3056,7 @@ function renderTable(){
     return `
     <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''}">
       <td><span class="chip chip-fac">${d.facultad}</span></td>
-      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let al='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='escalamiento';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}al=`<span class="obs-escal-icon" title="${ds}d sin respuesta — informar a ${lv}">⚠</span> `;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${al}${o.length>72?o.slice(0,70)+'…':o}</div>`;})()}</td>
+      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let pill='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}pill=`<div class="row-escal-pill">⚠ ${ds}d — Informar a ${lv}</div>`;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${o.length>65?o.slice(0,63)+'…':o}</div>${pill}`;})()}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${planifLabel(d.planif,d)}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
