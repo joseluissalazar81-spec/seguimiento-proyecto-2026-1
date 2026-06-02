@@ -1431,9 +1431,13 @@
     .fv-idx-chevron{ color:rgba(255,255,255,.5); transition:transform .25s; }
     .fv-idx-chevron.open{ transform:rotate(90deg); }
     .fv-idx-notaext{ font-size:9.5px; color:#d4a820; font-weight:600; }
-    .fv-obs-inline{ display:flex; align-items:center; gap:5px; margin-left:4px; }
-    .fv-obs-count-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(212,184,120,.18); border:1px solid rgba(212,184,120,.35); color:#d4a820; white-space:nowrap; cursor:default; }
-    .fv-obs-escal-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(200,80,60,.2); border:1px solid rgba(200,80,60,.45); color:#e05a40; white-space:nowrap; cursor:default; animation:pulse 1.6s infinite; }
+    .fv-obs-inline{ display:flex; align-items:center; gap:5px; margin-left:4px; cursor:pointer; }
+    .fv-obs-count-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(212,184,120,.18); border:1px solid rgba(212,184,120,.35); color:#d4a820; white-space:nowrap; transition:background .15s; }
+    .fv-obs-count-dot:hover{ background:rgba(212,184,120,.32); }
+    .fv-obs-escal-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(200,80,60,.2); border:1px solid rgba(200,80,60,.45); color:#e05a40; white-space:nowrap; animation:pulse 1.6s infinite; transition:background .15s; }
+    .fv-obs-escal-dot:hover{ background:rgba(200,80,60,.35); }
+    .fv-obs-panel{ background:rgba(212,184,120,.06); border-left:3px solid var(--am); padding:12px 18px; display:flex; flex-direction:column; gap:10px; }
+    .fv-obs-item{ display:flex; align-items:flex-start; gap:10px; }
 
     /* Tabla de asignaturas tipo ticker */
     .fv-ticker-wrap{ overflow:hidden; }
@@ -4859,15 +4863,38 @@ function renderFacView(){
     }).join('');
 
     // Obs count for inline badge
+    const facId = fac.replace(/[^a-z0-9]/gi,'_');
     let obsN=0, escalN=0;
-    items.forEach(d=>{
+    const obsList = items.map(d=>{
       const o=(AVANCE[d.asignatura]||{}).obs||d.obs||'';
-      if(!o.trim()) return;
+      if(!o.trim()) return null;
       obsN++;
-      if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3)escalN++;}
-    });
+      let escalHtml='';
+      if(d.fechaSR){
+        const ds=diasDesde(d.fechaSR);
+        if(ds!==null&&ds>=3){
+          escalN++;
+          let lv='Equipo';
+          for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}
+          escalHtml=`<span class="fv-obs-escal-dot" style="font-size:10px;padding:1px 6px;margin-left:6px;animation:none">⚠ ${ds}d → ${lv}</span>`;
+        }
+      }
+      const txt=o.trim();
+      return `<div class="fv-obs-item">
+        <span style="flex-shrink:0;font-size:14px">💬</span>
+        <div>
+          <span style="font-size:12px;font-weight:700;color:var(--az)">${d.asignatura}</span>
+          <span style="font-size:11px;color:var(--text-muted);margin-left:5px">${d.docente}</span>${escalHtml}
+          <div style="font-size:11.5px;color:var(--text);margin-top:3px;line-height:1.4">${txt}</div>
+        </div>
+      </div>`;
+    }).filter(Boolean).join('');
+
     const obsBadge = obsN
-      ? `<div class="fv-obs-inline">${escalN>0?`<span class="fv-obs-escal-dot" title="${escalN} con escalamiento pendiente">⚠ ${escalN}</span>`:''}<span class="fv-obs-count-dot" title="${obsN} asignatura(s) con observaciones">💬 ${obsN}</span></div>`
+      ? `<div class="fv-obs-inline" onclick="event.stopPropagation();toggleFvObs('${facId}')">${escalN>0?`<span class="fv-obs-escal-dot" title="${escalN} con escalamiento pendiente">⚠ ${escalN}</span>`:''}<span class="fv-obs-count-dot" title="Ver ${obsN} observación(es)">💬 ${obsN}</span></div>`
+      : '';
+    const obsPanel = obsN
+      ? `<div class="fv-obs-panel" id="fv-obs-${facId}" style="display:none">${obsList}</div>`
       : '';
 
     return `<div class="fv-idx-card">
@@ -4890,6 +4917,7 @@ function renderFacView(){
         </div>
         <svg class="fv-idx-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
+      ${obsPanel}
       <div class="fv-ticker-wrap" style="display:none">
         <table class="fv-ticker-table">
           <thead><tr>
@@ -4906,11 +4934,17 @@ function renderFacView(){
   }).join('')}</div>`;
 }
 function toggleFvGroup(hdr){
-  const body = hdr.nextElementSibling;
+  const card = hdr.parentElement;
+  const body = card.querySelector('.fv-ticker-wrap');
   const chev = hdr.querySelector('.fv-idx-chevron');
   const closed = body.style.display === 'none';
   body.style.display = closed ? '' : 'none';
   if(chev) chev.classList.toggle('open', closed);
+}
+function toggleFvObs(facId){
+  const panel = document.getElementById('fv-obs-'+facId);
+  if(!panel) return;
+  panel.style.display = panel.style.display === 'none' ? '' : 'none';
 }
 
 // ── 11. MODO PRESENTACIÓN FULLSCREEN ─────────────────────────────────────────
