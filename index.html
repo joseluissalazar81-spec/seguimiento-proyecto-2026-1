@@ -1431,12 +1431,9 @@
     .fv-idx-chevron{ color:rgba(255,255,255,.5); transition:transform .25s; }
     .fv-idx-chevron.open{ transform:rotate(90deg); }
     .fv-idx-notaext{ font-size:9.5px; color:#d4a820; font-weight:600; }
-    .fv-obs-bubble{ background:rgba(212,184,120,.07); border-left:3px solid var(--am); padding:9px 16px 9px 14px; display:flex; flex-direction:column; gap:5px; }
-    .fv-obs-item{ display:flex; align-items:flex-start; gap:8px; font-size:11.5px; line-height:1.4; }
-    .fv-obs-dot{ flex-shrink:0; margin-top:2px; font-size:13px; }
-    .fv-obs-txt{ color:var(--text-muted); }
-    .fv-obs-txt strong{ color:var(--text); font-weight:600; }
-    .fv-obs-escal{ display:inline-flex; align-items:center; gap:3px; margin-left:6px; padding:1px 7px; border-radius:20px; font-size:10px; font-weight:700; background:rgba(200,80,60,.18); border:1px solid rgba(200,80,60,.4); color:#e05a40; white-space:nowrap; vertical-align:middle; }
+    .fv-obs-inline{ display:flex; align-items:center; gap:5px; margin-left:4px; }
+    .fv-obs-count-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(212,184,120,.18); border:1px solid rgba(212,184,120,.35); color:#d4a820; white-space:nowrap; cursor:default; }
+    .fv-obs-escal-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(200,80,60,.2); border:1px solid rgba(200,80,60,.45); color:#e05a40; white-space:nowrap; cursor:default; animation:pulse 1.6s infinite; }
 
     /* Tabla de asignaturas tipo ticker */
     .fv-ticker-wrap{ overflow:hidden; }
@@ -4861,26 +4858,17 @@ function renderFacView(){
       </tr>`;
     }).join('');
 
-    // Obs bubble — collect asignaturas with observations
-    const obsItems = items.map(d=>{
-      const o = (AVANCE[d.asignatura]||{}).obs || d.obs || '';
-      if(!o.trim()) return null;
-      let escalHtml='';
-      if(d.fechaSR){
-        const ds=diasDesde(d.fechaSR);
-        if(ds!==null&&ds>=3){
-          let lv='Equipo';
-          for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}
-          escalHtml=`<span class="fv-obs-escal">⚠ ${ds}d → ${lv}</span>`;
-        }
-      }
-      const txt=o.trim();
-      return `<div class="fv-obs-item">
-        <span class="fv-obs-dot">💬</span>
-        <span class="fv-obs-txt"><strong>${d.asignatura}</strong> (${d.docente}): ${txt.length>80?txt.slice(0,78)+'…':txt}${escalHtml}</span>
-      </div>`;
-    }).filter(Boolean).join('');
-    const obsBubble = obsItems ? `<div class="fv-obs-bubble">${obsItems}</div>` : '';
+    // Obs count for inline badge
+    let obsN=0, escalN=0;
+    items.forEach(d=>{
+      const o=(AVANCE[d.asignatura]||{}).obs||d.obs||'';
+      if(!o.trim()) return;
+      obsN++;
+      if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3)escalN++;}
+    });
+    const obsBadge = obsN
+      ? `<div class="fv-obs-inline">${escalN>0?`<span class="fv-obs-escal-dot" title="${escalN} con escalamiento pendiente">⚠ ${escalN}</span>`:''}<span class="fv-obs-count-dot" title="${obsN} asignatura(s) con observaciones">💬 ${obsN}</span></div>`
+      : '';
 
     return `<div class="fv-idx-card">
       <div class="fv-idx-hdr" onclick="toggleFvGroup(this)">
@@ -4892,6 +4880,7 @@ function renderFacView(){
           ${atras>0?`<div class="fv-idx-count"><span class="num c-ro">${atras}</span><span class="lbl">Atras.</span></div>`:''}
           ${enT>0 ?`<div class="fv-idx-count"><span class="num c-gr">${enT}</span><span class="lbl">Const.</span></div>`:''}
           <div class="fv-idx-count"><span class="num" style="color:rgba(255,255,255,.6)">${n}</span><span class="lbl">Total</span></div>
+          ${obsBadge}
         </div>
         <div class="fv-idx-bar-wrap">
           ${wOk >0?`<div class="fv-idx-bar-seg ok"  style="width:${wOk}%"></div>`:''}
@@ -4901,7 +4890,6 @@ function renderFacView(){
         </div>
         <svg class="fv-idx-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      ${obsBubble}
       <div class="fv-ticker-wrap" style="display:none">
         <table class="fv-ticker-table">
           <thead><tr>
