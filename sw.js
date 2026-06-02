@@ -1,8 +1,8 @@
-const CACHE = 'ust-elearning-v4';
-const SHELL  = ['/', '/index.html', '/icons/icon-192.png', '/icons/icon-512.png'];
+const CACHE = 'ust-elearning-v5';
+const STATIC = ['/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
   self.skipWaiting();
 });
 
@@ -17,22 +17,33 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // Google Sheets y Drive: siempre red (datos en tiempo real)
+
+  // Google APIs: always network
   if (url.hostname.includes('google') || url.hostname.includes('googleapis')) {
     e.respondWith(fetch(e.request).catch(() => new Response('', {status: 503})));
     return;
   }
-  // App shell: cache-first, actualiza en background
+
+  // HTML: always network-first so updates are instant
+  if (e.request.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('/icons/icon-192.png')
+        .then(() => new Response('<h2>Sin conexión</h2>', {headers:{'Content-Type':'text/html'}})))
+    );
+    return;
+  }
+
+  // Static assets (icons, etc.): cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
-      const network = fetch(e.request).then(res => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
         if (res.ok && e.request.method === 'GET') {
           const clone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, clone));
         }
         return res;
       });
-      return cached || network;
     })
   );
 });
