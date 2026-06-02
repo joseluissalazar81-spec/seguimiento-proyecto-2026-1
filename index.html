@@ -4075,6 +4075,11 @@ function renderExecutiveHero(){
   if(currentBlockIdx === -1) currentWeek = Math.max(0, Math.round((today - GANTT_HITOS[0].fecha + 14*86400000)/86400000/7));
   // Semana esperada = weeksDone del último bloque pasado / 18 * 100
   const pctEsperado = Math.round(currentWeek / 18 * 100);
+  // Expose for informe so both always show the same numbers
+  window._dashPctReal = pctReal;
+  window._dashPctEsperado = pctEsperado;
+  window._dashCurrentWeek = currentWeek;
+  window._dashCurrentBlockIdx = currentBlockIdx;
 
   // ── Semáforo (considera plazos diferenciados: delAtras excluye grupos con plazo extendido) ──
   const diff = pctReal - pctEsperado;
@@ -4695,27 +4700,14 @@ function generarInforme(){
   const fechaStr = hoy.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const fechaCorta = hoy.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
 
-  // ── Avance esperado según cronograma (misma lógica que el dashboard) ──
-  let currentWeek=0, currentBlockIdx=-1;
-  GANTT_HITOS.forEach((h,i)=>{ if(hoy>=h.fecha){currentWeek=h.weeksDone;currentBlockIdx=i;} });
-  if(currentBlockIdx===-1) currentWeek=Math.max(0,Math.round((hoy-GANTT_HITOS[0].fecha+14*86400000)/86400000/7));
-  const pctEsperado=Math.round(currentWeek/18*100);
-  const semActual=currentBlockIdx>=0?GANTT_HITOS[currentBlockIdx].label:'Inicio';
-  const proxHito=currentBlockIdx<GANTT_HITOS.length-1?GANTT_HITOS[currentBlockIdx+1]:null;
-
-  // ── Avance real global ──
-  const src=DATA_ALL.length?DATA_ALL:DATA;
-  const avSrc=DATA_ALL.length?AVANCE_ALL:AVANCE;
-  const totalAsig=src.length||1;
-  let validated=0,inProd=0;
-  src.forEach(d=>{
-    const av=avSrc[d.asignatura]||{};
-    const hv=Object.values(av.hitos||{});
-    const allV=hv.length&&hv.every(h=>!h||h==='Validada'||h==='No aplica'||h==='—'||h==='No inicia');
-    if(av.avance>=100||allV) validated++;
-    else if(av.avance>0||hv.some(h=>h&&h!=='No aplica'&&h!=='—'&&h!=='No inicia')) inProd++;
-  });
-  const pctReal=Math.round((validated+inProd*0.5)/totalAsig*100);
+  // ── Tomar valores directamente del dashboard (misma fuente, misma fórmula) ──
+  const pctReal     = window._dashPctReal     ?? 0;
+  const pctEsperado = window._dashPctEsperado ?? 0;
+  const currentBlockIdx = window._dashCurrentBlockIdx ?? -1;
+  const currentWeek     = window._dashCurrentWeek     ?? 0;
+  const semActual = currentBlockIdx>=0 ? GANTT_HITOS[currentBlockIdx].label : 'Inicio';
+  const proxHito  = currentBlockIdx<GANTT_HITOS.length-1 ? GANTT_HITOS[currentBlockIdx+1] : null;
+  const totalAsig = (DATA_ALL&&DATA_ALL.length ? DATA_ALL : DATA).length || 1;
   const diff=pctReal-pctEsperado;
   const semClass=diff>=-5?'verde':diff>=-20?'amarillo':'rojo';
   const semLabel=diff>=-5?'A tiempo':diff>=-20?'En riesgo':'Atrasado';
