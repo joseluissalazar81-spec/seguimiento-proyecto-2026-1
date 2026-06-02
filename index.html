@@ -2036,6 +2036,12 @@
       </div>
     </div>
 
+    <!-- OBSERVACIONES -->
+    <div class="panel-section" id="p-obs-section" style="display:none">
+      <div class="ps-title">Observaciones</div>
+      <div class="obs-box" id="p-obs"></div>
+    </div>
+
     <!-- SEGUIMIENTO DI — stepper de estados -->
     <div class="panel-section">
       <div class="ps-title">Estado de Seguimiento</div>
@@ -2125,12 +2131,6 @@
     <div class="panel-section">
       <div class="ps-title">Equipo Asignado</div>
       <div class="team-grid" id="p-team"></div>
-    </div>
-
-    <!-- OBSERVACIONES -->
-    <div class="panel-section">
-      <div class="ps-title">Observaciones</div>
-      <div class="obs-box" id="p-obs"></div>
     </div>
 
     <!-- HISTORIAL DE CAMBIOS -->
@@ -3234,13 +3234,18 @@ function openPanel(idx){
 
   // OBS — detectar keywords de alerta (no responde, sin respuesta)
   const obsEl=document.getElementById('p-obs');
+  const obsSection=document.getElementById('p-obs-section');
   const obsText=av.obs||d.obs||'';
   const OBS_ALERT_KW=['no responde','sin respuesta','no contesta','no ha respondido','no contesta correo','no responde correo'];
   const obsEsAlerta = OBS_ALERT_KW.some(kw=>obsText.toLowerCase().includes(kw));
-  obsEl.className = 'obs-box' + (obsEsAlerta ? ' obs-alerta' : '');
-  obsEl.innerHTML = obsText
-    ? (obsEsAlerta ? `⚠ ${obsText}` : obsText)
-    : `<span class="obs-empty">Sin observaciones registradas.</span>`;
+  if(obsText){
+    obsSection.style.display='';
+    obsEl.className = 'obs-box' + (obsEsAlerta ? ' obs-alerta' : '');
+    obsEl.innerHTML = obsEsAlerta ? `⚠ ${obsText}` : obsText;
+  } else {
+    obsSection.style.display='none';
+    obsEl.innerHTML='';
+  }
 
   // BLOQUEO (override local)
   const bloqSection = document.getElementById('p-bloq-section');
