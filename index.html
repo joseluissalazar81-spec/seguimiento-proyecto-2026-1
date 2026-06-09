@@ -4078,12 +4078,10 @@ function renderExecutiveHero(){
   });
   // Si estamos antes del primer deadline, week = 0-1
   if(currentBlockIdx === -1) currentWeek = Math.max(0, Math.round((today - GANTT_HITOS[0].fecha + 14*86400000)/86400000/7));
-  // % esperado = interpolación lineal 2-marzo → 1-julio (fecha de entrega de todas las aulas)
-  const PROJ_START = new Date(2026, 2, 2);
-  const PROJ_END   = new Date(2026, 6, 1);
-  const elapsed    = Math.max(0, today - PROJ_START);
-  const totalDur   = PROJ_END - PROJ_START;
-  const pctEsperado = Math.min(100, Math.round(elapsed / totalDur * 100));
+  // % esperado = hitos que deberían estar "Validada" hoy / 11
+  // planif (col J) siempre esperado desde inicio + cada GANTT_HITO cuya fecha ya pasó
+  const hitosEsperados = 1 + GANTT_HITOS.filter(h => today >= h.fecha).length;
+  const pctEsperado = Math.min(100, Math.round(hitosEsperados / 11 * 100));
   // Expose for informe so both always show the same numbers
   window._dashPctReal = pctReal;
   window._dashPctEsperado = pctEsperado;
