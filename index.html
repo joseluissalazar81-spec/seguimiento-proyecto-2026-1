@@ -2787,7 +2787,7 @@ function rbClass(r){if(r==='Realizada')return'rb rb-r';if(r==='Agendada')return'
 function isAtrasada(d){
   const today = new Date(); today.setHours(0,0,0,0);
   const step = planifStepIndex(d.planif||'');
-  return step < 1.5 && today > planifDeadline(d.facultad);
+  return step < 1.5 && today > asigDeadline(d);
 }
 
 function dotClass(p, d){
@@ -3019,7 +3019,7 @@ function renderKPIs(){
   rows.forEach(d=>{
     const p = (d.planif||'').trim();
     const step = planifStepIndex(p);
-    const deadline = planifDeadline(d.facultad);
+    const deadline = asigDeadline(d);
     if(step >= 4)                        ok++;
     else if(step >= 2)                   rev++;
     else if(p === 'Ajustes según Escala') escala++;
@@ -4009,6 +4009,14 @@ const PLANIF_DEADLINES = {
 function planifDeadline(facultad){
   return PLANIF_DEADLINES[facultad] || PLANIF_DEADLINES.default;
 }
+// Excepciones por asignatura (plazo distinto al de su facultad)
+const PLANIF_DEADLINES_ASIG = {
+  "Trabajo de Título":               new Date(2026, 8, 2),
+  "Calidad e Inocuidad Alimentaria": new Date(2026, 8, 2),
+};
+function asigDeadline(d){
+  return PLANIF_DEADLINES_ASIG[d.asignatura] || planifDeadline(d.facultad);
+}
 
 // ─── TOGGLE DETALLES TÉCNICOS ─────────────────────────────────────────────────
 let detallesVisible = false;
@@ -4113,7 +4121,7 @@ function renderExecutiveHero(){
   if(body){
     const atrasadas = src.filter(d=>{
       const step = planifStepIndex(d.planif||'');
-      return step < 2 && today > planifDeadline(d.facultad);
+      return step < 2 && today > asigDeadline(d);
     });
     const sinIniciar = src.filter(d=>!d.planif||d.planif==='No inicia');
     const enConst    = src.filter(d=>d.planif==='En construcción'||d.planif==='Pendiente');
@@ -4725,7 +4733,7 @@ function generarInforme(){
   let nValid=0,nDEL=0,nEscala=0,nConstr=0,nNoInicia=0,nAtras=0,nObs=0,nEscalPend=0;
   DATA.forEach(d=>{
     const s=planifStepIndex(d.planif||'');
-    const dl=planifDeadline(d.facultad);
+    const dl=asigDeadline(d);
     if(s>=4) nValid++;
     else if(s>=2) nDEL++;
     else if(s===1.5) nEscala++;
@@ -4743,7 +4751,7 @@ function generarInforme(){
     const fd=facData[d.facultad]; if(!fd)return;
     fd.n++;
     const s=planifStepIndex(d.planif||'');
-    const dl=planifDeadline(d.facultad);
+    const dl=asigDeadline(d);
     const av=(AVANCE[d.asignatura]||{}).avance||0;
     fd.sumAv+=av; fd.nAv++;
     if(s>=4) fd.valid++;
