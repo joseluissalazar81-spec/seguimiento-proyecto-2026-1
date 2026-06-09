@@ -2521,8 +2521,10 @@ function buildDataFromCSV(rows){
     const r4l = (r[4]||'').toLowerCase().trim();
     if(CSV_HEADER_R4.includes(r4l) || CSV_HEADER_R1.includes(r1l)) return;
     const asig = r[1].trim();
-    const rawPct = r[20] ? parseFloat(String(r[20]).replace('%','').replace(',','.')) : 0;
-    const pct = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
+    // Columna U = COUNTIF(J:T,"Validada")/11 — recomputar desde hitos para evitar overrides
+    const HITO_COLS = [r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
+    const nVal = HITO_COLS.filter(v=>(v||'').trim()==='Validada').length;
+    const pct = Math.round(nVal/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
@@ -2544,8 +2546,9 @@ function buildDataFromGviz(rows){
     const r1l=r[1].toLowerCase().trim(), r4l=(r[4]||'').toLowerCase().trim();
     if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))return;
     const asig=r[1];
-    const rawPct=row.c?.[20]?.v;
-    const pct=typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
+    // Columna U = COUNTIF(J:T,"Validada")/11
+    const HITO_COLS_G=[r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
+    const pct=Math.round(HITO_COLS_G.filter(v=>(v||'').trim()==='Validada').length/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
@@ -2850,8 +2853,7 @@ async function cargarAvanceDashboard(){
       let d=mapa[key];
       if(!d){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){d=v;break;}}}
       if(d!==undefined){
-        AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:d.pct};
-        AVANCE[asig]={...(AVANCE[asig]||{}),avance:d.pct};
+        // No sobreescribir avance — se calcula desde hitos (=COUNTIF(J:T,"Validada")/11)
         const pKey=Object.keys(PROD).find(k=>normD(k)===key||normD(k).startsWith(key.split(' ').slice(0,4).join(' ')));
         if(pKey) PROD[pKey]={...PROD[pKey],sc:d.sc,di:d.di,vd:d.vd,dm:d.dm,qa:d.qa,ter:d.ter};
       }
