@@ -4219,35 +4219,57 @@ function renderExecutiveHero(){
     }).join('');
   }
 
-  // ── Avance real vs esperado por asignatura ──
+  // ── Avance real vs esperado por facultad (o por asignatura si hay filtro) ──
   const facRowsEl = document.getElementById('exec-fac-rows');
   const stripLabel = document.getElementById('exec-fac-strip-label');
   if(facRowsEl){
     const activeFac = filters.facultad || '';
-    if(stripLabel){
-      stripLabel.textContent = activeFac
-        ? `Avance real vs esperado — ${FAC_ABBR[activeFac]||activeFac}`
-        : 'Avance real vs esperado por asignatura';
+    // Cuando hay filtro de facultad → mostrar asignaturas de esa facultad
+    // Cuando no hay filtro → mostrar promedio por facultad
+    if(activeFac){
+      if(stripLabel) stripLabel.textContent = `Avance real vs esperado — ${FAC_ABBR[activeFac]||activeFac}`;
+      facRowsEl.innerHTML = src.map(d=>{
+        const rPct = (avSrc[d.asignatura]||{}).avance || 0;
+        const done = rPct >= 100;
+        const diff = rPct - pctEsperado;
+        const barColor = done ? 'rgba(168,196,160,.9)' : diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
+        const diffCls  = done ? 'dv' : diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
+        const diffTxt  = done ? '✓' : (diff >= 0 ? '+' : '') + diff + 'pp';
+        const shortName = d.asignatura.length > 28 ? d.asignatura.slice(0,26)+'…' : d.asignatura;
+        return `<div class="exec-asig-row" title="${d.asignatura} — Real: ${rPct}% · Esperado: ${pctEsperado}% · Dif: ${diffTxt}">
+          <span class="exec-asig-name">${shortName}</span>
+          <div class="exec-asig-bar-wrap">
+            <div class="exec-asig-bar" style="width:${rPct}%;background:${barColor}"></div>
+            <div class="exec-asig-esp-line" style="left:${pctEsperado}%"></div>
+          </div>
+          <span class="exec-asig-pct">${rPct}%</span>
+          <span class="exec-asig-diff ${diffCls}">${diffTxt}</span>
+        </div>`;
+      }).join('');
+    } else {
+      if(stripLabel) stripLabel.textContent = 'Avance real vs esperado por facultad';
+      const rows = FAC_ORDER.filter(f=>src.some(d=>d.facultad===f)).map(fac=>{
+        const items = src.filter(d=>d.facultad===fac);
+        const vals = items.map(d=>(avSrc[d.asignatura]||{}).avance||0);
+        const withAv = vals.filter(v=>v>0);
+        const rPct = withAv.length ? Math.round(withAv.reduce((a,b)=>a+b,0)/withAv.length) : 0;
+        const diff = rPct - pctEsperado;
+        const barColor = diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
+        const diffCls  = diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
+        const diffTxt  = (diff >= 0 ? '+' : '') + diff + 'pp';
+        const label = FAC_ABBR[fac]||fac;
+        return `<div class="exec-asig-row" title="${fac} — Real: ${rPct}% · Esperado: ${pctEsperado}% · Dif: ${diffTxt}">
+          <span class="exec-asig-name" style="font-weight:600">${label}</span>
+          <div class="exec-asig-bar-wrap">
+            <div class="exec-asig-bar" style="width:${rPct}%;background:${barColor}"></div>
+            <div class="exec-asig-esp-line" style="left:${pctEsperado}%"></div>
+          </div>
+          <span class="exec-asig-pct">${rPct}%</span>
+          <span class="exec-asig-diff ${diffCls}">${diffTxt}</span>
+        </div>`;
+      });
+      facRowsEl.innerHTML = rows.join('');
     }
-    facRowsEl.innerHTML = src.map(d=>{
-      const rPct = (avSrc[d.asignatura]||{}).avance || 0;
-      const done = rPct >= 100;
-      const diff = rPct - pctEsperado;
-      const barColor = done ? 'rgba(168,196,160,.9)' : diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
-      const diffCls  = done ? 'dv' : diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
-      const diffTxt  = done ? '✓' : (diff >= 0 ? '+' : '') + diff + 'pp';
-      const shortName = d.asignatura.length > 28 ? d.asignatura.slice(0,26)+'…' : d.asignatura;
-      const facTag = activeFac ? '' : `<span style="font-size:9px;color:var(--text-muted);opacity:.7"> · ${FAC_ABBR[d.facultad]||d.facultad}</span>`;
-      return `<div class="exec-asig-row" title="${d.asignatura} — Real: ${rPct}% · Esperado: ${pctEsperado}% · Diferencia: ${diffTxt}">
-        <span class="exec-asig-name">${shortName}${facTag}</span>
-        <div class="exec-asig-bar-wrap">
-          <div class="exec-asig-bar" style="width:${rPct}%;background:${barColor}"></div>
-          <div class="exec-asig-esp-line" style="left:${pctEsperado}%"></div>
-        </div>
-        <span class="exec-asig-pct">${rPct}%</span>
-        <span class="exec-asig-diff ${diffCls}">${diffTxt}</span>
-      </div>`;
-    }).join('');
   }
 }
 
