@@ -4032,9 +4032,11 @@ function toggleDetalles(){
 
 // ─── EXECUTIVE HERO ───────────────────────────────────────────────────────────
 function renderExecutiveHero(){
-  const src  = DATA_ALL.length ? DATA_ALL : DATA;
-  const avSrc= DATA_ALL.length ? AVANCE_ALL : AVANCE;
-  if(!src.length) return;
+  const allSrc = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc  = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  if(!allSrc.length) return;
+  // Usar datos filtrados para que reaccione al filtro de facultad
+  const src = filtered().length ? filtered() : allSrc;
 
   const today = new Date(); today.setHours(0,0,0,0);
 
