@@ -4051,10 +4051,16 @@ function renderExecutiveHero(){
   const delPend = delAtras; // alias para compatibilidad
   const total = src.length;
 
-  // ── % avance real = promedio simple de columna U (% Avance del Sheet) ──
-  let sumAv=0, countAv=0;
-  src.forEach(d=>{ sumAv+=(avSrc[d.asignatura]||{}).avance||0; countAv++; });
+  // ── % avance real = promedio de asignaturas que ya iniciaron producción (col U > 0) ──
+  let sumAv=0, countAv=0, countCero=0;
+  src.forEach(d=>{
+    const av=(avSrc[d.asignatura]||{}).avance||0;
+    if(av>0){ sumAv+=av; countAv++; }
+    else countCero++;
+  });
   const pctReal = countAv>0 ? Math.round(sumAv/countAv) : 0;
+  window._dashCountCero = countCero;
+  window._dashCountAv   = countAv;
 
   // ── Semana actual del proyecto (basada en GANTT_HITOS deadlines) ──
   let currentWeek = 0;
@@ -4083,7 +4089,7 @@ function renderExecutiveHero(){
   let semClass='rojo', semEmoji='🔴', semLabel='Atrasado', semSub='';
   if(diffAjustado >= 5)    { semClass='verde';   semEmoji='🟢'; semLabel='A tiempo'; }
   else if(diffAjustado >= -15){ semClass='amarillo'; semEmoji='🟡'; semLabel='En riesgo'; }
-  semSub = `Real ${pctReal}% vs esperado ${pctEsperado}%`;
+  semSub = `Real ${pctReal}% (${countAv} en prod.) vs esperado ${pctEsperado}% · ${countCero} sin iniciar`;
 
   const semEl = document.getElementById('exec-sem');
   if(semEl){
@@ -4697,6 +4703,8 @@ function generarInforme(){
   // ── Tomar valores directamente del dashboard (misma fuente, misma fórmula) ──
   const pctReal     = window._dashPctReal     ?? 0;
   const pctEsperado = window._dashPctEsperado ?? 0;
+  const countAv     = window._dashCountAv     ?? 0;
+  const countCero   = window._dashCountCero   ?? 0;
   const currentBlockIdx = window._dashCurrentBlockIdx ?? -1;
   const currentWeek     = window._dashCurrentWeek     ?? 0;
   const semActual = currentBlockIdx>=0 ? GANTT_HITOS[currentBlockIdx].label : 'Inicio';
@@ -4846,6 +4854,7 @@ function generarInforme(){
       </div>
       ${barReal}
       <div style="font-size:10.5px;color:#5a7080">▌ Barra sólida = avance real &nbsp;|&nbsp; línea vertical = avance esperado</div>
+      <div style="font-size:10.5px;color:#5a7080;margin-top:4px">Promedio de <strong>${countAv}</strong> asignaturas con producción iniciada · <strong>${countCero}</strong> aún sin iniciar (0%)</div>
     </div>
     <div class="rvse-badge">${semLabel}</div>
   </div>
