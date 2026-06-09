@@ -3996,10 +3996,10 @@ function renderProjectCharts(){
 // ── Plazos de entrega de planificación a DEL por grupo de facultades ──────────
 // Fuente: CartaGantt_2026-1 + ajuste comunicado por el equipo
 const PLANIF_DEADLINES = {
-  default:            new Date(2026,6,1),  // 1 julio — Ingeniería, Economía, Cs. Sociales, Rec. Naturales
-  "Salud":            new Date(2026,6,1),  // 1 julio a construcción semana 13-apr
-  "Formación General":new Date(2026,6,1),  // 1 julio
-    "Recursos Naturales y Medicina Veterinaria":  new Date(2026,5,7),  // 7 junio
+  default:            new Date(2026,6,4),  // 4 julio — (+3 días, CartaGantt actualizado)
+  "Salud":            new Date(2026,6,4),  // 4 julio
+  "Formación General":new Date(2026,6,4),  // 4 julio
+  "Recursos Naturales y Medicina Veterinaria": new Date(2026,5,10), // 10 junio (+3 días)
 };
 function planifDeadline(facultad){
   return PLANIF_DEADLINES[facultad] || PLANIF_DEADLINES.default;
@@ -4251,23 +4251,23 @@ function renderExecutiveHero(){
 // ─── OVERVIEW PANEL ─────────────────────────────────────────────────────────
 
 // Fechas del proyecto (CartaGantt real: Mar 2 → Jul 17)
-const GANTT_START = new Date(2026,2,2);   // 2 mar 2026 — inicio CartaGantt
-const GANTT_END   = new Date(2026,6,17);  // 17 jul 2026 — fin CartaGantt (Aulas habilitadas)
+const GANTT_START = new Date(2026,2,5);   // 5 mar 2026 — inicio CartaGantt (+3 días)
+const GANTT_END   = new Date(2026,6,20);  // 20 jul 2026 — fin CartaGantt (+3 días)
 
 // Bloques de producción: 9 bloques × 2 semanas = 18 semanas
 // (S0 = bloque 0 especial; S1-S2 a S17-S18 = bloques 1-9)
 // weeksDone: cuántas semanas académicas se habrán completado al llegar a la fecha límite
 const GANTT_HITOS = [
-  {label:'S0',     key:'s0',    fecha: new Date(2026,2,31), weeksDone:2,  hito:'Videos B y C'},
-  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,3,10), weeksDone:4,  hito:'Primeros recursos'},
-  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,3,20), weeksDone:6,  hito:'Entrega planif. DEL ◆'},
-  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,4,1),  weeksDone:8,  hito:'Producción'},
-  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,4,11), weeksDone:10, hito:'Producción'},
-  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,4,21), weeksDone:12, hito:'Rec. Nat. finaliza ◆'},
-  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,4,31), weeksDone:14, hito:'Producción'},
-  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,5,11), weeksDone:16, hito:'Producción'},
-  {label:'S15–S16',key:'s15s16',fecha: new Date(2026,5,21), weeksDone:17, hito:'Producción'},
-  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,6,1),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
+  {label:'S0',     key:'s0',    fecha: new Date(2026,3,3),  weeksDone:2,  hito:'Videos B y C'},
+  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,3,13), weeksDone:4,  hito:'Primeros recursos'},
+  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,3,23), weeksDone:6,  hito:'Entrega planif. DEL ◆'},
+  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,4,4),  weeksDone:8,  hito:'Producción'},
+  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,4,14), weeksDone:10, hito:'Producción'},
+  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,4,24), weeksDone:12, hito:'Rec. Nat. finaliza ◆'},
+  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,5,3),  weeksDone:14, hito:'Producción'},
+  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,5,14), weeksDone:16, hito:'Producción'},
+  {label:'S15–S16',key:'s15s16',fecha: new Date(2026,5,24), weeksDone:17, hito:'Producción'},
+  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,6,4),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
 ];
 
 let ovBarInstance = null, ovDonutInstance = null;
