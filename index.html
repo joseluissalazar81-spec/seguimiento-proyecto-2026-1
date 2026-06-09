@@ -2752,6 +2752,7 @@ function setFacFilter(fac){
   renderTeamPills();
   renderTable();
   renderKPIs();
+  renderExecutiveHero();
   if(currentView==='fac') renderFacView();
 }
 
@@ -2936,7 +2937,7 @@ function renderSidebar(){
   function applyFilter(fn){
     const openAsig=selectedIdx!==null&&currentRows[selectedIdx]?currentRows[selectedIdx].asignatura:null;
     fn();
-    renderSidebar();renderTable();renderKPIs();
+    renderSidebar();renderTable();renderKPIs();renderExecutiveHero();
     if(openAsig!==null){
       const ni=currentRows.findIndex(d=>d.asignatura===openAsig);
       if(ni>=0) openPanel(ni); else closePanel();
@@ -3333,7 +3334,7 @@ document.querySelectorAll('th[data-col]').forEach(th=>{
 // ─── SEARCH ───
 document.getElementById('search').addEventListener('input',e=>{
   searchQ=e.target.value.trim();
-  renderTable();renderKPIs();
+  renderTable();renderKPIs();renderExecutiveHero();
   if(currentView==='fac') renderFacView();
 });
 
@@ -4227,7 +4228,7 @@ function renderExecutiveHero(){
     if(stripLabel) stripLabel.textContent = activeFac
       ? `Avance real vs esperado — ${FAC_ABBR[activeFac]||activeFac}`
       : 'Avance real vs esperado por asignatura';
-    facRowsEl.innerHTML = src.map(d=>{
+    facRowsEl.innerHTML = filtered().map(d=>{
       const rPct = (avSrc[d.asignatura]||{}).avance || 0;
       const done = rPct >= 100;
       const diff = rPct - pctEsperado;
