@@ -4051,16 +4051,10 @@ function renderExecutiveHero(){
   const delPend = delAtras; // alias para compatibilidad
   const total = src.length;
 
-  // ── % avance real (ponderado por hitos) ──
-  let validated=0, inProd=0;
-  src.forEach(d=>{
-    const av = avSrc[d.asignatura]||{};
-    const hv = Object.values(av.hitos||{});
-    const allV = hv.length>0 && hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||h==='');
-    if(av.avance>=100||allV) validated++;
-    else if(av.avance>0||hv.some(h=>h&&h!=='No aplica'&&h!=='—'&&h!=='No inicia')) inProd++;
-  });
-  const pctReal = total>0 ? Math.round((validated+(inProd*.5))/total*100) : 0;
+  // ── % avance real = promedio simple de columna U (% Avance del Sheet) ──
+  let sumAv=0, countAv=0;
+  src.forEach(d=>{ sumAv+=(avSrc[d.asignatura]||{}).avance||0; countAv++; });
+  const pctReal = countAv>0 ? Math.round(sumAv/countAv) : 0;
 
   // ── Semana actual del proyecto (basada en GANTT_HITOS deadlines) ──
   let currentWeek = 0;
