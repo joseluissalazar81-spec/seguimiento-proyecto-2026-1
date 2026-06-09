@@ -1960,7 +1960,7 @@
             <th data-col="facultad">Facultad</th>
             <th data-col="asignatura">Asignatura</th>
             <th data-col="docente">Docente</th>
-            <th data-col="planif">Planificación</th>
+            <th data-col="planif">Estado global</th>
             <th data-col="avance" style="text-align:center">Avance</th>
             <th class="col-hitos">Hitos S0–S18</th>
           </tr>
@@ -2527,7 +2527,7 @@ function buildDataFromCSV(rows){
     const pct = Math.round(nVal/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
-      reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
+      reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
       fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
@@ -2551,7 +2551,7 @@ function buildDataFromGviz(rows){
     const pct=Math.round(HITO_COLS_G.filter(v=>(v||'').trim()==='Validada').length/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
-      reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
+      reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
       fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
@@ -2618,6 +2618,7 @@ function buildData(rows){
       implementador: r[7]||'',
       reunion:       r[8]||'',
       planif:        r[9]||'',
+      estadoGlobal:  r[21]||'',
       obs:           r[22]||'',
       correo:        r[24]||'',
       fechaSR:       r[25]||'',
@@ -3071,7 +3072,7 @@ function renderTable(){
       <td><span class="chip chip-fac">${d.facultad}</span></td>
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let pill='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}pill=`<div class="row-escal-pill">⚠ ${ds}d — Informar a ${lv}</div>`;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${o.length>65?o.slice(0,63)+'…':o}</div>${pill}`;})()}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
-      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${planifLabel(d.planif,d)}</span></td>
+      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${isAtrasada(d)?'⚠ Atrasada':(d.estadoGlobal||planifLabel(d.planif,d))}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
@@ -5078,7 +5079,7 @@ function renderFacView(){
           </div>
         </td>
         <td>
-          <span class="ftk-planif ${isAt?'ftk-p-at':ftkPlanifClass(d.planif)}">${isAt?'⚠':''}${isAt?'':ftkPlanifIcon(d.planif)+' '}${isAt?'Atrasada':planifLabel(d.planif)||'No inicia'}</span>
+          <span class="ftk-planif ${isAt?'ftk-p-at':ftkPlanifClass(d.planif)}">${isAt?'⚠':''}${isAt?'':ftkPlanifIcon(d.planif)+' '}${isAt?'Atrasada':(d.estadoGlobal||planifLabel(d.planif)||'No inicia')}</span>
         </td>
         <td>
           <div class="ftk-hitos">${ftkHitosDots(hitos)}</div>
