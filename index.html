@@ -1250,8 +1250,7 @@
       font-size:9px; background:rgba(154,184,204,.3); border-radius:4px; padding:1px 3px;
       color:var(--ca); font-weight:800;
     }
-    /* Facultades strip */
-    /* ── DEL por Facultad ── */
+    /* ── Avance real vs esperado por asignatura ── */
     .exec-fac-strip {
       border-top:1px solid var(--borde); padding-top:14px; margin-top:4px;
     }
@@ -1263,40 +1262,36 @@
     .exec-fac-legend {display:flex; gap:12px; margin-left:auto;}
     .exec-fac-legend-item {display:flex; align-items:center; gap:4px; font-size:9.5px; color:var(--text-muted); font-weight:600;}
     .exec-fac-legend-dot {width:8px; height:8px; border-radius:2px; flex-shrink:0;}
-    .exec-fac-rows {display:flex; flex-direction:column; gap:6px;}
-    .exec-fac-row {display:grid; grid-template-columns:138px 1fr 24px 90px; align-items:center; gap:8px;}
-    .exec-fac-name {
-      font-size:11px; color:var(--text); font-weight:600;
+    .exec-fac-rows {display:flex; flex-direction:column; gap:5px; max-height:320px; overflow-y:auto; padding-right:4px;}
+    .exec-fac-rows::-webkit-scrollbar{width:3px}
+    .exec-fac-rows::-webkit-scrollbar-track{background:transparent}
+    .exec-fac-rows::-webkit-scrollbar-thumb{background:var(--borde);border-radius:2px}
+    .exec-asig-row {display:grid; grid-template-columns:160px 1fr 36px 52px; align-items:center; gap:8px;}
+    .exec-asig-name {
+      font-size:10.5px; color:var(--text); font-weight:500;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    /* Barra apilada DEL */
-    .exec-fac-stack {
-      height:14px; border-radius:4px; overflow:hidden;
-      background:rgba(255,255,255,.05); display:flex; position:relative;
+    .exec-asig-bar-wrap {
+      position:relative; height:10px; border-radius:5px;
+      background:rgba(255,255,255,.06);
     }
-    .exec-fac-seg {height:100%; transition:width .6s cubic-bezier(.4,0,.2,1); position:relative;}
-    .exec-fac-seg:first-child {border-radius:4px 0 0 4px;}
-    .exec-fac-seg:last-child  {border-radius:0 4px 4px 0;}
-    .exec-fac-seg.seg-ok   {background:rgba(168,196,160,.7);}
-    .exec-fac-seg.seg-rev  {background:rgba(212,184,120,.6);}
-    .exec-fac-seg.seg-at   {background:rgba(200,160,144,.7);}
-    .exec-fac-seg.seg-enT  {background:rgba(255,255,255,.15);}
-    /* Semáforo mini */
-    .exec-fac-sem {
-      width:20px; height:20px; border-radius:50%; flex-shrink:0;
-      display:flex; align-items:center; justify-content:center; font-size:10px;
+    .exec-asig-bar {height:100%; border-radius:5px; transition:width .5s cubic-bezier(.4,0,.2,1);}
+    .exec-asig-esp-line {
+      position:absolute; top:0; width:2px; height:100%;
+      background:rgba(255,255,255,.45); border-radius:1px;
     }
-    /* Números DEL */
-    .exec-fac-nums {
-      display:flex; gap:4px; justify-content:flex-end; align-items:center;
+    .exec-asig-pct {
+      font-size:10px; font-family:'DM Mono',monospace; font-weight:700;
+      text-align:right; color:var(--text);
+    }
+    .exec-asig-diff {
       font-size:9.5px; font-family:'DM Mono',monospace; font-weight:700;
+      text-align:right; padding:1px 5px; border-radius:4px;
     }
-    .exec-fac-n {padding:1px 5px; border-radius:4px; min-width:18px; text-align:center;}
-    .exec-fac-n.ok  {background:rgba(168,196,160,.15); color:var(--ve);}
-    .exec-fac-n.rev {background:rgba(212,184,120,.15);  color:var(--am);}
-    .exec-fac-n.at  {background:rgba(200,160,144,.15); color:var(--ro);}
-    .exec-fac-n.enT {background:rgba(255,255,255,.06); color:var(--text-muted);}
-    /* Nota plazo extendido */
+    .exec-asig-diff.dv  {background:rgba(168,196,160,.15); color:var(--ve);}
+    .exec-asig-diff.dam {background:rgba(212,184,120,.15);  color:var(--am);}
+    .exec-asig-diff.dro {background:rgba(200,80,80,.12);    color:var(--ro);}
+    /* Nota plazo extendido (legacy keep) */
     .exec-fac-nota {
       font-size:9px; color:var(--az); font-style:italic;
       grid-column:2/-1; margin-top:-2px; margin-bottom:2px;
@@ -1815,15 +1810,13 @@
         <div id="exec-blocks"></div>
       </div>
 
-      <!-- DEL por facultad -->
+      <!-- Avance real vs esperado por asignatura -->
       <div class="exec-fac-strip" id="exec-fac-strip">
         <div class="exec-fac-strip-title">
-          Estado DEL por Facultad
+          <span id="exec-fac-strip-label">Avance real vs esperado</span>
           <div class="exec-fac-legend">
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(168,196,160,.7)"></span>Validadas</span>
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(212,184,120,.6)"></span>En revisión</span>
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(200,160,144,.7)"></span>Atrasadas</span>
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(255,255,255,.2)"></span>En construcción</span>
+            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(168,196,160,.7);border-radius:50%"></span>Real %</span>
+            <span class="exec-fac-legend-item"><span style="display:inline-block;width:2px;height:8px;background:rgba(255,255,255,.45);border-radius:1px;margin-right:2px"></span>Esperado</span>
           </div>
         </div>
         <div class="exec-fac-rows" id="exec-fac-rows"></div>
@@ -4226,58 +4219,33 @@ function renderExecutiveHero(){
     }).join('');
   }
 
-  // ── Estado DEL por Facultad — barras apiladas ──
-  const facRows = document.getElementById('exec-fac-rows');
-  if(facRows){
-    const facData = FAC_ORDER.filter(f=>src.some(d=>d.facultad===f)).map(fac=>{
-      const items = src.filter(d=>d.facultad===fac);
-      const n = items.length;
-      let ok=0, rev=0, atras=0, enT=0;
-      const deadline = planifDeadline(fac);
-      const hasExtended = today <= deadline && fac !== 'Recursos Naturales y Medicina Veterinaria';
-      items.forEach(d=>{
-        const step = planifStepIndex(d.planif||'');
-        if(step >= 4)       ok++;
-        else if(step >= 2)  rev++;
-        else if(today > deadline) atras++;
-        else                enT++;
-      });
-      // Semáforo por facultad
-      let sem = '🔴';
-      const pctOk = n>0 ? ok/n : 0;
-      if(atras===0 && ok+rev===n) sem='🟢';
-      else if(atras===0)          sem='🟡';
-      else if(atras/n > 0.5)      sem='🔴';
-      else                        sem='🟡';
-      return {label:FAC_ABBR[fac]||fac, n, ok, rev, atras, enT, sem, hasExtended, deadline};
-    });
-
-    facRows.innerHTML = facData.map(f=>{
-      const n = f.n || 1; // evitar /0
-      const wOk   = Math.round(f.ok/n*100);
-      const wRev  = Math.round(f.rev/n*100);
-      const wAt   = Math.round(f.atras/n*100);
-      const wEnT  = Math.round(f.enT/n*100);
-      const notaHTML = f.hasExtended
-        ? `<div class="exec-fac-nota" style="grid-column:2/-1">⏳ Plazo extendido hasta ${f.deadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</div>`
-        : '';
-      return `<div class="exec-fac-row" title="${f.label}: ${f.ok} validadas · ${f.rev} en revisión · ${f.atras} atrasadas · ${f.enT} en construcción">
-        <span class="exec-fac-name">${f.label}</span>
-        <div class="exec-fac-stack">
-          ${wOk  > 0 ? `<div class="exec-fac-seg seg-ok"  style="width:${wOk}%"  title="${f.ok} validadas"></div>` : ''}
-          ${wRev > 0 ? `<div class="exec-fac-seg seg-rev" style="width:${wRev}%" title="${f.rev} en revisión"></div>` : ''}
-          ${wAt  > 0 ? `<div class="exec-fac-seg seg-at"  style="width:${wAt}%"  title="${f.atras} atrasadas"></div>` : ''}
-          ${wEnT > 0 ? `<div class="exec-fac-seg seg-enT" style="width:${wEnT}%" title="${f.enT} en construcción"></div>` : ''}
+  // ── Avance real vs esperado por asignatura ──
+  const facRowsEl = document.getElementById('exec-fac-rows');
+  const stripLabel = document.getElementById('exec-fac-strip-label');
+  if(facRowsEl){
+    const activeFac = filters.facultad || '';
+    if(stripLabel){
+      stripLabel.textContent = activeFac
+        ? `Avance real vs esperado — ${FAC_ABBR[activeFac]||activeFac}`
+        : 'Avance real vs esperado por asignatura';
+    }
+    facRowsEl.innerHTML = src.map(d=>{
+      const rPct = (avSrc[d.asignatura]||{}).avance || 0;
+      const diff = rPct - pctEsperado;
+      const barColor = diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
+      const diffCls  = diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
+      const diffTxt  = (diff >= 0 ? '+' : '') + diff + 'pp';
+      const shortName = d.asignatura.length > 28 ? d.asignatura.slice(0,26)+'…' : d.asignatura;
+      const facTag = activeFac ? '' : `<span style="font-size:9px;color:var(--text-muted);opacity:.7"> · ${FAC_ABBR[d.facultad]||d.facultad}</span>`;
+      return `<div class="exec-asig-row" title="${d.asignatura} — Real: ${rPct}% · Esperado: ${pctEsperado}% · Diferencia: ${diffTxt}">
+        <span class="exec-asig-name">${shortName}${facTag}</span>
+        <div class="exec-asig-bar-wrap">
+          <div class="exec-asig-bar" style="width:${rPct}%;background:${barColor}"></div>
+          <div class="exec-asig-esp-line" style="left:${pctEsperado}%"></div>
         </div>
-        <span class="exec-fac-sem" title="Estado ${f.sem}">${f.sem}</span>
-        <div class="exec-fac-nums">
-          <span class="exec-fac-n ok"  title="Validadas">${f.ok}</span>
-          <span class="exec-fac-n rev" title="En revisión">${f.rev}</span>
-          ${f.atras > 0 ? `<span class="exec-fac-n at" title="Atrasadas">${f.atras}</span>` : ''}
-          ${f.enT   > 0 ? `<span class="exec-fac-n enT" title="En construcción">${f.enT}</span>` : ''}
-        </div>
-      </div>
-      ${notaHTML}`;
+        <span class="exec-asig-pct">${rPct}%</span>
+        <span class="exec-asig-diff ${diffCls}">${diffTxt}</span>
+      </div>`;
     }).join('');
   }
 }
