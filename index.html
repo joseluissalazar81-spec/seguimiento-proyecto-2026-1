@@ -4231,10 +4231,11 @@ function renderExecutiveHero(){
     }
     facRowsEl.innerHTML = src.map(d=>{
       const rPct = (avSrc[d.asignatura]||{}).avance || 0;
+      const done = rPct >= 100;
       const diff = rPct - pctEsperado;
-      const barColor = diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
-      const diffCls  = diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
-      const diffTxt  = (diff >= 0 ? '+' : '') + diff + 'pp';
+      const barColor = done ? 'rgba(168,196,160,.9)' : diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
+      const diffCls  = done ? 'dv' : diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
+      const diffTxt  = done ? '✓' : (diff >= 0 ? '+' : '') + diff + 'pp';
       const shortName = d.asignatura.length > 28 ? d.asignatura.slice(0,26)+'…' : d.asignatura;
       const facTag = activeFac ? '' : `<span style="font-size:9px;color:var(--text-muted);opacity:.7"> · ${FAC_ABBR[d.facultad]||d.facultad}</span>`;
       return `<div class="exec-asig-row" title="${d.asignatura} — Real: ${rPct}% · Esperado: ${pctEsperado}% · Diferencia: ${diffTxt}">
