@@ -4,6 +4,16 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Seguimiento Proyecto e-Learning UST 2026-1</title>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#3a6db5"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="UST e-Learning"/>
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png"/>
+  <!-- /PWA -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -255,7 +265,9 @@
     tbody tr.selected td{background:rgba(176,184,204,.1)}
     tbody tr.selected{box-shadow:inset 3px 0 0 var(--am)}
     td{padding:10px 14px;font-size:13px;vertical-align:middle}
-    td.asig-col{font-weight:500;max-width:220px}
+    td.asig-col{font-weight:500;max-width:240px}
+    .row-obs{font-size:10.5px;color:var(--am);font-weight:400;margin-top:3px;line-height:1.3;white-space:normal;opacity:.9}
+    .row-escal-pill{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(200,80,60,.15);border:1px solid rgba(200,80,60,.4);color:#e05a40;white-space:nowrap}
 
     /* ── CHIPS ── */
     .chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid transparent}
@@ -504,6 +516,8 @@
       border-color:rgba(200,160,144,.35);border-left-color:var(--ro);
     }
     .obs-empty{font-size:12.5px;color:var(--text-muted);font-style:italic}
+    .obs-escal-badge{margin-top:9px;padding:7px 10px;border-radius:6px;font-size:12px;font-weight:500;background:rgba(200,160,144,.15);border:1px solid rgba(200,160,144,.4);color:var(--ro);line-height:1.4}
+    .obs-escal-icon{color:var(--ro);font-weight:900;font-size:11px;vertical-align:middle}
 
     /* ── BANNER BLOQUEO PANEL ── */
     .panel-bloq{
@@ -1239,8 +1253,7 @@
       font-size:9px; background:rgba(154,184,204,.3); border-radius:4px; padding:1px 3px;
       color:var(--ca); font-weight:800;
     }
-    /* Facultades strip */
-    /* ── DEL por Facultad ── */
+    /* ── Avance real vs esperado por asignatura ── */
     .exec-fac-strip {
       border-top:1px solid var(--borde); padding-top:14px; margin-top:4px;
     }
@@ -1252,40 +1265,36 @@
     .exec-fac-legend {display:flex; gap:12px; margin-left:auto;}
     .exec-fac-legend-item {display:flex; align-items:center; gap:4px; font-size:9.5px; color:var(--text-muted); font-weight:600;}
     .exec-fac-legend-dot {width:8px; height:8px; border-radius:2px; flex-shrink:0;}
-    .exec-fac-rows {display:flex; flex-direction:column; gap:6px;}
-    .exec-fac-row {display:grid; grid-template-columns:138px 1fr 24px 90px; align-items:center; gap:8px;}
-    .exec-fac-name {
-      font-size:11px; color:var(--text); font-weight:600;
+    .exec-fac-rows {display:flex; flex-direction:column; gap:5px; max-height:320px; overflow-y:auto; padding-right:4px;}
+    .exec-fac-rows::-webkit-scrollbar{width:3px}
+    .exec-fac-rows::-webkit-scrollbar-track{background:transparent}
+    .exec-fac-rows::-webkit-scrollbar-thumb{background:var(--borde);border-radius:2px}
+    .exec-asig-row {display:grid; grid-template-columns:160px 1fr 36px 52px; align-items:center; gap:8px;}
+    .exec-asig-name {
+      font-size:10.5px; color:var(--text); font-weight:500;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    /* Barra apilada DEL */
-    .exec-fac-stack {
-      height:14px; border-radius:4px; overflow:hidden;
-      background:rgba(255,255,255,.05); display:flex; position:relative;
+    .exec-asig-bar-wrap {
+      position:relative; height:10px; border-radius:5px;
+      background:rgba(255,255,255,.06);
     }
-    .exec-fac-seg {height:100%; transition:width .6s cubic-bezier(.4,0,.2,1); position:relative;}
-    .exec-fac-seg:first-child {border-radius:4px 0 0 4px;}
-    .exec-fac-seg:last-child  {border-radius:0 4px 4px 0;}
-    .exec-fac-seg.seg-ok   {background:rgba(168,196,160,.7);}
-    .exec-fac-seg.seg-rev  {background:rgba(212,184,120,.6);}
-    .exec-fac-seg.seg-at   {background:rgba(200,160,144,.7);}
-    .exec-fac-seg.seg-enT  {background:rgba(255,255,255,.15);}
-    /* Semáforo mini */
-    .exec-fac-sem {
-      width:20px; height:20px; border-radius:50%; flex-shrink:0;
-      display:flex; align-items:center; justify-content:center; font-size:10px;
+    .exec-asig-bar {height:100%; border-radius:5px; transition:width .5s cubic-bezier(.4,0,.2,1);}
+    .exec-asig-esp-line {
+      position:absolute; top:0; width:2px; height:100%;
+      background:rgba(255,255,255,.45); border-radius:1px;
     }
-    /* Números DEL */
-    .exec-fac-nums {
-      display:flex; gap:4px; justify-content:flex-end; align-items:center;
+    .exec-asig-pct {
+      font-size:10px; font-family:'DM Mono',monospace; font-weight:700;
+      text-align:right; color:var(--text);
+    }
+    .exec-asig-diff {
       font-size:9.5px; font-family:'DM Mono',monospace; font-weight:700;
+      text-align:right; padding:1px 5px; border-radius:4px;
     }
-    .exec-fac-n {padding:1px 5px; border-radius:4px; min-width:18px; text-align:center;}
-    .exec-fac-n.ok  {background:rgba(168,196,160,.15); color:var(--ve);}
-    .exec-fac-n.rev {background:rgba(212,184,120,.15);  color:var(--am);}
-    .exec-fac-n.at  {background:rgba(200,160,144,.15); color:var(--ro);}
-    .exec-fac-n.enT {background:rgba(255,255,255,.06); color:var(--text-muted);}
-    /* Nota plazo extendido */
+    .exec-asig-diff.dv  {background:rgba(168,196,160,.15); color:var(--ve);}
+    .exec-asig-diff.dam {background:rgba(212,184,120,.15);  color:var(--am);}
+    .exec-asig-diff.dro {background:rgba(200,80,80,.12);    color:var(--ro);}
+    /* Nota plazo extendido (legacy keep) */
     .exec-fac-nota {
       font-size:9px; color:var(--az); font-style:italic;
       grid-column:2/-1; margin-top:-2px; margin-bottom:2px;
@@ -1420,6 +1429,13 @@
     .fv-idx-chevron{ color:rgba(255,255,255,.5); transition:transform .25s; }
     .fv-idx-chevron.open{ transform:rotate(90deg); }
     .fv-idx-notaext{ font-size:9.5px; color:#d4a820; font-weight:600; }
+    .fv-obs-inline{ display:flex; align-items:center; gap:5px; margin-left:4px; cursor:pointer; }
+    .fv-obs-count-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(212,184,120,.18); border:1px solid rgba(212,184,120,.35); color:#d4a820; white-space:nowrap; transition:background .15s; }
+    .fv-obs-count-dot:hover{ background:rgba(212,184,120,.32); }
+    .fv-obs-escal-dot{ display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:700; background:rgba(200,80,60,.2); border:1px solid rgba(200,80,60,.45); color:#e05a40; white-space:nowrap; animation:pulse 1.6s infinite; transition:background .15s; }
+    .fv-obs-escal-dot:hover{ background:rgba(200,80,60,.35); }
+    .fv-obs-panel{ background:rgba(212,184,120,.06); border-left:3px solid var(--am); padding:12px 18px; display:flex; flex-direction:column; gap:10px; }
+    .fv-obs-item{ display:flex; align-items:flex-start; gap:10px; }
 
     /* Tabla de asignaturas tipo ticker */
     .fv-ticker-wrap{ overflow:hidden; }
@@ -1832,15 +1848,13 @@
         <div id="exec-blocks"></div>
       </div>
 
-      <!-- DEL por facultad -->
+      <!-- Avance real vs esperado por asignatura -->
       <div class="exec-fac-strip" id="exec-fac-strip">
         <div class="exec-fac-strip-title">
-          Estado DEL por Facultad
+          <span id="exec-fac-strip-label">Avance real vs esperado</span>
           <div class="exec-fac-legend">
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(168,196,160,.7)"></span>Validadas</span>
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(212,184,120,.6)"></span>En revisión</span>
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(200,160,144,.7)"></span>Atrasadas</span>
-            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(255,255,255,.2)"></span>En construcción</span>
+            <span class="exec-fac-legend-item"><span class="exec-fac-legend-dot" style="background:rgba(168,196,160,.7);border-radius:50%"></span>Real %</span>
+            <span class="exec-fac-legend-item"><span style="display:inline-block;width:2px;height:8px;background:rgba(255,255,255,.45);border-radius:1px;margin-right:2px"></span>Esperado</span>
           </div>
         </div>
         <div class="exec-fac-rows" id="exec-fac-rows"></div>
@@ -1950,6 +1964,10 @@
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         PDF
       </button>
+      <button class="pdf-btn" id="informe-btn" style="background:rgba(130,90,180,.15);border-color:rgba(130,90,180,.35);color:#b08ee0" title="Generar informe ejecutivo firmado por Paulina Vera B.">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><path d="M9 17l1.5-1.5L12 17l1.5-1.5L15 17"/></svg>
+        <span id="informe-btn-label">Informe</span>
+      </button>
     </div>
     <!-- ── FILTRO RÁPIDO JP (oculto) ── -->
     <div class="jp-quick" id="jp-quick" style="display:none"></div>
@@ -1973,7 +1991,7 @@
             <th data-col="facultad">Facultad</th>
             <th data-col="asignatura">Asignatura</th>
             <th data-col="docente">Docente</th>
-            <th data-col="planif">Planificación</th>
+            <th data-col="planif">Estado global</th>
             <th data-col="avance" style="text-align:center">Avance</th>
             <th class="col-hitos">Hitos S0–S18</th>
           </tr>
@@ -2061,6 +2079,12 @@
           <div class="panel-bloq-text" id="p-bloq-text"></div>
         </div>
       </div>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    <div class="panel-section" id="p-obs-section" style="display:none">
+      <div class="ps-title">Observaciones</div>
+      <div class="obs-box" id="p-obs"></div>
     </div>
 
     <!-- SEGUIMIENTO DI — stepper de estados -->
@@ -2152,12 +2176,6 @@
     <div class="panel-section">
       <div class="ps-title">Equipo Asignado</div>
       <div class="team-grid" id="p-team"></div>
-    </div>
-
-    <!-- OBSERVACIONES -->
-    <div class="panel-section">
-      <div class="ps-title">Observaciones</div>
-      <div class="obs-box" id="p-obs"></div>
     </div>
 
     <!-- HISTORIAL DE CAMBIOS -->
@@ -2265,12 +2283,17 @@ const MOODLE_URLS = {
   'Electivo FP: Factores fisiológicos y psicológicos del ejercicio': 'https://aulasvirtuales.santotomas.cl/course/view.php?id=769012',
 };
 function getMoodleUrl(asignatura, facultad){
-  return MOODLE_URLS[asignatura+'|'+facultad] || MOODLE_URLS[asignatura] || null;
+  const exact=MOODLE_URLS[asignatura+'|'+facultad]||MOODLE_URLS[asignatura];
+  if(exact)return exact;
+  const kF=(asignatura+'|'+(facultad||'')).toLowerCase(), k2=asignatura.toLowerCase();
+  for(const k of Object.keys(MOODLE_URLS)){const kl=k.toLowerCase();if(kl===kF||kl===k2)return MOODLE_URLS[k];}
+  return null;
 }
 
 // ── Programas de asignatura (PDFs) ───────────────────────────────────────────
 const PROGRAMA_URLS = {
   'Análisis de Datos':                        '/reportes/programas/flat/analisis-datos.pdf',
+  'Calidad e Inocuidad Alimentaria':          '/reportes/programas/flat/calidad-inocuidad-alimentaria.pdf',
   'Contabilidad Financiera':                  '/reportes/programas/flat/contabilidad-financiera.pdf',
   'Políticas Públicas e Innovación':          '/reportes/programas/flat/politicas-publicas.pdf',
   'Derecho Comercial y Laboral':              '/reportes/programas/flat/derecho-comercial-laboral.pdf',
@@ -2301,12 +2324,22 @@ const PROGRAMA_URLS = {
   'Sist. Prod. Frutales Sostenibles':         '/reportes/programas/flat/sist-prod-frutales.pdf',
   'Electivo I: Tecnologías Excavación':       '/reportes/programas/flat/electivo-i-tec-excavacion.pdf',
   'Electivo III: IA y Tecnologías 4.0':       '/reportes/programas/flat/electivo-iii-ia-tec-40.pdf',
-  'Gestión de Operaciones Mineras':           '/reportes/programas/flat/gestion-operaciones-mineras.pdf',
-  'Taller Emprendimiento en Minería':         '/reportes/programas/flat/taller-emprendimiento-mineria.pdf',
-  'Taller de Pronóstico IA':                  '/reportes/programas/flat/taller-pronostico-ia.pdf',   'Bases del comportamiento alimentario': '/reportes/programas/flat/bases-comportamiento-alimentario.pdf',   'Componentes bioactivos en alimentos': '/reportes/programas/flat/componentes-bioactivos-alimentos.pdf',   'Mercado IDI I': '/reportes/programas/flat/mercado-idi-i.pdf',
+  'Gestión de Operaciones Mineras':                         '/reportes/programas/flat/gestion-operaciones-mineras.pdf',
+  'Taller Emprendimiento en Minería':                       '/reportes/programas/flat/taller-emprendimiento-mineria.pdf',
+  'Taller de Pronóstico IA':                                '/reportes/programas/flat/taller-pronostico-ia.pdf',
+  'Electivo FP: Bases Comportamiento Alimentario':          '/reportes/programas/flat/bases-comportamiento-alimentario.pdf',
+  'FP: Bases Comportamiento Alimentario':                   '/reportes/programas/flat/bases-comportamiento-alimentario.pdf',
+  'Electivo FP: Componentes Bioactivos en Alimentos':       '/reportes/programas/flat/componentes-bioactivos-alimentos.pdf',
+  'FP: Componentes Bioactivos en Alimentos':                '/reportes/programas/flat/componentes-bioactivos-alimentos.pdf',
+  'Electivo FP: Mercado I+D+i I':                          '/reportes/programas/flat/mercado-idi-i.pdf',
+  'FP: Mercado I+D+i I':                                   '/reportes/programas/flat/mercado-idi-i.pdf',
 };
 function getProgramaUrl(asignatura, facultad){
-  return PROGRAMA_URLS[asignatura+'|'+facultad] || PROGRAMA_URLS[asignatura] || null;
+  const exact=PROGRAMA_URLS[asignatura+'|'+facultad]||PROGRAMA_URLS[asignatura];
+  if(exact)return exact;
+  const kF=(asignatura+'|'+(facultad||'')).toLowerCase(), k2=asignatura.toLowerCase();
+  for(const k of Object.keys(PROGRAMA_URLS)){const kl=k.toLowerCase();if(kl===kF||kl===k2)return PROGRAMA_URLS[k];}
+  return null;
 }
 
 // ── Seguimiento DI — URLs por DI (fallback) ───────────────────────────────────
@@ -2519,13 +2552,14 @@ function buildDataFromCSV(rows){
     const r4l = (r[4]||'').toLowerCase().trim();
     if(CSV_HEADER_R4.includes(r4l) || CSV_HEADER_R1.includes(r1l)) return;
     const asig = r[1].trim();
-    const rawPct = r[20] ? parseFloat(String(r[20]).replace('%','').replace(',','.')) : 0;
+    // Columna U = COUNTIF(J:T,"Validada")/11 — recomputar desde hitos para evitar overrides
     const isRecNatC = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
-    const basePctC = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
-    const pct = isRecNatC ? Math.min(100,Math.round(basePctC*18/12)) : basePctC;
+    const HITO_COLS_C = [r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
+    const nValC = HITO_COLS_C.filter(v=>(v||'').trim()==='Validada').length;
+    const pct = isRecNatC ? Math.min(100,Math.round(nValC/8*100)) : Math.round(nValC/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
-      reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
+      reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
       fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
@@ -2546,13 +2580,14 @@ function buildDataFromGviz(rows){
     const r1l=r[1].toLowerCase().trim(), r4l=(r[4]||'').toLowerCase().trim();
     if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))return;
     const asig=r[1];
-    const rawPct=row.c?.[20]?.v;
+    // Columna U = COUNTIF(J:T,"Validada")/11
     const isRecNatG = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
-    const basePctG = typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
-    const pct = isRecNatG ? Math.min(100,Math.round(basePctG*18/12)) : basePctG;
+    const HITO_COLS_G=[r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
+    const nValG=HITO_COLS_G.filter(v=>(v||'').trim()==='Validada').length;
+    const pct=isRecNatG ? Math.min(100,Math.round(nValG/8*100)) : Math.round(nValG/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
-      reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
+      reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
       fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
@@ -2622,6 +2657,7 @@ function buildData(rows){
       implementador: r[7]||'',
       reunion:       r[8]||'',
       planif:        r[9]||'',
+      estadoGlobal:  r[21]||'',
       obs:           r[22]||'',
       correo:        r[24]||'',
       fechaSR:       r[25]||'',
@@ -2762,6 +2798,8 @@ function setFacFilter(fac){
   renderTeamPills();
   renderTable();
   renderKPIs();
+  renderExecutiveHero();
+  updateInformeBtn();
   if(currentView==='fac') renderFacView();
 }
 
@@ -2791,7 +2829,7 @@ function rbClass(r){if(r==='Realizada')return'rb rb-r';if(r==='Agendada')return'
 function isAtrasada(d){
   const today = new Date(); today.setHours(0,0,0,0);
   const step = planifStepIndex(d.planif||'');
-  return step < 1.5 && today > planifDeadline(d.facultad);
+  return step < 1.5 && today > asigDeadline(d);
 }
 
 function dotClass(p, d){
@@ -2857,8 +2895,7 @@ async function cargarAvanceDashboard(){
       let d=mapa[key];
       if(!d){const w=key.split(' ').slice(0,4).join(' ');for(const [k,v] of Object.entries(mapa)){if(k.includes(w)||w.includes(k.split(' ').slice(0,4).join(' '))){d=v;break;}}}
       if(d!==undefined){
-        AVANCE_ALL[asig]={...(AVANCE_ALL[asig]||{}),avance:d.pct};
-        AVANCE[asig]={...(AVANCE[asig]||{}),avance:d.pct};
+        // No sobreescribir avance — se calcula desde hitos (=COUNTIF(J:T,"Validada")/11)
         const pKey=Object.keys(PROD).find(k=>normD(k)===key||normD(k).startsWith(key.split(' ').slice(0,4).join(' ')));
         if(pKey) PROD[pKey]={...PROD[pKey],sc:d.sc,di:d.di,vd:d.vd,dm:d.dm,qa:d.qa,ter:d.ter};
       }
@@ -2947,7 +2984,7 @@ function renderSidebar(){
   function applyFilter(fn){
     const openAsig=selectedIdx!==null&&currentRows[selectedIdx]?currentRows[selectedIdx].asignatura:null;
     fn();
-    renderSidebar();renderTable();renderKPIs();
+    renderSidebar();renderTable();renderKPIs();renderExecutiveHero();
     if(openAsig!==null){
       const ni=currentRows.findIndex(d=>d.asignatura===openAsig);
       if(ni>=0) openPanel(ni); else closePanel();
@@ -3024,7 +3061,7 @@ function renderKPIs(){
   rows.forEach(d=>{
     const p = (d.planif||'').trim();
     const step = planifStepIndex(p);
-    const deadline = planifDeadline(d.facultad);
+    const deadline = asigDeadline(d);
     if(step >= 4)                        ok++;
     else if(step >= 2)                   rev++;
     else if(p === 'Ajustes según Escala') escala++;
@@ -3074,9 +3111,9 @@ function renderTable(){
     return `
     <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''} ${rPct>=100?'row-completa':''}">
       <td><span class="chip chip-fac">${d.facultad}</span></td>
-      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}</td>
+      <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let pill='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}pill=`<div class="row-escal-pill">⚠ ${ds}d — Informar a ${lv}</div>`;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${o.length>65?o.slice(0,63)+'…':o}</div>${pill}`;})()}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
-      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${planifLabel(d.planif,d)}</span></td>
+      <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${isAtrasada(d)?'⚠ Atrasada':(d.estadoGlobal||planifLabel(d.planif,d))}</span></td>
       <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}</div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
@@ -3255,13 +3292,27 @@ function openPanel(idx){
 
   // OBS — detectar keywords de alerta (no responde, sin respuesta)
   const obsEl=document.getElementById('p-obs');
+  const obsSection=document.getElementById('p-obs-section');
   const obsText=av.obs||d.obs||'';
   const OBS_ALERT_KW=['no responde','sin respuesta','no contesta','no ha respondido','no contesta correo','no responde correo'];
   const obsEsAlerta = OBS_ALERT_KW.some(kw=>obsText.toLowerCase().includes(kw));
-  obsEl.className = 'obs-box' + (obsEsAlerta ? ' obs-alerta' : '');
-  obsEl.innerHTML = obsText
-    ? (obsEsAlerta ? `⚠ ${obsText}` : obsText)
-    : `<span class="obs-empty">Sin observaciones registradas.</span>`;
+  if(obsText){
+    obsSection.style.display='';
+    // Check if escalation is overdue (obs exists + fechaSR + 3+ days)
+    let escBadge='';
+    if(d.fechaSR){
+      const dias=diasDesde(d.fechaSR);
+      if(dias!==null && dias>=3){
+        let lv=''; for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(dias>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}
+        escBadge=`<div class="obs-escal-badge">⚠ ${dias}d sin respuesta — proceder con escalamiento a <strong>${lv}</strong></div>`;
+      }
+    }
+    obsEl.className = 'obs-box' + (obsEsAlerta ? ' obs-alerta' : '');
+    obsEl.innerHTML = (obsEsAlerta ? `⚠ ${obsText}` : obsText) + escBadge;
+  } else {
+    obsSection.style.display='none';
+    obsEl.innerHTML='';
+  }
 
   // BLOQUEO (override local)
   const bloqSection = document.getElementById('p-bloq-section');
@@ -3330,7 +3381,7 @@ document.querySelectorAll('th[data-col]').forEach(th=>{
 // ─── SEARCH ───
 document.getElementById('search').addEventListener('input',e=>{
   searchQ=e.target.value.trim();
-  renderTable();renderKPIs();
+  renderTable();renderKPIs();renderExecutiveHero();
   if(currentView==='fac') renderFacView();
 });
 
@@ -3992,13 +4043,21 @@ function renderProjectCharts(){
 // ── Plazos de entrega de planificación a DEL por grupo de facultades ──────────
 // Fuente: CartaGantt_2026-1 + ajuste comunicado por el equipo
 const PLANIF_DEADLINES = {
-  default:            new Date(2026,6,1),  // 1 julio — Ingeniería, Economía, Cs. Sociales, Rec. Naturales
-  "Salud":            new Date(2026,6,1),  // 1 julio a construcción semana 13-apr
-  "Formación General":new Date(2026,6,1),  // 1 julio
-    "Recursos Naturales y Medicina Veterinaria":  new Date(2026,5,7),  // 7 junio
+  default:            new Date(2026,6,4),  // 4 julio — (+3 días, CartaGantt actualizado)
+  "Salud":            new Date(2026,6,4),  // 4 julio
+  "Formación General":new Date(2026,6,4),  // 4 julio
+  "Recursos Naturales y Medicina Veterinaria": new Date(2026,5,10), // 10 junio (+3 días)
 };
 function planifDeadline(facultad){
   return PLANIF_DEADLINES[facultad] || PLANIF_DEADLINES.default;
+}
+// Excepciones por asignatura (plazo distinto al de su facultad)
+const PLANIF_DEADLINES_ASIG = {
+  "Trabajo de Título":               new Date(2026, 8, 2),
+  "Calidad e Inocuidad Alimentaria": new Date(2026, 8, 2),
+};
+function asigDeadline(d){
+  return PLANIF_DEADLINES_ASIG[d.asignatura] || planifDeadline(d.facultad);
 }
 
 // ─── TOGGLE DETALLES TÉCNICOS ─────────────────────────────────────────────────
@@ -4020,9 +4079,11 @@ function toggleDetalles(){
 
 // ─── EXECUTIVE HERO ───────────────────────────────────────────────────────────
 function renderExecutiveHero(){
-  const src  = DATA_ALL.length ? DATA_ALL : DATA;
-  const avSrc= DATA_ALL.length ? AVANCE_ALL : AVANCE;
-  if(!src.length) return;
+  const allSrc = DATA_ALL.length ? DATA_ALL : DATA;
+  const avSrc  = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  if(!allSrc.length) return;
+  // Usar datos filtrados para que reaccione al filtro de facultad
+  const src = filtered().length ? filtered() : allSrc;
 
   const today = new Date(); today.setHours(0,0,0,0);
 
@@ -4044,16 +4105,16 @@ function renderExecutiveHero(){
   const delPend = delAtras; // alias para compatibilidad
   const total = src.length;
 
-  // ── % avance real (ponderado por hitos) ──
-  let validated=0, inProd=0;
+  // ── % avance real = promedio de asignaturas que ya iniciaron producción (col U > 0) ──
+  let sumAv=0, countAv=0, countCero=0;
   src.forEach(d=>{
-    const av = avSrc[d.asignatura]||{};
-    const hv = Object.values(av.hitos||{});
-    const allV = hv.length>0 && hv.every(h=>h==='Validada'||h==='No aplica'||h==='—'||h==='');
-    if(av.avance>=100||allV) validated++;
-    else if(av.avance>0||hv.some(h=>h&&h!=='No aplica'&&h!=='—'&&h!=='No inicia')) inProd++;
+    const av=(avSrc[d.asignatura]||{}).avance||0;
+    if(av>0){ sumAv+=av; countAv++; }
+    else countCero++;
   });
-  const pctReal = total>0 ? Math.round((validated+(inProd*.5))/total*100) : 0;
+  const pctReal = countAv>0 ? Math.round(sumAv/countAv) : 0;
+  window._dashCountCero = countCero;
+  window._dashCountAv   = countAv;
 
   // ── Semana actual del proyecto (basada en GANTT_HITOS deadlines) ──
   let currentWeek = 0;
@@ -4066,8 +4127,15 @@ function renderExecutiveHero(){
   });
   // Si estamos antes del primer deadline, week = 0-1
   if(currentBlockIdx === -1) currentWeek = Math.max(0, Math.round((today - GANTT_HITOS[0].fecha + 14*86400000)/86400000/7));
-  // Semana esperada = weeksDone del último bloque pasado / 18 * 100
-  const pctEsperado = Math.round(currentWeek / 18 * 100);
+  // % esperado = hitos que deberían estar "Validada" hoy / 11
+  // planif (col J) siempre esperado desde inicio + cada GANTT_HITO cuya fecha ya pasó
+  const hitosEsperados = 1 + GANTT_HITOS.filter(h => today >= h.fecha).length;
+  const pctEsperado = Math.min(100, Math.round(hitosEsperados / 11 * 100));
+  // Expose for informe so both always show the same numbers
+  window._dashPctReal = pctReal;
+  window._dashPctEsperado = pctEsperado;
+  window._dashCurrentWeek = currentWeek;
+  window._dashCurrentBlockIdx = currentBlockIdx;
 
   // ── Semáforo (considera plazos diferenciados: delAtras excluye grupos con plazo extendido) ──
   const diff = pctReal - pctEsperado;
@@ -4077,7 +4145,7 @@ function renderExecutiveHero(){
   let semClass='rojo', semEmoji='🔴', semLabel='Atrasado', semSub='';
   if(diffAjustado >= 5)    { semClass='verde';   semEmoji='🟢'; semLabel='A tiempo'; }
   else if(diffAjustado >= -15){ semClass='amarillo'; semEmoji='🟡'; semLabel='En riesgo'; }
-  semSub = `Real ${pctReal}% vs esperado ${pctEsperado}%`;
+  semSub = `Real ${pctReal}% (${countAv} en prod.) vs esperado ${pctEsperado}% · ${countCero} sin iniciar`;
 
   const semEl = document.getElementById('exec-sem');
   if(semEl){
@@ -4095,7 +4163,7 @@ function renderExecutiveHero(){
   if(body){
     const atrasadas = src.filter(d=>{
       const step = planifStepIndex(d.planif||'');
-      return step < 2 && today > planifDeadline(d.facultad);
+      return step < 2 && today > asigDeadline(d);
     });
     const sinIniciar = src.filter(d=>!d.planif||d.planif==='No inicia');
     const enConst    = src.filter(d=>d.planif==='En construcción'||d.planif==='Pendiente');
@@ -4199,58 +4267,32 @@ function renderExecutiveHero(){
     }).join('');
   }
 
-  // ── Estado DEL por Facultad — barras apiladas ──
-  const facRows = document.getElementById('exec-fac-rows');
-  if(facRows){
-    const facData = FAC_ORDER.filter(f=>src.some(d=>d.facultad===f)).map(fac=>{
-      const items = src.filter(d=>d.facultad===fac);
-      const n = items.length;
-      let ok=0, rev=0, atras=0, enT=0;
-      const deadline = planifDeadline(fac);
-      const hasExtended = today <= deadline && fac !== 'Recursos Naturales y Medicina Veterinaria';
-      items.forEach(d=>{
-        const step = planifStepIndex(d.planif||'');
-        if(step >= 4)       ok++;
-        else if(step >= 2)  rev++;
-        else if(today > deadline) atras++;
-        else                enT++;
-      });
-      // Semáforo por facultad
-      let sem = '🔴';
-      const pctOk = n>0 ? ok/n : 0;
-      if(atras===0 && ok+rev===n) sem='🟢';
-      else if(atras===0)          sem='🟡';
-      else if(atras/n > 0.5)      sem='🔴';
-      else                        sem='🟡';
-      return {label:FAC_ABBR[fac]||fac, n, ok, rev, atras, enT, sem, hasExtended, deadline};
-    });
-
-    facRows.innerHTML = facData.map(f=>{
-      const n = f.n || 1; // evitar /0
-      const wOk   = Math.round(f.ok/n*100);
-      const wRev  = Math.round(f.rev/n*100);
-      const wAt   = Math.round(f.atras/n*100);
-      const wEnT  = Math.round(f.enT/n*100);
-      const notaHTML = f.hasExtended
-        ? `<div class="exec-fac-nota" style="grid-column:2/-1">⏳ Plazo extendido hasta ${f.deadline.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}</div>`
-        : '';
-      return `<div class="exec-fac-row" title="${f.label}: ${f.ok} validadas · ${f.rev} en revisión · ${f.atras} atrasadas · ${f.enT} en construcción">
-        <span class="exec-fac-name">${f.label}</span>
-        <div class="exec-fac-stack">
-          ${wOk  > 0 ? `<div class="exec-fac-seg seg-ok"  style="width:${wOk}%"  title="${f.ok} validadas"></div>` : ''}
-          ${wRev > 0 ? `<div class="exec-fac-seg seg-rev" style="width:${wRev}%" title="${f.rev} en revisión"></div>` : ''}
-          ${wAt  > 0 ? `<div class="exec-fac-seg seg-at"  style="width:${wAt}%"  title="${f.atras} atrasadas"></div>` : ''}
-          ${wEnT > 0 ? `<div class="exec-fac-seg seg-enT" style="width:${wEnT}%" title="${f.enT} en construcción"></div>` : ''}
+  // ── Avance real vs esperado — una fila por asignatura, reactivo al filtro ──
+  const facRowsEl = document.getElementById('exec-fac-rows');
+  const stripLabel = document.getElementById('exec-fac-strip-label');
+  if(facRowsEl){
+    const activeFac = filters.facultad || '';
+    if(stripLabel) stripLabel.textContent = activeFac
+      ? `Avance real vs esperado — ${FAC_ABBR[activeFac]||activeFac}`
+      : 'Avance real vs esperado por asignatura';
+    facRowsEl.innerHTML = filtered().map(d=>{
+      const rPct = (avSrc[d.asignatura]||{}).avance || 0;
+      const done = rPct >= 100;
+      const diff = rPct - pctEsperado;
+      const barColor = done ? 'rgba(168,196,160,.9)' : diff >= -5 ? 'rgba(168,196,160,.75)' : diff >= -20 ? 'rgba(212,184,120,.75)' : 'rgba(200,80,80,.65)';
+      const diffCls  = done ? 'dv' : diff >= -5 ? 'dv' : diff >= -20 ? 'dam' : 'dro';
+      const diffTxt  = done ? '✓' : (diff >= 0 ? '+' : '') + diff + 'pp';
+      const shortName = d.asignatura.length > 28 ? d.asignatura.slice(0,26)+'…' : d.asignatura;
+      const facTag = activeFac ? '' : `<span style="font-size:9px;color:var(--text-muted);opacity:.65"> ${FAC_ABBR[d.facultad]||d.facultad}</span>`;
+      return `<div class="exec-asig-row" title="${d.asignatura} — Real: ${rPct}% · Esperado: ${pctEsperado}% · Dif: ${diffTxt}">
+        <span class="exec-asig-name">${shortName}${facTag}</span>
+        <div class="exec-asig-bar-wrap">
+          <div class="exec-asig-bar" style="width:${rPct}%;background:${barColor}"></div>
+          <div class="exec-asig-esp-line" style="left:${pctEsperado}%"></div>
         </div>
-        <span class="exec-fac-sem" title="Estado ${f.sem}">${f.sem}</span>
-        <div class="exec-fac-nums">
-          <span class="exec-fac-n ok"  title="Validadas">${f.ok}</span>
-          <span class="exec-fac-n rev" title="En revisión">${f.rev}</span>
-          ${f.atras > 0 ? `<span class="exec-fac-n at" title="Atrasadas">${f.atras}</span>` : ''}
-          ${f.enT   > 0 ? `<span class="exec-fac-n enT" title="En construcción">${f.enT}</span>` : ''}
-        </div>
-      </div>
-      ${notaHTML}`;
+        <span class="exec-asig-pct">${rPct}%</span>
+        <span class="exec-asig-diff ${diffCls}">${diffTxt}</span>
+      </div>`;
     }).join('');
   }
 }
@@ -4258,23 +4300,23 @@ function renderExecutiveHero(){
 // ─── OVERVIEW PANEL ─────────────────────────────────────────────────────────
 
 // Fechas del proyecto (CartaGantt real: Mar 2 → Jul 17)
-const GANTT_START = new Date(2026,2,2);   // 2 mar 2026 — inicio CartaGantt
-const GANTT_END   = new Date(2026,6,17);  // 17 jul 2026 — fin CartaGantt (Aulas habilitadas)
+const GANTT_START = new Date(2026,2,5);   // 5 mar 2026 — inicio CartaGantt (+3 días)
+const GANTT_END   = new Date(2026,6,20);  // 20 jul 2026 — fin CartaGantt (+3 días)
 
 // Bloques de producción: 9 bloques × 2 semanas = 18 semanas
 // (S0 = bloque 0 especial; S1-S2 a S17-S18 = bloques 1-9)
 // weeksDone: cuántas semanas académicas se habrán completado al llegar a la fecha límite
 const GANTT_HITOS = [
-  {label:'S0',     key:'s0',    fecha: new Date(2026,2,31), weeksDone:2,  hito:'Videos B y C'},
-  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,3,10), weeksDone:4,  hito:'Primeros recursos'},
-  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,3,20), weeksDone:6,  hito:'Entrega planif. DEL ◆'},
-  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,4,1),  weeksDone:8,  hito:'Producción'},
-  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,4,11), weeksDone:10, hito:'Producción'},
-  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,4,21), weeksDone:12, hito:'Rec. Nat. finaliza ◆'},
-  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,4,31), weeksDone:14, hito:'Producción'},
-  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,5,11), weeksDone:16, hito:'Producción'},
-  {label:'S15–S16',key:'s15s16',fecha: new Date(2026,5,21), weeksDone:17, hito:'Producción'},
-  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,6,1),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
+  {label:'S0',     key:'s0',    fecha: new Date(2026,3,3),  weeksDone:2,  hito:'Videos B y C'},
+  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,3,13), weeksDone:4,  hito:'Primeros recursos'},
+  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,3,23), weeksDone:6,  hito:'Entrega planif. DEL ◆'},
+  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,4,4),  weeksDone:8,  hito:'Producción'},
+  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,4,14), weeksDone:10, hito:'Producción'},
+  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,4,24), weeksDone:12, hito:'Rec. Nat. finaliza ◆'},
+  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,5,3),  weeksDone:14, hito:'Producción'},
+  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,5,14), weeksDone:16, hito:'Producción'},
+  {label:'S15–S16',key:'s15s16',fecha: new Date(2026,5,24), weeksDone:17, hito:'Producción'},
+  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,6,4),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
 ];
 
 let ovBarInstance = null, ovDonutInstance = null;
@@ -4681,6 +4723,256 @@ function renderHistorial(asignatura){
 
 // ── 8. EXPORTAR PDF ───────────────────────────────────────────────────────────
 document.getElementById('pdf-btn').addEventListener('click',()=>{ window.print(); });
+document.getElementById('informe-btn').addEventListener('click', generarInforme);
+
+function updateInformeBtn(){
+  const lbl = document.getElementById('informe-btn-label');
+  if(!lbl) return;
+  const fac = filters.facultad;
+  lbl.innerHTML = fac
+    ? `Informe<br><span style="font-size:9px;opacity:.8;font-weight:400">${FAC_ABBR[fac]||fac}</span>`
+    : 'Informe';
+}
+
+function generarInforme(){
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const fechaStr = hoy.toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const fechaCorta = hoy.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  // Respetar filtro de facultad activo
+  const src    = filtered().length ? filtered() : (DATA_ALL.length ? DATA_ALL : DATA);
+  const avSrc  = DATA_ALL.length ? AVANCE_ALL : AVANCE;
+  const activeFac = filters.facultad || '';
+  const facTitulo = activeFac ? ` — ${activeFac}` : '';
+
+  // ── Tomar valores directamente del dashboard (misma fuente, misma fórmula) ──
+  const pctReal     = window._dashPctReal     ?? 0;
+  const pctEsperado = window._dashPctEsperado ?? 0;
+  const countAv     = window._dashCountAv     ?? 0;
+  const countCero   = window._dashCountCero   ?? 0;
+  const currentBlockIdx = window._dashCurrentBlockIdx ?? -1;
+  const currentWeek     = window._dashCurrentWeek     ?? 0;
+  const semActual = currentBlockIdx>=0 ? GANTT_HITOS[currentBlockIdx].label : 'Inicio';
+  const proxHito  = currentBlockIdx<GANTT_HITOS.length-1 ? GANTT_HITOS[currentBlockIdx+1] : null;
+  const totalAsig = src.length || 1;
+  const diff=pctReal-pctEsperado;
+  const semClass=diff>=-5?'verde':diff>=-20?'amarillo':'rojo';
+  const semLabel=diff>=-5?'A tiempo':diff>=-20?'En riesgo':'Atrasado';
+  const semColor=diff>=-5?'#27a06e':diff>=-20?'#d4a820':'#c04848';
+
+  // ── Métricas planificación ──
+  let nValid=0,nDEL=0,nEscala=0,nConstr=0,nNoInicia=0,nAtras=0,nObs=0,nEscalPend=0;
+  src.forEach(d=>{
+    const s=planifStepIndex(d.planif||'');
+    const dl=asigDeadline(d);
+    if(s>=4) nValid++;
+    else if(s>=2) nDEL++;
+    else if(s===1.5) nEscala++;
+    else if(s>=1) nConstr++;
+    else nNoInicia++;
+    if(s<1.5&&hoy>dl) nAtras++;
+    const o=(avSrc[d.asignatura]||{}).obs||d.obs||'';
+    if(o.trim()){nObs++;if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3)nEscalPend++;}}
+  });
+
+  // ── Por facultad ──
+  const facData={};
+  FAC_ORDER.forEach(f=>{facData[f]={n:0,valid:0,del:0,escala:0,constr:0,noInicia:0,atras:0,sumAv:0,nAv:0,obs:[]};});
+  src.forEach(d=>{
+    const fd=facData[d.facultad]; if(!fd)return;
+    fd.n++;
+    const s=planifStepIndex(d.planif||'');
+    const dl=asigDeadline(d);
+    const av=(avSrc[d.asignatura]||{}).avance||0;
+    fd.sumAv+=av; fd.nAv++;
+    if(s>=4) fd.valid++;
+    else if(s>=2) fd.del++;
+    else if(s===1.5) fd.escala++;
+    else if(s>=1) fd.constr++;
+    else fd.noInicia++;
+    if(s<1.5&&hoy>dl) fd.atras++;
+    const o=(avSrc[d.asignatura]||{}).obs||d.obs||'';
+    if(o.trim()){
+      let escalMsg='';
+      if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}escalMsg=` ⚠ ${ds}d → ${lv}`;}}
+      fd.obs.push({asig:d.asignatura,doc:d.docente,txt:o.trim(),escal:escalMsg});
+    }
+  });
+
+  const facRows=FAC_ORDER.filter(f=>facData[f]&&facData[f].n>0).map(f=>{
+    const fd=facData[f];
+    const pct=fd.nAv?Math.round(fd.sumAv/fd.nAv):0;
+    const facDiff=pct-pctEsperado;
+    const facColor=facDiff>=-5?'#27a06e':facDiff>=-20?'#d4a820':'#c04848';
+    const facLabel=facDiff>=-5?'✓ A tiempo':facDiff>=-20?'⚡ En riesgo':'✗ Atrasada';
+    const barBg=`<div style="background:#e8eef4;border-radius:3px;height:7px;width:100%"><div style="background:${facColor};height:7px;border-radius:3px;width:${pct}%"></div></div>`;
+    const espBar=`<div style="background:transparent;border-radius:3px;height:7px;width:100%;border:1px dashed #aaa;margin-top:2px"><div style="background:rgba(0,0,0,.2);height:5px;border-radius:2px;margin:1px;width:${pctEsperado}%"></div></div>`;
+    const atCol=fd.atras>0?'color:#c04848;font-weight:700':'color:#888';
+    return `<tr>
+      <td style="padding:8px 10px;border-bottom:1px solid #e8eef4;font-weight:600;font-size:12.5px">${f}</td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4">${fd.n}</td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;color:#27a06e;font-weight:600">${fd.valid}</td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;color:#d4a820">${fd.del+fd.escala}</td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;${atCol}">${fd.atras>0?'⚠ '+fd.atras:fd.atras}</td>
+      <td style="padding:8px;border-bottom:1px solid #e8eef4;min-width:110px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-weight:700;color:${facColor};min-width:32px">${pct}%</span>
+          <div style="flex:1">${barBg}${espBar}</div>
+        </div>
+        <div style="font-size:10px;color:#888;margin-top:2px">Esperado: ${pctEsperado}% · Dif: <span style="color:${facColor};font-weight:700">${facDiff>=0?'+':''}${facDiff}pp</span></div>
+      </td>
+      <td style="text-align:center;padding:8px;border-bottom:1px solid #e8eef4;font-size:12px;font-weight:700;color:${facColor}">${facLabel}</td>
+    </tr>`;
+  }).join('');
+
+  const obsRows=src.filter(d=>{const o=(avSrc[d.asignatura]||{}).obs||d.obs||'';return o.trim();}).map(d=>{
+    const o=((avSrc[d.asignatura]||{}).obs||d.obs||'').trim();
+    let escalHtml='';
+    if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}escalHtml=`<br><span style="color:#c04848;font-size:11px;font-weight:600">⚠ ${ds}d sin respuesta — escalar a ${lv}</span>`;}}
+    return `<tr>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;font-weight:600">${d.asignatura}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px">${d.docente}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:11px;color:#5a7080">${d.facultad}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px">${o}${escalHtml}</td>
+    </tr>`;
+  }).join('');
+
+  // ── Docentes sin respuesta (reunion = 'Sin respuesta') ──
+  const sinResp = src.filter(d=>d.reunion==='Sin respuesta');
+  const sinRespRows = sinResp.map(d=>{
+    const obs = ((avSrc[d.asignatura]||{}).obs||d.obs||'').trim();
+    let diasHtml='';
+    if(d.fechaSR){
+      const ds=diasDesde(d.fechaSR);
+      if(ds!==null){
+        let lv='Equipo';
+        for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}
+        diasHtml=`<br><span style="color:#c04848;font-size:10.5px;font-weight:700">⚠ ${ds} días — escalar a ${lv}</span>`;
+      }
+    }
+    return `<tr>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;font-weight:600">${d.asignatura}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:12px">${d.docente}${d.correo?`<br><span style='font-size:10px;color:#5a7080'>${d.correo}</span>`:''}${diasHtml}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:11px;color:#5a7080">${d.facultad}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee;font-size:11.5px;color:#444">${obs||'<span style="color:#aaa;font-style:italic">Sin observación registrada</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  // ── Barra visual real vs esperado ──
+  const barReal=`<div style="position:relative;background:#e8eef4;border-radius:6px;height:22px;margin:8px 0">
+    <div style="background:${semColor};height:22px;border-radius:6px;width:${pctReal}%;transition:width .3s"></div>
+    <div style="position:absolute;top:0;left:${pctEsperado}%;height:22px;width:2px;background:rgba(0,0,0,.35);border-radius:1px"></div>
+    <div style="position:absolute;top:3px;left:${Math.min(pctEsperado+1,95)}%;font-size:9px;color:rgba(0,0,0,.5);font-weight:600">Esp.</div>
+  </div>`;
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <title>Informe Avance e-Learning 2026-1${facTitulo} — ${fechaCorta}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;color:#1a2a3a;background:#fff;padding:28px 36px}
+    h1{font-size:19px;color:#1a3a6b;margin-bottom:3px}
+    h2{font-size:13.5px;color:#1a3a6b;margin:20px 0 8px;border-bottom:2px solid #1a3a6b;padding-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:3px solid #1a3a6b}
+    .sub{font-size:11px;color:#5a7080;margin-top:3px}
+    .header-right{text-align:right;font-size:11px;color:#5a7080}
+    /* Real vs esperado hero */
+    .rvse{display:flex;gap:16px;background:#f4f7fa;border-radius:10px;padding:16px 20px;margin:10px 0 18px;align-items:center;border-left:5px solid ${semColor}}
+    .rvse-main{flex:1}
+    .rvse-title{font-size:11px;font-weight:700;color:#5a7080;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+    .rvse-nums{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+    .rvse-real{font-size:36px;font-weight:800;color:${semColor};line-height:1}
+    .rvse-esp{font-size:14px;color:#5a7080}
+    .rvse-diff{font-size:13px;font-weight:700;color:${semColor}}
+    .rvse-badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;background:${semColor};color:#fff;white-space:nowrap;align-self:center}
+    .kpi-row{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+    .kpi{flex:1;min-width:90px;background:#f4f7fa;border-radius:7px;padding:9px 12px;border-top:3px solid #1a3a6b}
+    .kpi .val{font-size:20px;font-weight:700;color:#1a3a6b}
+    .kpi .lbl{font-size:10px;color:#5a7080;margin-top:1px}
+    .kpi.verde .val{color:#27a06e}.kpi.verde{border-top-color:#27a06e}
+    .kpi.amarillo .val{color:#d4a820}.kpi.amarillo{border-top-color:#d4a820}
+    .kpi.rojo .val{color:#c04848}.kpi.rojo{border-top-color:#c04848}
+    table{width:100%;border-collapse:collapse}
+    thead th{background:#1a3a6b;color:#fff;padding:7px 10px;font-size:11px;text-align:left}
+    .firma-section{margin-top:44px;display:flex;justify-content:flex-end}
+    .firma-box{text-align:center;min-width:220px}
+    .firma-line{border-top:1.5px solid #1a3a6b;margin-bottom:5px}
+    .nota{font-size:10px;color:#7a9080;margin-top:24px;border-top:1px solid #e0e8f0;padding-top:7px}
+    @media print{body{padding:12px 18px}button{display:none}}
+  </style></head><body>
+  <div class="header">
+    <div>
+      <div style="font-size:10.5px;font-weight:700;color:#7a9080;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">Universidad Santo Tomás — Dirección e-Learning</div>
+      <h1>Informe de Avance — Proyecto e-Learning 2026-1${facTitulo}</h1>
+      <div class="sub">Seguimiento virtualización de cursos · ${fechaStr}</div>
+    </div>
+    <div class="header-right"><div style="font-weight:700;color:#1a3a6b">CONFIDENCIAL</div><div>${fechaCorta}</div><div style="color:#1a3a6b;margin-top:3px">Uso interno</div></div>
+  </div>
+
+  <h2>Avance Real vs Esperado según Cronograma</h2>
+  <div class="rvse">
+    <div class="rvse-main">
+      <div class="rvse-title">📍 Semana actual del proyecto: ${semActual} (semana ${currentWeek} de 18)${proxHito?` · Próximo hito: ${proxHito.label} (${proxHito.fecha.toLocaleDateString('es-CL',{day:'numeric',month:'short'})})`:''}</div>
+      <div class="rvse-nums">
+        <div><div style="font-size:11px;color:#5a7080;margin-bottom:2px">Avance real (producción)</div><div class="rvse-real">${pctReal}%</div></div>
+        <div style="align-self:center;color:#aaa;font-size:20px">vs</div>
+        <div><div style="font-size:11px;color:#5a7080;margin-bottom:2px">Esperado según cronograma</div><div style="font-size:36px;font-weight:800;color:#5a7080;line-height:1">${pctEsperado}%</div></div>
+        <div style="align-self:center;margin-left:8px"><div style="font-size:11px;color:#5a7080;margin-bottom:2px">Diferencia</div><div class="rvse-diff" style="font-size:24px">${diff>=0?'+':''}${diff} pp</div></div>
+      </div>
+      ${barReal}
+      <div style="font-size:10.5px;color:#5a7080">▌ Barra sólida = avance real &nbsp;|&nbsp; línea vertical = avance esperado</div>
+      <div style="font-size:10.5px;color:#5a7080;margin-top:4px">Promedio de <strong>${countAv}</strong> asignaturas con producción iniciada · <strong>${countCero}</strong> aún sin iniciar (0%)</div>
+    </div>
+    <div class="rvse-badge">${semLabel}</div>
+  </div>
+
+  <h2>Estado de Planificaciones DEL</h2>
+  <div class="kpi-row">
+    <div class="kpi verde"><div class="val">${nValid}</div><div class="lbl">Validadas</div></div>
+    <div class="kpi amarillo"><div class="val">${nDEL}</div><div class="lbl">En revisión DEL</div></div>
+    <div class="kpi"><div class="val">${nEscala}</div><div class="lbl">Ajustes según Escala</div></div>
+    <div class="kpi"><div class="val">${nConstr}</div><div class="lbl">En construcción</div></div>
+    <div class="kpi"><div class="val">${nNoInicia}</div><div class="lbl">No iniciadas</div></div>
+    ${nAtras>0?`<div class="kpi rojo"><div class="val">${nAtras}</div><div class="lbl">Atrasadas (plazo vencido)</div></div>`:''}
+    <div class="kpi"><div class="val">${totalAsig}</div><div class="lbl">Total asignaturas</div></div>
+  </div>
+
+  <h2>Avance por Facultad (real vs esperado ${pctEsperado}%)</h2>
+  <table>
+    <thead><tr><th>Facultad</th><th>Total</th><th>Valid.</th><th>En DEL</th><th>Atras.</th><th>Avance real / esperado</th><th>Estado</th></tr></thead>
+    <tbody>${facRows}</tbody>
+  </table>
+
+  ${nObs>0?`<h2>Observaciones Activas (${nObs} asignaturas)${nEscalPend>0?` — ⚠ ${nEscalPend} con escalamiento pendiente`:''}</h2>
+  <table>
+    <thead><tr><th>Asignatura</th><th>Docente</th><th>Facultad</th><th>Observación</th></tr></thead>
+    <tbody>${obsRows}</tbody>
+  </table>`:''}
+
+  ${sinResp.length>0?`<h2 style="color:#c04848">⚠ Docentes sin respuesta (${sinResp.length})</h2>
+  <p style="font-size:11.5px;color:#5a7080;margin-bottom:8px">Los siguientes docentes no han respondido al correo de convocatoria a reunión. Se incluyen las observaciones registradas (col. W) y el nivel de escalamiento vigente.</p>
+  <table>
+    <thead><tr><th>Asignatura</th><th>Docente / Días sin resp.</th><th>Facultad</th><th>Observación (col. W)</th></tr></thead>
+    <tbody>${sinRespRows}</tbody>
+  </table>`:'<p style="font-size:11.5px;color:#27a06e;margin-top:16px">✓ No hay docentes sin respuesta registrados.</p>'}
+
+  <div class="firma-section">
+    <div class="firma-box">
+      <div style="height:32px"></div>
+      <div class="firma-line"></div>
+      <div style="font-size:13px;font-weight:700;color:#1a3a6b">Paulina Vera B.</div>
+      <div style="font-size:11.5px;color:#5a7080">Directora e-Learning</div>
+      <div style="font-size:11.5px;color:#5a7080">Universidad Santo Tomás</div>
+    </div>
+  </div>
+  <div class="nota">Informe generado automáticamente desde el sistema de seguimiento e-Learning UST 2026-1 · ${fechaStr} · El avance esperado se calcula en base al cronograma de 18 semanas aprobado (inicio 2 mar 2026). El avance real corresponde al promedio ponderado de producción de recursos digitales por asignatura.</div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`;
+
+  const w=window.open('','_blank','width=960,height=750');
+  w.document.write(html);
+  w.document.close();
+}
+
 
 // ── 9. VISTA KANBAN ───────────────────────────────────────────────────────────
 function renderKanban(){
@@ -4845,7 +5137,7 @@ function renderFacView(){
           </div>
         </td>
         <td>
-          <span class="ftk-planif ${isAt?'ftk-p-at':ftkPlanifClass(d.planif)}">${isAt?'⚠':''}${isAt?'':ftkPlanifIcon(d.planif)+' '}${isAt?'Atrasada':planifLabel(d.planif)||'No inicia'}</span>
+          <span class="ftk-planif ${isAt?'ftk-p-at':ftkPlanifClass(d.planif)}">${isAt?'⚠':''}${isAt?'':ftkPlanifIcon(d.planif)+' '}${isAt?'Atrasada':(d.estadoGlobal||planifLabel(d.planif)||'No inicia')}</span>
         </td>
         <td>
           <div class="ftk-hitos">${ftkHitosDots(hitos)}</div>
@@ -4859,6 +5151,41 @@ function renderFacView(){
       </tr>`;
     }).join('');
 
+    // Obs count for inline badge
+    const facId = fac.replace(/[^a-z0-9]/gi,'_');
+    let obsN=0, escalN=0;
+    const obsList = items.map(d=>{
+      const o=(AVANCE[d.asignatura]||{}).obs||d.obs||'';
+      if(!o.trim()) return null;
+      obsN++;
+      let escalHtml='';
+      if(d.fechaSR){
+        const ds=diasDesde(d.fechaSR);
+        if(ds!==null&&ds>=3){
+          escalN++;
+          let lv='Equipo';
+          for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}
+          escalHtml=`<span class="fv-obs-escal-dot" style="font-size:10px;padding:1px 6px;margin-left:6px;animation:none">⚠ ${ds}d → ${lv}</span>`;
+        }
+      }
+      const txt=o.trim();
+      return `<div class="fv-obs-item">
+        <span style="flex-shrink:0;font-size:14px">💬</span>
+        <div>
+          <span style="font-size:12px;font-weight:700;color:var(--az)">${d.asignatura}</span>
+          <span style="font-size:11px;color:var(--text-muted);margin-left:5px">${d.docente}</span>${escalHtml}
+          <div style="font-size:11.5px;color:var(--text);margin-top:3px;line-height:1.4">${txt}</div>
+        </div>
+      </div>`;
+    }).filter(Boolean).join('');
+
+    const obsBadge = obsN
+      ? `<div class="fv-obs-inline" onclick="event.stopPropagation();toggleFvObs('${facId}')">${escalN>0?`<span class="fv-obs-escal-dot" title="${escalN} con escalamiento pendiente">⚠ ${escalN}</span>`:''}<span class="fv-obs-count-dot" title="Ver ${obsN} observación(es)">💬 ${obsN}</span></div>`
+      : '';
+    const obsPanel = obsN
+      ? `<div class="fv-obs-panel" id="fv-obs-${facId}" style="display:none">${obsList}</div>`
+      : '';
+
     return `<div class="fv-idx-card">
       <div class="fv-idx-hdr" onclick="toggleFvGroup(this)">
         <div class="fv-idx-sem ${semCls}"></div>
@@ -4869,6 +5196,7 @@ function renderFacView(){
           ${atras>0?`<div class="fv-idx-count"><span class="num c-ro">${atras}</span><span class="lbl">Atras.</span></div>`:''}
           ${enT>0 ?`<div class="fv-idx-count"><span class="num c-gr">${enT}</span><span class="lbl">Const.</span></div>`:''}
           <div class="fv-idx-count"><span class="num" style="color:rgba(255,255,255,.6)">${n}</span><span class="lbl">Total</span></div>
+          ${obsBadge}
         </div>
         <div class="fv-idx-bar-wrap">
           ${wOk >0?`<div class="fv-idx-bar-seg ok"  style="width:${wOk}%"></div>`:''}
@@ -4878,6 +5206,7 @@ function renderFacView(){
         </div>
         <svg class="fv-idx-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
+      ${obsPanel}
       <div class="fv-ticker-wrap" style="display:none">
         <table class="fv-ticker-table">
           <thead><tr>
@@ -4894,11 +5223,17 @@ function renderFacView(){
   }).join('')}</div>`;
 }
 function toggleFvGroup(hdr){
-  const body = hdr.nextElementSibling;
+  const card = hdr.parentElement;
+  const body = card.querySelector('.fv-ticker-wrap');
   const chev = hdr.querySelector('.fv-idx-chevron');
   const closed = body.style.display === 'none';
   body.style.display = closed ? '' : 'none';
   if(chev) chev.classList.toggle('open', closed);
+}
+function toggleFvObs(facId){
+  const panel = document.getElementById('fv-obs-'+facId);
+  if(!panel) return;
+  panel.style.display = panel.style.display === 'none' ? '' : 'none';
 }
 
 // ── 11. MODO PRESENTACIÓN FULLSCREEN ─────────────────────────────────────────
@@ -5505,6 +5840,8 @@ window.addEventListener('load', function(){
 <script>
 (function(){
   let botOpen = false, botGreeted = false;
+  let ctxPersona = null;  // última persona mencionada en la conversación
+  let ctxAsig = null;     // última asignatura mencionada
 
   function nrm(s){
     return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
@@ -5514,23 +5851,23 @@ window.addEventListener('load', function(){
   function findAsig(q){
     const nq = nrm(q);
     let best = null, bestScore = 0;
-    (window.DATA||[]).forEach(d=>{
+    (DATA||[]).forEach(d=>{
       const na = nrm(d.asignatura);
       if(nq.includes(na)){ bestScore=999; best=d; return; }
-      const words = na.split(' ').filter(w=>w.length>3);
+      const words = na.split(' ').filter(w=>w.length>4);
       let sc = words.filter(w=>nq.includes(w)).length;
       if(sc>bestScore){ bestScore=sc; best=d; }
     });
     return bestScore>=1 ? best : null;
   }
 
-  function pct(asig){ return (window.AVANCE||{})[asig?.asignatura]?.avance||0; }
+  function pct(asig){ return (AVANCE||{})[asig?.asignatura]?.avance||0; }
 
   // Conocimiento del proyecto UST 2026-1
   const PROYECTO = {
     nombre: 'Proyecto de Virtualización de Cursos UST 2026-1',
-    botNombre: 'Pauli',
-    botOrigen: 'Mi nombre es en honor a Paulina Vera Benavente, Directora del proyecto.',
+    botNombre: 'Vio',
+    botOrigen: 'Me llamo Vio, abreviación de Violetta — la asistente virtual del proyecto UST 2026-1.',
     descripcion: 'Diseño y producción de recursos educativos digitales para cursos universitarios de la Universidad Santo Tomás, semestre 2026-1.',
     directora: {nombre:'Paulina Vera Benavente', rol:'Directora del proyecto', mail:'pverab@santotomas.cl'},
     fases: [
@@ -5542,18 +5879,17 @@ window.addEventListener('load', function(){
     ],
     equipo: [
       {nombre:'Paulina Vera Benavente',rol:'Directora',       mail:'pverab@santotomas.cl'},
-      {nombre:'María José Suazo',      rol:'JP',              mail:'msuazop@santotomas.cl'},
-      {nombre:'Noelia Escalona',       rol:'JP',              mail:'nomaesga@gmail.com'},
-      {nombre:'José Luis Salazar',     rol:'JP / DI',         mail:'joseluissalazar81@gmail.com'},
-      {nombre:'Nicole Pastene',        rol:'Coordinadora QA', mail:'npasten20@santotomas.cl'},
+      {nombre:'María José Suazo',      rol:'Coordinadora QA',      mail:'msuazop@santotomas.cl'},
+      {nombre:'Noelia Escalona',        rol:'JP / DI',              mail:'nomaesga@gmail.com'},
+      {nombre:'José Luis Salazar',     rol:'JP / DI',              mail:'joseluissalazar81@gmail.com'},
       {nombre:'Cristián Domínguez',    rol:'DI',              mail:'profe.cristian.d@gmail.com'},
       {nombre:'Andreina Rodríguez',    rol:'DI',              mail:'andreina.rodriguezruiz@gmail.com'},
-      {nombre:'Karen Chávez',          rol:'DI',              mail:'karend.chavezlopez@gmail.com'},
-      {nombre:'Natalie Baeza',         rol:'DI',              mail:'Nbaeza.n@gmail.com'},
+      {nombre:'Natalia Baeza',          rol:'DI',              mail:'Nbaeza.n@gmail.com'},
       {nombre:'Brenda Bastías',        rol:'DI',              mail:'brenda.bastiasbaier@gmail.com'},
       {nombre:'Magdalena Quezada',     rol:'DI',              mail:''},
+      {nombre:'Noelia Jara',           rol:'DI',              mail:''},
       {nombre:'Francisco Tapia',       rol:'DG',              mail:''},
-      {nombre:'Giovanni Perini',       rol:'DG',              mail:''},
+      {nombre:'Jorge Arévalo',         rol:'DG',              mail:''},
       {nombre:'Jenny García',          rol:'DG',              mail:''},
       {nombre:'Elías Castillo',        rol:'Implementador',   mail:'eliascastillo2@gmail.com'},
       {nombre:'Antonio Cabrera',       rol:'Implementador',   mail:''},
@@ -5572,20 +5908,35 @@ window.addEventListener('load', function(){
       DG:   'El Diseñador Gráfico produce los recursos multimedia y visuales del curso.',
       impl:'El Implementador carga y configura los recursos en el aula virtual Moodle.',
       qa:  'La Coordinadora de Calidad (QA) revisa que los recursos cumplan los estándares antes de publicarse.',
-    }
+    },
+    reportes: [
+      {facultad:'Ingeniería y Negocios',                         url:'/reportes/ingenieria.html'},
+      {facultad:'Ciencias Sociales y Educación',                 url:'/reportes/ciencias-sociales.html'},
+      {facultad:'Recursos Naturales y Medicina Veterinaria',     url:'/reportes/recursos-naturales.html'},
+      {facultad:'Economía y Negocios',                           url:'/reportes/economia.html'},
+    ],
+    contactosDEL: [
+      {facultad:'Ingeniería y Negocios (Ing. Industrial / Minas)', nombre:'Karen Kanzur',      mail:'kkanzua@santotomas.cl'},
+      {facultad:'Ingeniería y Negocios (Ing. Comercial)',          nombre:'Catherine Korn',    mail:'kkorn@santotomas.cl'},
+      {facultad:'Ciencias Sociales y Educación',                  nombre:'Verónica Rubio',    mail:'vrubioa@santotomas.cl'},
+      {facultad:'Recursos Naturales y Medicina Veterinaria',      nombre:'Álvaro Reyes',      mail:'areyes@santotomas.cl'},
+      {facultad:'Salud — Nutrición y Dietética',                  nombre:'Jenny Arteaga',     mail:'jarteaga@santotomas.cl'},
+      {facultad:'Salud — Terapia Ocupacional',                    nombre:'Alicia Marcoleta',  mail:'amarcoleta@santotomas.cl'},
+      {facultad:'Salud — Kinesiología',                           nombre:'Alexis Espinoza',   mail:'alexisespinozasa@santotomas.cl'},
+    ],
   };
 
   function botRespond(q){
     const nq = nrm(q);
 
-    if(nq.match(/como te llamas|quien eres|tu nombre|eres pauli|por que pauli|de donde.*nombre/))
-      return {txt:'Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1.\n\n${PROYECTO.botOrigen}\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.'.replace('${PROYECTO.botOrigen}', PROYECTO.botOrigen), chips:['¿Quién es Paulina?','Tipos de recursos','Ayuda']};
+    if(nq.match(/como te llamas|quien eres|tu nombre|eres vio|por que vio|de donde.*nombre|violetta/))
+      return {txt:'Soy <strong>Vio</strong>, la asistente virtual del proyecto UST 2026-1.\n\n'+PROYECTO.botOrigen+'\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.', chips:['Ver promedio','Reuniones realizadas','Ayuda']};
 
     if(nq.match(/paulina|directora/))
       return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Pauli</strong>, la asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, horas, programas o el avance de cualquier asignatura.', chips:['¿Qué es el proyecto?','Tipos de recursos','Ayuda']};
+      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
       return {txt:'Podés preguntarme sobre:\n• <strong>Avance por facultad / asignatura</strong> (% promedio por área)\n• <strong>Docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Tipos de recursos</strong> T1–T4 (cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Manual DG, Manual Implementador</strong> (nomenclatura, checklist QA)\n• <strong>Fases del proceso</strong> y <strong>roles del equipo</strong>\n• <strong>Co-diseño, Escala de Apreciación, QA planificación</strong>\n• <strong>Colores por facultad</strong>, herramientas, duplas de trabajo\n• <strong>Estadísticas:</strong> promedio, top 5, menor avance, formatos', chips:['Avance por facultad','Tipos de recursos','Fases del proceso']};
@@ -5597,6 +5948,11 @@ window.addEventListener('load', function(){
     // Fases
     if(nq.match(/fases|etapas|proceso|flujo de trabajo/))
       return {txt:'<strong>Fases del proceso:</strong>\n'+PROYECTO.fases.map((f,i)=>`${i+1}. <strong>${f.nombre}</strong>: ${f.desc}`).join('\n')};
+
+    // ── MENÚ DE CONOCIMIENTO — chip "Manuales" ─────────────────────────────────
+    if(nq==='manuales' || nq.match(/^menu|^categorias|^que sabe|^que conoces|^que temas/))
+      return {txt:'📚 <strong>¿Sobre qué querés saber?</strong>\n\nElegí una categoría:',
+              chips:['¿Cómo hacer una planificación?','Manual del DI','Manual del DG','Manual del Implementador','Flujo de producción','Reunión de inicio','Guía del docente','Tipos de recursos','Prompts IA','Brandbook UST','Estándar de recursos','Los 3 momentos']};
 
     // ── RECURSOS ──────────────────────────────────────────────────────────────
 
@@ -5634,7 +5990,7 @@ window.addEventListener('load', function(){
 
     // Los 3 momentos
     if(nq.match(/3 momentos|tres momentos|momentos de aprendizaje|preparacion|trabajo independiente/) && !findAsig(q))
-      return {txt:'<strong>Los 3 momentos de aprendizaje UST:</strong>\n\n<strong>1. Preparación</strong>\nEstudiante autónomo se prepara para la clase. Usa TPE (tiempo personal). Sin docente.\n\n<strong>2. Desarrollo</strong>\nContacto directo con el docente. Horas sincrónicas o asincrónicas. Evaluaciones formativas y sumativas.\n\n<strong>3. Trabajo Independiente</strong>\nEstudiante profundiza lo aprendido de manera personal. Practica habilidades y conocimientos. Usa TPE.', chips:['Tipos de recursos','¿Qué es T1?']};
+      return {txt:'<strong>Los 3 momentos de aprendizaje UST:</strong>\n\n<strong>1. Preparación</strong>\nEstudiante autónomo se prepara para la clase. Usa TPE (tiempo personal). Sin docente.\n\n<strong>2. Desarrollo</strong>\nContacto directo con el docente. Horas sincrónicas o asincrónicas. Evaluaciones formativas y sumativas.\n\n<strong>3. Trabajo Independiente</strong>\nEstudiante profundiza lo aprendido de manera personal. Practica habilidades y conocimientos. Usa TPE.\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1TNmRJnOrZP-rsauFZSz-HiQEZyTMfpZP/view" target="_blank">Ver documento completo (PDF)</a>', chips:['Tipos de recursos','¿Qué es T1?']};
 
     // Plantillas
     if(nq.match(/plantilla.*t1|t1.*plantilla/))
@@ -5667,11 +6023,15 @@ window.addEventListener('load', function(){
 
     // Prompts IA
     if(nq.match(/prompt|prompts|ia para recursos|claude para/))
-      return {txt:'<strong>Prompts de IA para recursos (Prompts_Recursos_DEL_v2.docx)</strong>\n\nEl proyecto tiene prompts listos para usar con Claude que generan guiones completos para:\n• Infografía\n• Infografía interactiva\n• Podcast\n• Cápsula y Videoclase\n• Genially\n• Guías de facilitación\n\nCómo usarlos:\n1. Abrí Claude en claude.ai\n2. Adjuntá la planificación Excel + la plantilla del recurso\n3. Copiá el prompt, reemplazá los [CORCHETES] y pegalo', chips:['Tipos de recursos','Plantillas']};
+      return {txt:'<strong>Prompts de IA para recursos (Prompts_Recursos_DEL_v2.docx)</strong>\n\nEl proyecto tiene prompts listos para usar con Claude que generan guiones completos para:\n• Infografía · Infografía interactiva · Podcast\n• Cápsula · Videoclase · Genially · Guías de facilitación\n\nCómo usarlos:\n1. Abrí Claude en claude.ai\n2. Adjuntá la planificación Excel + la plantilla del recurso\n3. Copiá el prompt, reemplazá los [CORCHETES] y pegalo\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1Uzl5HTSq3L4bTA8XecZLzLxcvMB52F8m/view" target="_blank">Descargar Prompts_Recursos_DEL_v2.docx</a>', chips:['Tipos de recursos','Plantillas']};
 
     // Manual DI
     if(nq.match(/manual.*di|di.*manual|manual.*instruccional|manual.*diseño instruccional/))
-      return {txt:'<strong>Manual de Diseño Instruccional en e-Learning UST</strong>\nAprobado por Resolución N°481/24 (Vicerrectoría Académica).\n\nContenido principal:\n• Pilares del Marco Institucional e-Learning (interacción, autonomía, flexibilidad, calidad)\n• Planificación didáctica: cómo crearla y completarla\n• Tipos de herramientas y recursos\n• Diseño de evaluaciones (diagnóstica, formativa)\n• Retroalimentación en entornos virtuales\n\nArchivo: <em>Aprueba Manual De Diseño Instruccional En E-Learning.pdf</em>', chips:['Los 3 momentos','Tipos de recursos']};
+      return {txt:'<strong>Manual de Diseño Instruccional en e-Learning UST</strong>\nAprobado por Resolución N°481/24 (Vicerrectoría Académica).\n\nContenido principal:\n• Pilares del Marco Institucional e-Learning (interacción, autonomía, flexibilidad, calidad)\n• Planificación didáctica: cómo crearla y completarla\n• Tipos de herramientas y recursos\n• Diseño de evaluaciones (diagnóstica, formativa)\n• Retroalimentación en entornos virtuales\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1ELMz2aPNuHUloG3FGlSTpmXyIH4z5ea9/view" target="_blank">Abrir Manual DI (PDF)</a>\n📐 <a class="bot-a" href="https://view.genially.com/69b8285205580fd47e45ebc5" target="_blank">Tutorial: ¿Cómo hacer una planificación?</a>', chips:['¿Cómo hacer una planificación?','Los 3 momentos','Tipos de recursos']};
+
+    // Planificación didáctica — cómo hacerla
+    if(nq.match(/como.*planif|planif.*como|hacer.*planif|planif.*hacer|que es.*planif|planif.*didac|tutorial.*planif|planif.*tutorial|elaborar.*planif/))
+      return {txt:'<strong>¿Cómo hacer una planificación didáctica?</strong>\n\nLa planificación es el documento base del curso virtual. El DI la elabora junto al docente antes de diseñar cualquier recurso.\n\nIncluye:\n• Competencias y resultados de aprendizaje\n• Distribución de horas (sincrónicas / asincrónicas / TPE)\n• Selección de recursos por semana (T1-T4)\n• Evaluaciones formativas y sumativas\n• Retroalimentación planificada\n\n📐 <a class="bot-a" href="https://view.genially.com/69b8285205580fd47e45ebc5" target="_blank">Ver tutorial interactivo: ¿Cómo hacer una planificación?</a>', chips:['Tipos de recursos','Los 3 momentos','Plazos DEL']};
 
     // Manual DG
     if(nq.match(/manual.*dg|dg.*manual|manual.*grafico|manual.*diseño grafico/))
@@ -5690,8 +6050,15 @@ window.addEventListener('load', function(){
       return {txt:'<strong>QA del DG — Causales de rechazo en DI o QA institucional:</strong>\n\n<strong>Identidad visual:</strong>\n• Logo modificado, estirado o recoloreado\n• Color de facultad incorrecto o no aplicado\n• Tipografía no institucional (no Arial en docs digitales)\n\n<strong>Diseño y accesibilidad:</strong>\n• Más de 7 líneas de texto en PPT\n• Contraste texto/fondo menor a 4.5:1 (WCAG AA)\n• Texto incrustado en imagen\n• Íconos sin etiqueta de texto\n• Recursos visualmente inconsistentes entre sí\n\n<strong>Archivos:</strong>\n• Formato incorrecto (SCORM para Genially, MP4 video, MP3 podcast)\n• Archivo en carpeta equivocada del Drive\n• Errores ortográficos o puntuación incorrecta', chips:['Manual DG','Dupla DI-DG']};
 
     // Equipo completo
-    if(nq.match(/equipo|integrantes|quienes son|miembros/))
-      return {txt:'<strong>Equipo del proyecto:</strong>\n'+PROYECTO.equipo.map(p=>`• ${p.nombre} — ${p.rol}`).join('\n')};
+    if(nq.match(/equipo|integrantes|quienes son|miembros/)){
+      const filas=PROYECTO.equipo.map(p=>{
+        const primer=p.nombre.split(' ')[0];
+        const query=p.rol.match(/DI|JP|DG|Implementador/)?`Asignaturas de ${primer}`:primer;
+        const nombre=`<span class="bot-link" onclick="botAsk('${query}')">${p.nombre}</span>`;
+        return `• ${nombre} — ${p.rol}`;
+      }).join('\n');
+      return {txt:`<strong>Equipo del proyecto:</strong>\n${filas}\n\n→ Tocá un nombre para ver sus asignaturas.`};
+    }
 
     // Rol JP
     if(nq.match(/que hace.*jp|rol.*jp|jp.*rol|jefe.*proyecto.*hace|para que.*jp/) && !findAsig(q))
@@ -5719,8 +6086,26 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Implementadores:</strong>\n'+PROYECTO.equipo.filter(p=>p.rol==='Implementador').map(p=>`• ${p.nombre}${p.mail?' — '+p.mail:''}`).join('\n')+'\n\nSe encargan de cargar y configurar los recursos en el aula virtual Moodle.', chips:['Manual del Implementador']};
 
     // Manuales
-    if(nq.match(/que manuales|listado.*manual|todos.*manual|manuales disponibles/) && !findAsig(q))
-      return {txt:'<strong>Manuales y guías disponibles:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> (para ${m.para})`).join('\n'), chips:['Manual del DI','Manual del DG','Manual del Implementador']};
+    if(nq.match(/que manuales|listado.*manual|todos.*manual|manuales disponibles|\bmanual\b|procedimiento|proceso del proyecto|flujo de trabajo/) && !findAsig(q))
+      return {txt:'<strong>Manuales y guías del proyecto:</strong>\n'+PROYECTO.manuales.map(m=>`• <strong>${m.nombre}</strong> — para ${m.para}`).join('\n')+'\n\n¿Cuál querés ver en detalle?', chips:['Manual del DI','Manual del DG','Manual del Implementador','Plantillas']};
+
+    // Plazos DEL por facultad
+    if(nq.match(/plazo.*del|plazo.*planif|plazo.*entrega|cuando.*del|fecha.*del|deadline/) && !findAsig(q)){
+      const fmt=d=>d.toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+      const custom=Object.entries(PLANIF_DEADLINES).filter(([f])=>f!=='default')
+        .map(([f,d])=>`• ${f}: <strong>${fmt(d)}</strong>`).join('\n');
+      return {txt:`<strong>Plazos de entrega de planificación al DEL:</strong>\n\n${custom}\n• Resto de facultades: <strong>${fmt(PLANIF_DEADLINES.default)}</strong>`, chips:['Contacto DEL']};
+    }
+
+    // Seguimiento por DI (planilla individual)
+    if(nq.match(/seguimiento|seg\b|planilla/) && !findAsig(q)){
+      const persona=PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+      if(persona && typeof DI_SEG_URLS!=='undefined'){
+        const primer=persona.nombre.split(' ')[0];
+        const url=DI_SEG_URLS[primer]||DI_SEG_URLS[persona.nombre];
+        if(url) return {txt:`<strong>Seguimiento de ${persona.nombre}</strong>\n📊 <a class="bot-a" href="${url}" target="_blank">Ver planilla de seguimiento</a>`};
+      }
+    }
 
     if(nq.match(/manual.*implementador|implementador.*manual|moodle.*manual/))
       return {txt:'<strong>Manual del Implementador — Moodle UST v1.0</strong>\n\nPrincipio: <em>"La planificación es la fuente de verdad. Si no lo indica, no se agrega."</em>\n\n<strong>3 Momentos de publicación:</strong>\n1. <strong>Estructura del aula</strong> — Sección Bienvenida (6 elementos fijos) + todas las sesiones + etiquetas de modalidad + encabezados de los 3 momentos\n2. <strong>Recursos e instrucciones</strong> — PDFs, URLs (nueva pestaña + APA), SCORMs, actividades Moodle configuradas\n3. <strong>Mini QA interno</strong> — Navegar en modo estudiante con checklist A–F antes de notificar a QA DEL\n\n<strong>Nomenclatura:</strong> <code>S[N]_[Tipo][N]_[Título].[ext]</code>\nEj: S1_Apunte1_Introduccion_al_Derecho_Penal.pdf\n\n<strong>Rúbricas: publicación DOBLE obligatoria</strong>\n→ Rúbrica nativa en Moodle + PDF descargable en las instrucciones\n\nDirigido a: Elías Castillo y Antonio Cabrera', chips:['Nomenclatura archivos','Errores críticos Moodle','Checklist QA Moodle']};
@@ -5743,23 +6128,143 @@ window.addEventListener('load', function(){
     if(nq.match(/escala.*apreciacion|41.*criterios|instrumento.*qa.*planif|qa.*planif.*instrumento/))
       return {txt:'<strong>Escala de Apreciación — QA de Planificación</strong>\n\n41 criterios en 5 dimensiones. La planificación debe alcanzar el umbral institucional de aprobación.\n\n<strong>Criterios mínimos de aprobación:</strong>\n• Datos generales completos, coinciden exactamente con el programa oficial\n• RA formulados con verbo de acción, condición y criterio (no paráfrasis genéricas)\n• Porcentajes de evaluación suman 100%\n• Cada RA tiene procedimiento e instrumento de evaluación declarado\n• Carga académica cuadra con el SCT (celda verificación = "Correcto")\n• Cada sesión tiene los 3 momentos completos con actividades específicas\n• Actividades redactadas en imperativo dirigido al estudiante\n• Alineación RA → Actividad → Evaluación verificada\n• Recursos con 5 campos: título, autor/a, tipo, acceso, extensión', chips:['Co-diseño planificación','Fases del proceso']};
 
+    // Reportes semanales
+    if(nq.match(/reporte|informe.*semanal|semanal.*informe/) && !findAsig(q)){
+      const links=PROYECTO.reportes?.map(r=>`• <a class="bot-a" href="${r.url}" target="_blank">${r.facultad}</a>`).join('\n')||'No hay reportes configurados.';
+      return {txt:`<strong>Reportes semanales por facultad:</strong>\n${links}\n\nSe actualizan automáticamente con datos del sistema de seguimiento.`};
+    }
+
+    // Contactos DEL
+    if(nq.match(/contacto.*del|del.*contacto|coordinador.*del|del.*quien|quien.*del|encargado.*del|del de/) && !findAsig(q)){
+      const lista=PROYECTO.contactosDEL?.map(c=>`• <strong>${c.facultad}</strong>\n  ${c.nombre} — <a class="bot-a" href="mailto:${c.mail}">${c.mail}</a>`).join('\n')||'No hay contactos DEL configurados.';
+      return {txt:`<strong>Contactos DEL por facultad:</strong>\n\n${lista}`};
+    }
+
+    if(nq.match(/brandbook|identidad visual|marca ust|logo ust|color.*facultad|facultad.*color/))
+      return {txt:'<strong>Brandbook UST — Identidad Visual</strong>\n\nDefine los criterios gráficos institucionales:\n• Logo e imagotipo (nunca modificar proporciones ni colores)\n• Tipografía: Arial / Calibri obligatorias en recursos digitales\n• Verde corporativo: <strong>#284639</strong> (70-80% de cada pieza)\n• Color complementario por facultad:\n  - Ingeniería: #6F7A73\n  - Ciencias Sociales: #9F83B3\n  - Economía y Negocios: #97BB5B\n  - Recursos Naturales: #A4CCBF\n  - Salud: #C02B22', chips:['Manual del DG','Dupla DI-DG']};
+
+    if(nq.match(/flujo.*produccion|produccion.*flujo|flujo.*proceso|proceso.*completo|fases.*produccion|diagrama.*roles/))
+      return {txt:'<strong>Flujo de Producción e-Learning 2026-1</strong>\n\nEl proceso tiene 6 fases:\n• <strong>Fase 0</strong> — Incorporación del docente (JP)\n• <strong>Fase I</strong> — Planificación con IA (DI)\n• <strong>Fase II</strong> — Co-diseño y validación QA (DI + QA)\n• <strong>Fase III</strong> — Producción semanal iterativa (DI + DG)\n• <strong>Fase IV</strong> — Publicación en plataforma (JP + IP + DI)\n• <strong>Fase V</strong> — Validación final del aula (JP + QA DEL)\n\n⭐ Regla de oro: ningún recurso entra a Fase III sin planificación aprobada por QA DEL.', chips:['Fases del proyecto','Manual del DI','Reunión de inicio']};
+
+    if(nq.match(/reunion.*inicio|inicio.*reunion|kick.*off|kickoff|bienvenida.*docente|reunion.*docente/))
+      return {txt:'<strong>Reunión de Inicio — Kick-off con el docente</strong>\n\nAgenda en 4 bloques:\n1. Bienvenida y contexto (presentación del equipo)\n2. El proceso de diseño (fases, flujo, rol del docente)\n3. Levantamiento de información (materiales disponibles, disponibilidad)\n4. Acuerdos y compromisos (fechas, entregables, canal de comunicación)\n\n<em>Premisa fundamental: el docente aporta el conocimiento disciplinar; el equipo pone la tecnología.</em>', chips:['Guía del docente','Fases del proyecto','Flujo de producción']};
+
+    if(nq.match(/estandar.*recurso|recurso.*estandar|estandar.*elearning|estandar.*virtual|estandarizacion/))
+      return {txt:'<strong>Estándar de Recursos e-Learning UST</strong>\n\nEstablece cuántos recursos de cada tipo debe tener un curso según sus créditos y horas.\n\nDistribución por tipo:\n• T1 (audiovisuales): 20% de las horas asincrónicas\n• T2 (prácticos/evaluativos): 80% de las horas asincrónicas\n• T3 (sincrónicas): 40% horas presenciales + 40% sincrónicas\n• T4 (TPE guiado): 20% horas TPE\n\nBeneficio: homogeneidad, eficiencia en producción, mejor experiencia del estudiante.', chips:['Tipos de recursos','Los 3 momentos','Manual del DI']};
+
+    if(nq.match(/aprendizaje.*servicio|a\+s|as.*elearning|lineamiento.*as|lineamiento.*a\+s/))
+      return {txt:'<strong>Lineamientos A+S e-Learning (Aprendizaje + Servicio)</strong>\n\nOrientaciones para diseñar asignaturas con metodología A+S en modalidad virtual.\n\nEjes principales:\n• Protagonismo estudiantil y autonomía progresiva\n• El entorno digital como espacio legítimo de aprendizaje\n• Vinculación del saber disciplinar con la realidad comunitaria\n• Criterios de calidad del A+S e-Learning UST', chips:['Manual del DI','Los 3 momentos']};
+
     if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
       return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nDocumentos oficiales por rol:\n• <strong>Manual DI</strong> — Diseño instruccional e-learning UST\n• <strong>Manual DG</strong> — Lineamientos gráficos + Brandbook\n• <strong>Manual Implementador</strong> — Moodle, nomenclatura, QA checklist\n• <strong>Manual de Procedimiento</strong> — Flujo completo 6 fases del proceso 2026-1\n• <strong>Flujo de Producción</strong> — Diagrama de carriles por rol (7 roles, 6 fases)\n• <strong>Paso a paso DI</strong> — Guía visual del flujo de trabajo semestral del DI\n• <strong>Guía Docente Revisión</strong> — Cómo revisar la planificación didáctica\n• <strong>Guía Docente Producción</strong> — Cómo entregar el contenido semanal\n• <strong>Capacitación de Equipo</strong> — Visión general, roles, fases y duplas\n\n<strong>Duplas JP–DI 2026-1:</strong>\n• Dupla 1: JP María José + DI Andreina\n• Dupla 2: JP Noelia + DI Cristián\n• Dupla 3: JP José Luis + DI Natalie\n• Dupla 5: JP José Luis + DI Karen\n• DI adicional flexible: José Luis', chips:['Fases del proceso','Duplas de trabajo','Manual DG']};
 
     if(nq.match(/duplas.*trabajo|duplas.*jp|jp.*dupla|asignacion.*equipo|quien.*trabaja.*con|como.*asignados/))
       return {txt:'<strong>Duplas JP–DI del proyecto 2026-1</strong>\n\nCada dupla tiene asignados 5–6 cursos (diseños nuevos y rediseños):\n\n• <strong>Dupla 1:</strong> JP María José Suazo + DI Andreina Rodríguez\n• <strong>Dupla 2:</strong> JP Noelia Escalona + DI Cristián Domínguez\n• <strong>Dupla 3:</strong> JP José Luis Salazar + DI Natalie Baeza\n• <strong>Dupla 5:</strong> JP José Luis Salazar + DI Karen Chávez\n• <strong>DI adicional:</strong> José Luis Salazar — apoyo flexible en cursos y rediseños\n\nDG asignados: Francisco Tapia, Giovanni Perini, Jenny García\nImplementadores: Elías Castillo, Antonio Cabrera', chips:['¿Quién es el equipo?','Fases del proceso']};
 
-    // Búsqueda de persona por nombre
+    // Guard: si DATA aún no cargó, intentar cargar y avisar
+    if(!DATA.length){
+      if(!window._botLoadingData){
+        window._botLoadingData = true;
+        if(typeof loadSheetData==='function')
+          loadSheetData().catch(()=>{}).finally(()=>{ window._botLoadingData=false; });
+      }
+      return {txt:'⏳ Los datos del proyecto aún están cargando desde el servidor.\n\nEsperá unos segundos y volvé a preguntar — la próxima vez va a responder.', chips:['Ayuda','¿Quién es el equipo?']};
+    }
+
+    // Búsqueda de docente por nombre en DATA (campo docente de la planilla)
+    const docenteEnData=(DATA||[]).find(d=>{
+      const doc=nrm(d.docente||'');
+      if(!doc||/ajuste|sin asignar|^\s*del\s*$/i.test(d.docente||''))return false;
+      return doc.split(' ').filter(w=>w.length>3).some(w=>nq.includes(w));
+    });
+    if(docenteEnData && !PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)))){
+      const todas=(DATA||[]).filter(d=>nrm(d.docente||'')===nrm(docenteEnData.docente));
+      const av=todas.length?Math.round(todas.reduce((s,d)=>s+pct(d),0)/todas.length):0;
+      const items=todas.map(d=>`• <span class="bot-link" onclick="botAsk('${d.asignatura.replace(/'/g,'\\\'')}')">${d.asignatura}</span> — ${pct(d)}%`).join('\n');
+      return {txt:`<strong>${docenteEnData.docente}</strong>\nDocente en ${todas.length} asignatura${todas.length!==1?'s':''} · Promedio: <strong>${av}%</strong>\n\n${items}`,
+              chips:['Docentes en riesgo']};
+    }
+
+    // Búsqueda de persona por nombre (o usar contexto previo)
     const personaMatch = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+    if(personaMatch) ctxPersona = personaMatch;
+
+    // Helper: listar asignaturas de una persona
+    function asigDePersona(p){
+      const campos = p.rol==='DI'?['di']: p.rol==='JP'?['jp']: p.rol==='JP / DI'?['jp','di']: p.rol==='DG'?['dg']: p.rol==='Implementador'?['implementador']:[];
+      const palabras = nrm(p.nombre).split(' ').filter(w=>w.length>3);
+      return (DATA||[]).filter(d=>campos.some(c=>palabras.some(w=>nrm(d[c]||'').includes(w))));
+    }
+
+    // Follow-up: "cuántas tiene?" sin repetir el nombre → usa contexto previo
+    const esFollowUp = nq.match(/cuantas|tiene|sus asig|sus cursos|cuales|listado|listar|muestra/) && !personaMatch;
+    const personaCtx = personaMatch || (esFollowUp ? ctxPersona : null);
+
+    // "Soy [nombre]" → registrar identidad y ofrecer sus asignaturas
+    if(nq.match(/^soy\b|yo soy\b/)){
+      if(personaMatch){
+        ctxPersona=personaMatch;
+        return {txt:`¡Hola, <strong>${personaMatch.nombre}</strong>! (${personaMatch.rol})\n¿Querés ver tus asignaturas asignadas?`, chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
+      }
+      return {txt:'No encontré tu nombre en el equipo. Intentá con tu nombre completo.'};
+    }
+
+    // "Mis asignaturas" sin nombre → pedir identificación o usar contexto
+    if(nq.match(/mis asig|mis cursos|mis materias|a diseñar|que.*diseñar|a cargo/) && !personaMatch){
+      if(ctxPersona){
+        const lista=asigDePersona(ctxPersona);
+        if(lista.length){
+          const lnkP=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+          const items=lista.map(d=>`• ${lnkP(d.asignatura)} — ${pct(d)}%`).join('\n');
+          return {txt:`<strong>${ctxPersona.nombre}</strong> (${ctxPersona.rol})\n${lista.length} asignaturas:\n\n${items}`, chips:[`Avance ${ctxPersona.nombre.split(' ')[0]}`]};
+        }
+      }
+      return {txt:'Para ver tus asignaturas, decime tu nombre primero.\nEjemplo: <em>"Soy Jenny"</em> o <em>"Asignaturas de Jenny"</em>', chips:['¿Quién es el equipo?']};
+    }
+
+    if(personaCtx && nq.match(/cuantas|asignaturas|tiene|asig|curso|materia|lista|listado|cuales|muestra|diseñar/)){
+      const lista = asigDePersona(personaCtx);
+      if(!lista.length) return {txt:`No encontré asignaturas asignadas a <strong>${personaCtx.nombre}</strong> en los datos cargados.\n\nVerificá que su nombre figure en la planilla de seguimiento.`};
+      const promedio = Math.round(lista.reduce((s,d)=>s+pct(d),0)/lista.length);
+      const lnkPA=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+      const items = lista.map(d=>`• ${lnkPA(d.asignatura)} — ${pct(d)}%`).join('\n');
+      return {txt:`<strong>${personaCtx.nombre}</strong> (${personaCtx.rol})\nAsignaturas: <strong>${lista.length}</strong> · Promedio: <strong>${promedio}%</strong>\n\n${items}`,
+              chips:[`Avance ${personaCtx.nombre.split(' ')[0]}`]};
+    }
+
     if(personaMatch && !findAsig(q))
-      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?'\nContacto: '+personaMatch.mail:''}`};
+      return {txt:`<strong>${personaMatch.nombre}</strong>\nRol: ${personaMatch.rol}${personaMatch.mail?`\n📧 <a class="bot-a" href="mailto:${personaMatch.mail}">${personaMatch.mail}</a>`:''}`,
+              chips:[`Asignaturas de ${personaMatch.nombre.split(' ')[0]}`]};
+
+    // ── REUNIONES — estadísticas globales ────────────────────────────────────
+    if(nq.match(/\breunion\b|estado.*reunion|sin.*respuesta|reuniones.*agendada|reuniones.*realizada/) && !findAsig(q)){
+      const data=DATA||[];
+      const real=data.filter(d=>/^realizada$/i.test((d.reunion||'').trim()));
+      const agen=data.filter(d=>/^agendada$/i.test((d.reunion||'').trim()));
+      const sinR=data.filter(d=>/^sin respuesta$/i.test((d.reunion||'').trim()));
+      if(nq.match(/sin.*respuesta/))
+        return {txt:`<strong>Sin respuesta (${sinR.length}):</strong>\n`+sinR.map(d=>`• ${d.asignatura}${d.docente?' — '+d.docente:''}`).slice(0,15).join('\n')+(sinR.length>15?`\n…y ${sinR.length-15} más.`:''), chips:['Reuniones realizadas','Reuniones agendadas']};
+      if(nq.match(/agendada/)){
+        const byJP={};
+        agen.forEach(d=>{const k=d.jp||'Sin JP';if(!byJP[k])byJP[k]=0;byJP[k]++;});
+        const filasA=Object.entries(byJP).sort((a,b)=>b[1]-a[1]).map(([jp,c])=>`• ${jp}: ${c}`).join('\n');
+        return {txt:`📅 <strong>Reuniones agendadas: ${agen.length}</strong>\n\nPor JP:\n${filasA}`, chips:['Reuniones realizadas','Reuniones sin respuesta']};
+      }
+      if(nq.match(/realizada/)){
+        const byFacR={};
+        real.forEach(d=>{const k=d.facultad||'Sin facultad';if(!byFacR[k])byFacR[k]=0;byFacR[k]++;});
+        const filasR=Object.entries(byFacR).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n');
+        return {txt:`✅ <strong>Reuniones realizadas: ${real.length}</strong>\n\nPor facultad:\n${filasR}`, chips:['Reuniones agendadas','Reuniones sin respuesta']};
+      }
+      return {txt:`<strong>Estado de reuniones:</strong>\n✅ Realizadas: <strong>${real.length}</strong>\n📅 Agendadas: <strong>${agen.length}</strong>\n❓ Sin respuesta: <strong>${sinR.length}</strong>`,
+              chips:['Reuniones sin respuesta','Reuniones agendadas','Reuniones realizadas']};
+    }
 
     // Stats generales
     // Directoras/directores de escuela (DNE)
     if(nq.match(/director|directora|dne|encargad|director.*facultad|director.*escuela|director.*programa/)){
       const dne = (typeof DNE_DATA!=='undefined'?DNE_DATA:[]);
       if(!dne.length) return {txt:'No hay datos de directores cargados.'};
-      // agrupar por facultad
       const byFac={};
       dne.forEach(d=>{
         if(!byFac[d.facultad]) byFac[d.facultad]=[];
@@ -5774,7 +6279,6 @@ window.addEventListener('load', function(){
     if(nq.match(/docentes.*proyecto|listado.*docente|todos.*docente|docente.*facultad|docentes.*facultad|docentes.*area/) && !findAsig(q)){
       const data=window.DATA||[];
       if(!data.length) return {txt:'Los datos aún no cargaron.'};
-      // si menciona facultad específica, filtrar
       const facMatch=Object.keys((()=>{const f={};data.forEach(d=>{if(d.facultad)f[d.facultad]=1;});return f;})())
         .find(f=>nq.includes(nrm(f).split(' ')[0]));
       const lista=facMatch?data.filter(d=>d.facultad===facMatch):data;
@@ -5788,11 +6292,132 @@ window.addEventListener('load', function(){
       return {txt:`El proyecto tiene <strong>${n} asignaturas</strong> en total.`, chips:['Avance por facultad','Top 5']};
     }
 
-    if(nq.match(/promedio|avance general|avance total|avance del proyecto/) && !findAsig(q)){
-      const arr=window.DATA||[];
+    // ── DETALLE DE FACULTAD — handler independiente para chips de facultad ───
+    if(!nq.match(/avance por|ver promedio|avance general|avance total|\bdi\b|\bjp\b|planif|cuantas|total.*asig|reunion|manual|equipo|tipo/)){
+      const _arr=DATA||[];
+      if(_arr.length){
+        const _facets=[...new Set(_arr.map(d=>d.facultad).filter(Boolean))];
+        let _matchFac=null,_bestSc=0;
+        _facets.forEach(f=>{
+          const words=nrm(f).split(' ').filter(w=>w.length>4);
+          const sc=words.filter(w=>nq.includes(w)).length;
+          if(sc>_bestSc){_bestSc=sc;_matchFac=f;}
+        });
+        if(_matchFac && _bestSc>=1){
+          const asigsFac=_arr.filter(d=>d.facultad===_matchFac);
+          const avgFac=asigsFac.length?Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length):0;
+          const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,5);
+          const alertas=asigsFac.filter(d=>pct(d)<20||/^sin respuesta$/i.test((d.reunion||'').trim()));
+          const lnk=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,'\\\'')}')">${a}</span>`;
+          const topTxt=top.map(d=>`• ${lnk(d.asignatura)} — ${pct(d)}%`).join('\n');
+          const alertTxt=alertas.length
+            ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${lnk(d.asignatura)} — ${pct(d)}%${/^sin respuesta$/i.test((d.reunion||'').trim())?' (sin reunión)':''}`).join('\n')
+            : '\n\n✅ Sin alertas críticas.';
+          return {txt:`<strong>${_matchFac}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Top 5 más avanzadas:</strong>\n${topTxt}${alertTxt}`,
+                  chips:['Avance por facultad','Avance por DI']};
+        }
+      }
+    }
+
+    if(nq.match(/promedio|avance general|avance global|avance total|avance del proyecto|ver promedio|avance por|rendimiento/) && !findAsig(q)){
+      const arr=DATA||[];
       if(!arr.length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
       const avg=Math.round(arr.reduce((s,d)=>s+pct(d),0)/arr.length);
-      return {txt:`El <strong>avance promedio</strong> del proyecto es <strong>${avg}%</strong>.`};
+
+      // Desglose por DI
+      if(nq.match(/\bdi\b|diseñador instruccional|instruccional/)){
+        const dis={};
+        arr.forEach(d=>{const k=d.di||'Sin asignar';if(!dis[k])dis[k]={sum:0,n:0};dis[k].sum+=pct(d);dis[k].n++;});
+        const filas=Object.entries(dis).filter(([,v])=>v.n>0).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
+          .map(([di,v])=>{
+            const primer=di.split(' ')[0];
+            const nombre=di==='Sin asignar'?di:`<span class="bot-link" onclick="botAsk('Asignaturas de ${primer}')">${di}</span>`;
+            return `• ${nombre}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`;
+          }).join('\n');
+        return {txt:`<strong>Avance promedio por DI:</strong>\n\n${filas}`, chips:['Avance por facultad','Avance por JP']};
+      }
+
+      // Desglose por JP
+      if(nq.match(/\bjp\b|jefe de proyecto|jefe proyecto/)){
+        const jps={};
+        arr.forEach(d=>{const k=d.jp||'Sin asignar';if(!jps[k])jps[k]={sum:0,n:0};jps[k].sum+=pct(d);jps[k].n++;});
+        const filas=Object.entries(jps).filter(([,v])=>v.n>0).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
+          .map(([jp,v])=>{
+            const primer=jp.split(' ')[0];
+            const nombre=jp==='Sin asignar'?jp:`<span class="bot-link" onclick="botAsk('Asignaturas de ${primer}')">${jp}</span>`;
+            return `• ${nombre}: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`;
+          }).join('\n');
+        return {txt:`<strong>Avance promedio por JP:</strong>\n\n${filas}`, chips:['Avance por facultad','Avance por DI']};
+      }
+
+      // Detalle de una facultad específica
+      function facMatch(nq){
+        const facets=[...new Set(arr.map(d=>d.facultad).filter(Boolean))];
+        let best=null,bestSc=0;
+        facets.forEach(f=>{
+          const words=nrm(f).split(' ').filter(w=>w.length>4);
+          const sc=words.filter(w=>nq.includes(w)).length;
+          if(sc>bestSc){bestSc=sc;best=f;}
+        });
+        return bestSc>=1?best:null;
+      }
+      const facEspecifica = !nq.match(/facultad|area|escuela|di\b|jp\b|promedio|general/) ? facMatch(nq) : null;
+      if(facEspecifica){
+        const asigsFac=arr.filter(d=>d.facultad===facEspecifica);
+        const avgFac=asigsFac.length?Math.round(asigsFac.reduce((s,d)=>s+pct(d),0)/asigsFac.length):0;
+        const top=asigsFac.slice().sort((a,b)=>pct(b)-pct(a)).slice(0,5);
+        const alertas=asigsFac.filter(d=>pct(d)<20||/^sin respuesta$/i.test((d.reunion||'').trim()));
+        const lnk2=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,'\\\'')}')">${a}</span>`;
+        const topTxt=top.map(d=>`• ${lnk2(d.asignatura)} — ${pct(d)}%`).join('\n');
+        const alertTxt=alertas.length
+          ? '\n\n⚠️ <strong>Alertas ('+alertas.length+'):</strong>\n'+alertas.slice(0,6).map(d=>`• ${lnk2(d.asignatura)} — ${pct(d)}%${/^sin respuesta$/i.test((d.reunion||'').trim())?' (sin reunión)':''}`).join('\n')
+          : '\n\n✅ Sin alertas críticas.';
+        return {txt:`<strong>${facEspecifica}</strong>\nAvance: <strong>${avgFac}%</strong> (${asigsFac.length} asignaturas)\n\n🏆 <strong>Top 5 más avanzadas:</strong>\n${topTxt}${alertTxt}`,
+                chips:['Avance por facultad','Avance por DI']};
+      }
+
+      // Desglose por facultad
+      if(nq.match(/facultad|area|escuela/)){
+        const facs={};
+        arr.forEach(d=>{if(!d.facultad)return;if(!facs[d.facultad])facs[d.facultad]={sum:0,n:0};facs[d.facultad].sum+=pct(d);facs[d.facultad].n++;});
+        const sorted=Object.entries(facs).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n);
+        const filas=sorted.map(([f,v])=>`• <span class="bot-link" onclick="botAsk('${f.replace(/'/g,"\\'")}')">` + f + `</span>: <strong>${Math.round(v.sum/v.n)}%</strong> (${v.n} asig)`).join('\n');
+        return {txt:`<strong>Avance promedio por facultad:</strong>\n\n${filas}\n\n→ Tocá una facultad para ver detalle, top 3 y alertas.`, chips:['Avance por DI']};
+      }
+
+      // General — resumen ejecutivo
+      const real=arr.filter(d=>/^realizada$/i.test((d.reunion||'').trim())).length;
+      const valids=arr.filter(d=>/^validada$/i.test((d.planif||'').trim())).length;
+      const enRiesgo=arr.filter(d=>pct(d)<20).length;
+      const facs2={};
+      arr.forEach(d=>{if(!d.facultad)return;if(!facs2[d.facultad])facs2[d.facultad]={sum:0,n:0};facs2[d.facultad].sum+=pct(d);facs2[d.facultad].n++;});
+      const facResumen=Object.entries(facs2).sort((a,b)=>b[1].sum/b[1].n-a[1].sum/a[1].n)
+        .map(([f,v])=>`• <span class="bot-link" onclick="botAsk('${f.replace(/'/g,"\\'")}')">` + f.split(' ').slice(0,3).join(' ') + `</span>: <strong>${Math.round(v.sum/v.n)}%</strong>`).join('\n');
+      return {txt:`📊 <strong>Avance del proyecto: ${avg}%</strong>\n(${arr.length} asignaturas en total)\n\n<strong>Por facultad:</strong>\n${facResumen}\n\n📋 Planificaciones validadas: <strong>${valids}</strong>\n✅ Reuniones realizadas: <strong>${real}</strong>\n⚠️ En riesgo (<20%): <strong>${enRiesgo}</strong>`,
+              chips:['Docentes en riesgo','Avance por DI','Avance por facultad','Mejor docente']};
+    }
+
+    // Planificaciones validadas
+    if(nq.match(/planificaci[oó]n.*valid|valid.*planificaci[oó]n|planif.*valid|valid.*planif|planificaciones/) && !findAsig(q)){
+      const arr=DATA||[];
+      const validadas=arr.filter(d=>(AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||/^validada$/i.test((d.planif||'').trim()));
+      const enviadas=arr.filter(d=>(d.planif||'').includes('Enviada'));
+      const enConst=arr.filter(d=>(d.planif||'').includes('construcción')||(d.planif||'').includes('construccion'));
+      if(nq.match(/facultad|por area|por escuela/)){
+        const facs={};
+        arr.forEach(d=>{
+          if(!d.facultad) return;
+          if(!facs[d.facultad]) facs[d.facultad]={valid:0,total:0};
+          facs[d.facultad].total++;
+          if((AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||(d.planif||'').toLowerCase().includes('valid'))
+            facs[d.facultad].valid++;
+        });
+        const filas=Object.entries(facs).sort((a,b)=>b[1].valid-a[1].valid)
+          .map(([f,v])=>`• ${f}: <strong>${v.valid}</strong>/${v.total}`).join('\n');
+        return {txt:`<strong>Planificaciones validadas por facultad:</strong>\nTotal: <strong>${validadas.length}</strong>/${arr.length}\n\n${filas}`, chips:['Ver promedio','Reuniones realizadas']};
+      }
+      return {txt:`<strong>Planificaciones:</strong>\n✅ Validadas: <strong>${validadas.length}</strong>\n📤 Enviadas a DEL: <strong>${enviadas.length}</strong>\n🔨 En construcción: <strong>${enConst.length}</strong>\n\nTotal asignaturas: ${arr.length}`,
+              chips:['Planificaciones validadas por facultad','Ver promedio']};
     }
 
     // Asignaturas de una persona (DI, DG, JP, docente)
@@ -5811,14 +6436,30 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${nombre}</strong> (${personaQ.rol})\n<strong>${asigs.length} asignaturas</strong> · Avance promedio: <strong>${avg}%</strong>\n\n`+asigs.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
 
-    if(nq.match(/mayor avance|mas avanzada|mejor avance|top|mas adelantada/)){
-      const top=[...(window.DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
-      return {txt:'<strong>Top 5 asignaturas:</strong>\n'+top.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+    if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada|mejor docente/) && !nq.match(/alerta/)){
+      const top=[...(DATA||[])].sort((a,b)=>pct(b)-pct(a)).slice(0,5);
+      const lnkT=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+      return {txt:'🏆 <strong>Top 5 más avanzadas:</strong>\n'+top.map(d=>{const doc=d.docente&&!/ajuste|sin asignar|^\s*del\s*$/i.test(d.docente)?' — '+d.docente:'';return `• ${lnkT(d.asignatura)}${doc}: <strong>${pct(d)}%</strong>`;}).join('\n'), chips:['Docentes en riesgo']};
     }
 
-    if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance/)){
-      const bot=[...(window.DATA||[])].sort((a,b)=>pct(a)-pct(b)).slice(0,5);
-      return {txt:'<strong>Menor avance (5):</strong>\n'+bot.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
+    if(nq.match(/menor avance|menos avanzada|mas atrasada|peor avance|alerta|en riesgo|critica/)){
+      const arr=DATA||[];
+      // Alertas: bajo avance + sin respuesta, ordenadas por riesgo
+      const conRiesgo=arr.map(d=>({
+        d, sinReun:d.reunion==='Sin respuesta', av:pct(d)
+      })).filter(x=>x.av<25||x.sinReun)
+        .sort((a,b)=>(a.av+(!a.sinReun?0:-10))-(b.av+(!b.sinReun?0:-10)))
+        .slice(0,7);
+      if(!conRiesgo.length) return {txt:'✅ No hay asignaturas en situación crítica actualmente.', chips:['Top 5 avance']};
+      const lnkR=a=>`<span class="bot-link" onclick="botAsk('${a.replace(/'/g,"\\'")}')">${a}</span>`;
+      const filas=conRiesgo.map(({d,sinReun,av})=>{
+        const tags=[`${av}%`];
+        if(sinReun) tags.push('sin reunión');
+        const docRaw=d.docente||'';
+        const docente=docRaw&&!/ajuste|sin asignar|^\s*del\s*$/i.test(docRaw)?` · ${docRaw}`:'';
+        return `• ${lnkR(d.asignatura)}${docente} — ${tags.join(' · ')}`;
+      }).join('\n');
+      return {txt:`⚠️ <strong>Alertas (${conRiesgo.length} asignaturas):</strong>\nCriterios: avance < 25% o reunión sin respuesta\n\n${filas}`, chips:['Top 5 avance','Reuniones realizadas']};
     }
 
     if(nq.match(/avance.*facultad|avance.*area|facultad.*avance|area.*avance|por facultad|cada facultad|porcent.*facultad/) && !findAsig(q)){
@@ -5913,6 +6554,42 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Asignaturas por tipo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
     }
 
+    // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
+
+    function listarFmt(label, fn){
+      const lista=(DATA||[]).filter(fn);
+      if(!lista.length) return {txt:`No encontré asignaturas de tipo <strong>${label}</strong>.`};
+      return {txt:`<strong>${label}</strong> (${lista.length}):\n`+lista.map(d=>`• ${d.asignatura}${d.jp?' · JP: '+d.jp:''}`).join('\n')};
+    }
+
+    if(nq.match(/a\+s|aprendizaje.?servicio|servicio.?aprendizaje/))
+      return listarFmt('A+S (Aprendizaje + Servicio)', d=>nrm(d.asignatura).includes('a s')||String(d.fmt).toLowerCase().includes('a+s')||(d.asignatura||'').includes('A+S'));
+
+    if(nq.match(/redise[nñ]o|redisenos/))
+      return listarFmt('Rediseños', d=>nrm(d.fmt).includes('rediseno')||nrm(d.fmt).includes('antiguo'));
+
+    if(nq.match(/nuevo|dise[nñ]o nuevo|asig.*nueva/))
+      return listarFmt('Diseños nuevos', d=>nrm(d.fmt)==='nuevo'||nrm(d.fmt).includes('nuevo'));
+
+    if(nq.match(/adecuaci[oó]n|adecuaciones/))
+      return listarFmt('Adecuaciones', d=>nrm(d.fmt).includes('adecuacion'));
+
+    if(nq.match(/ajuste.*aula|aula.*ajuste/))
+      return listarFmt('Ajustes de aula', d=>nrm(d.fmt).includes('ajuste'));
+
+    if(nq.match(/tipos.*formato|formatos.*asig|que formatos|cuantos.*formato/) && !findAsig(q)){
+      const fmts={};
+      (DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      return {txt:'<strong>Asignaturas por tipo de trabajo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n'), chips:['Diseños nuevos','Rediseños','Adecuaciones']};
+    }
+
+    if(nq.match(/\bformato\b|tipo.*trabajo/) && findAsig(q)){/* handled below */}
+    else if(nq.match(/\bformato\b|tipo.*trabajo/) && !findAsig(q)){
+      const fmts={};
+      (DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      return {txt:'<strong>Asignaturas por tipo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
+    }
+
     // Asignatura específica
     const asig = findAsig(q);
     if(!asig) return {txt:'No encontré esa asignatura ni esa persona. Intentá con parte del nombre o escribí <strong>ayuda</strong> para ver ejemplos.', chips:['Ayuda','¿Quién es el equipo?']};
@@ -5937,14 +6614,29 @@ window.addEventListener('load', function(){
     if(nq.match(/implementador|quien implementa/))
       return {txt:`<strong>${asig.asignatura}</strong>\nImplementador: <strong>${asig.implementador||'—'}</strong>`};
 
+    if(nq.match(/moodle|aula virtual|link.*aula|url.*aula|enlace.*aula/)){
+      const url=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
+      if(url) return {txt:`<strong>${asig.asignatura}</strong>\n🔗 <a class="bot-a" href="${url}" target="_blank">Abrir aula Moodle</a>`};
+      return {txt:`No encontré el link Moodle de <strong>${asig.asignatura}</strong>.`};
+    }
+
+    if(nq.match(/seguimiento|seg\b|planilla/)){
+      const url=typeof getSegUrl==='function'?getSegUrl(asig.asignatura,asig.facultad,asig.di):null;
+      if(url) return {txt:`<strong>${asig.asignatura}</strong>\n📊 <a class="bot-a" href="${url}" target="_blank">Ver planilla de seguimiento</a>`};
+      return {txt:`No encontré la planilla de seguimiento de <strong>${asig.asignatura}</strong>.`};
+    }
+
     if(nq.match(/observ|obs\b|nota/))
-      return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(window.AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
+      return {txt:`<strong>${asig.asignatura}</strong>\nObservaciones: ${(AVANCE||{})[asig.asignatura]?.obs||'Sin observaciones.'}`};
 
     if(nq.match(/reunion|reunión|kick.?off/))
       return {txt:`<strong>${asig.asignatura}</strong>\nReunión de inicio: <strong>${asig.reunion||'—'}</strong>\nPlanificación: <strong>${asig.planif||'—'}</strong>`};
 
-    if(nq.match(/programa|formato|plan\b/))
-      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>`};
+    if(nq.match(/programa|silabo|syllabus|formato|plan\b/)){
+      const pdfUrl=typeof getProgramaUrl==='function'?getProgramaUrl(asig.asignatura,asig.facultad):null;
+      const pdfLink=pdfUrl?`\n📄 <a class="bot-a" href="${pdfUrl}" target="_blank">Ver programa PDF</a>`:'';
+      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>${pdfLink}`};
+    }
 
     if(nq.match(/t1|t2|t3|t4|tipos.*recurso|recursos.*tipo/)){
       const fmt=asig.fmt||'—';
@@ -5962,6 +6654,8 @@ window.addEventListener('load', function(){
         return `${icon} ${h.label}: ${v}`;
       }).join('\n');
       const obs=avObj.obs||asig.obs||'';
+      const moodleUrl=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
+      const moodleLink=moodleUrl?`\n🔗 <a class="bot-a" href="${moodleUrl}" target="_blank">Aula Moodle</a>`:'';
       let txt=`<strong>${asig.asignatura}</strong>\n`;
       txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
       txt+=`📊 Avance: <strong>${av}%</strong>\n`;
@@ -5978,6 +6672,7 @@ window.addEventListener('load', function(){
       txt+=`📅 Planificación: ${asig.planif||'—'}\n`;
       if(hitoStr){txt+=`━━━━━━━━━━━━━━━━━━━━━\n<strong>Hitos de producción:</strong>\n${hitoStr}\n`;}
       if(obs){txt+=`━━━━━━━━━━━━━━━━━━━━━\n📝 Obs: ${obs}\n`;}
+      if(moodleLink){txt+=moodleLink+'\n';}
       return {txt, chips:['Avance por facultad','Top 5']};
     }
   }
@@ -6021,8 +6716,23 @@ window.addEventListener('load', function(){
     setTimeout(()=>{
       const r=botRespond(q);
       addMsg(r.txt,'bot',r.chips);
+      // Si avisó que está cargando, reintenta automáticamente cuando DATA esté listo
+      if(!DATA.length){
+        let tries=0;
+        const poll=setInterval(()=>{
+          tries++;
+          if(tries>15){ clearInterval(poll); return; }
+          if(DATA.length){
+            clearInterval(poll);
+            addMsg('✅ Datos cargados. Repitiendo tu consulta...','bot');
+            setTimeout(()=>{ const r2=botRespond(q); addMsg(r2.txt,'bot',r2.chips); },400);
+          }
+        },1000);
+      }
     },220);
   }
+
+  window.botAsk=function(q){ botProcess(q); };
 
   window.botSend=function(){
     const inp=document.getElementById('bot-input');
@@ -6038,15 +6748,35 @@ window.addEventListener('load', function(){
       w.classList.add('open');
       if(!botGreeted){
         botGreeted=true;
-        setTimeout(()=>addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-1. Preguntame sobre recursos, plantillas, equipo, o el avance de cualquier asignatura.','bot',['Tipos de recursos','Los 3 momentos','Ver promedio']),300);
+        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']),300);
       }
       setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
     } else {
       w.classList.remove('open');
     }
   };
+
+  window.botClear=function(){
+    const msgs=document.getElementById('bot-msgs');
+    if(msgs) msgs.innerHTML='';
+    botGreeted=false;
+    ctxPersona=null;
+    setTimeout(()=>{
+      botGreeted=true;
+      addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']);
+    },200);
+  };
 })();
 </script>
 
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('/sw.js')
+        .then(r=>console.log('SW registrado:',r.scope))
+        .catch(e=>console.warn('SW error:',e));
+    });
+  }
+</script>
 </body>
 </html>
