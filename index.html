@@ -549,6 +549,9 @@
     @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,160,144,.4)}50%{opacity:.6;box-shadow:0 0 0 4px rgba(200,160,144,.0)}}
     .urg-row{background:rgba(200,160,144,.04)!important}
     .urg-row:hover{background:rgba(200,160,144,.08)!important}
+    .row-completa td{background:linear-gradient(90deg,rgba(212,175,55,.08) 0%,transparent 55%)!important}
+    .row-completa:hover td{background:linear-gradient(90deg,rgba(212,175,55,.16) 0%,transparent 55%)!important}
+    .badge-completa{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,#d4af37,#f5d060);color:#3a2800;font-size:9.5px;font-weight:800;padding:2px 8px 2px 5px;border-radius:20px;margin-left:6px;letter-spacing:.03em;vertical-align:middle;box-shadow:0 1px 6px rgba(212,175,55,.45);white-space:nowrap}
 
     /* ── EXPORT BTN ── */
     .export-btn{
@@ -1646,6 +1649,41 @@
     .inf-btn-pdf{background:linear-gradient(135deg,#b03030,#c04848);color:#fff}
     .inf-btn-pdf:hover{opacity:.88;transform:translateY(-1px)}
     .inf-btn svg{flex-shrink:0}
+
+    /* ── PAULI — paleta verde UST ── */
+    #bot-btn{position:fixed;bottom:24px;right:24px;z-index:600;width:52px;height:52px;
+      border-radius:50%;background:#284639;border:none;cursor:pointer;
+      box-shadow:0 4px 18px rgba(0,0,0,.55);display:flex;align-items:center;
+      justify-content:center;transition:transform .2s}
+    #bot-btn:hover{transform:scale(1.08)}
+    #bot-btn svg{pointer-events:none}
+    #bot-panel{
+      position:fixed;top:0;right:0;width:390px;height:100vh;
+      background:#1a3528 !important;
+      border-left:3px solid #4ade80;
+      box-shadow:-8px 0 48px rgba(0,0,0,.65);
+      z-index:700;display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1)}
+    #bot-panel.open{transform:translateX(0)}
+    #bot-panel-header{
+      background:#0f2018 !important;
+      border-bottom:2px solid #4ade80;
+      padding:16px 18px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:space-between}
+    #bot-msgs{flex:1;overflow-y:auto;padding:16px 14px;
+      background:#1a3528 !important;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+    #bot-msgs::-webkit-scrollbar{width:5px}
+    #bot-msgs::-webkit-scrollbar-thumb{background:#4ade80;border-radius:4px}
+    #bot-input-row{display:flex;gap:8px;padding:12px 14px;
+      border-top:2px solid #4ade80;background:#0f2018 !important;flex-shrink:0}
+    #bot-input{flex:1;background:#243d2e !important;border:1px solid #4ade80;
+      border-radius:24px;padding:10px 16px;color:#d1fae5 !important;font-size:14px;
+      outline:none;font-family:inherit}
+    #bot-input::placeholder{color:#6ee7b7}
+    #bot-input:focus{border-color:#86efac;background:#1a3528 !important}
+    #bot-send{background:#284639;border:1px solid #4ade80;border-radius:12px;width:42px;height:42px;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    #bot-send:hover{background:#4ade80}
   </style>
 </head>
 <body>
@@ -2515,9 +2553,10 @@ function buildDataFromCSV(rows){
     if(CSV_HEADER_R4.includes(r4l) || CSV_HEADER_R1.includes(r1l)) return;
     const asig = r[1].trim();
     // Columna U = COUNTIF(J:T,"Validada")/11 — recomputar desde hitos para evitar overrides
-    const HITO_COLS = [r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
-    const nVal = HITO_COLS.filter(v=>(v||'').trim()==='Validada').length;
-    const pct = Math.round(nVal/11*100);
+    const isRecNatC = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const HITO_COLS_C = [r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
+    const nValC = HITO_COLS_C.filter(v=>(v||'').trim()==='Validada').length;
+    const pct = isRecNatC ? Math.min(100,Math.round(nValC/8*100)) : Math.round(nValC/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
@@ -2525,8 +2564,10 @@ function buildDataFromCSV(rows){
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
       s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
-      s11s12:mapHito(r[16]),s13s14:mapHito(r[17]),s15s16:mapHito(r[18]),
-      s17s18:mapHito(r[19])}};
+      s11s12:mapHito(r[16]),
+      s13s14:isRecNatC ? 'No aplica' : mapHito(r[17]),
+      s15s16:isRecNatC ? 'No aplica' : mapHito(r[18]),
+      s17s18:isRecNatC ? 'No aplica' : mapHito(r[19])}};
   });
   return {data,avance};
 }
@@ -2540,8 +2581,10 @@ function buildDataFromGviz(rows){
     if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))return;
     const asig=r[1];
     // Columna U = COUNTIF(J:T,"Validada")/11
+    const isRecNatG = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
     const HITO_COLS_G=[r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
-    const pct=Math.round(HITO_COLS_G.filter(v=>(v||'').trim()==='Validada').length/11*100);
+    const nValG=HITO_COLS_G.filter(v=>(v||'').trim()==='Validada').length;
+    const pct=isRecNatG ? Math.min(100,Math.round(nValG/8*100)) : Math.round(nValG/11*100);
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
@@ -2549,8 +2592,10 @@ function buildDataFromGviz(rows){
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
       s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
-      s11s12:mapHito(r[16]),s13s14:mapHito(r[17]),s15s16:mapHito(r[18]),
-      s17s18:mapHito(r[19])}};
+      s11s12:mapHito(r[16]),
+      s13s14:isRecNatG ? 'No aplica' : mapHito(r[17]),
+      s15s16:isRecNatG ? 'No aplica' : mapHito(r[18]),
+      s17s18:isRecNatG ? 'No aplica' : mapHito(r[19])}};
   });
   return {data,avance};
 }
@@ -2599,7 +2644,8 @@ function buildData(rows){
     if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))continue;
     const asig   = r[1]||'';
     const pctRaw = (r[20]||'0%').replace('%','').trim();
-    const pct    = parseInt(pctRaw)||0;
+    const isRecNat = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const pct    = isRecNat ? Math.min(100,Math.round((parseInt(pctRaw)||0)*18/12)) : (parseInt(pctRaw)||0);
     data.push({
       facultad:      r[0]||'',
       asignatura:    asig,
@@ -2629,9 +2675,9 @@ function buildData(rows){
         s7s8:  mapHito(r[14]),
         s9s10: mapHito(r[15]),
         s11s12:mapHito(r[16]),
-        s13s14:mapHito(r[17]),
-        s15s16:mapHito(r[18]),
-        s17s18:mapHito(r[19]),
+        s13s14:isRecNat ? 'No aplica' : mapHito(r[17]),
+        s15s16:isRecNat ? 'No aplica' : mapHito(r[18]),
+        s17s18:isRecNat ? 'No aplica' : mapHito(r[19]),
       }
     };
   }
@@ -3063,12 +3109,12 @@ function renderTable(){
     const isVenc=isHitoVencido(d);
     const avColor=rPct>=50?'hi':rPct>0?'mid':'lo';
     return `
-    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''}">
+    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''} ${rPct>=100?'row-completa':''}">
       <td><span class="chip chip-fac">${d.facultad}</span></td>
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let pill='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}pill=`<div class="row-escal-pill">⚠ ${ds}d — Informar a ${lv}</div>`;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${o.length>65?o.slice(0,63)+'…':o}</div>${pill}`;})()}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${isAtrasada(d)?'⚠ Atrasada':(d.estadoGlobal||planifLabel(d.planif,d))}</span></td>
-      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
+      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}</div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
   }).join('');
@@ -5098,8 +5144,8 @@ function renderFacView(){
         </td>
         <td style="min-width:110px">
           <div class="ftk-av-wrap">
-            <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${avFill}"></div></div>
-            <span class="ftk-av-pct">${av}%</span>
+            <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${av>=100?'linear-gradient(90deg,#d4af37,#f5d060)':avFill}"></div></div>
+            <span class="ftk-av-pct">${av}%${av>=100?' <span class="badge-completa">🏅</span>':''}</span>
           </div>
         </td>
       </tr>`;
@@ -5758,136 +5804,37 @@ window.addEventListener('load', function(){
 </footer>
 
 <!-- ─── CHATBOT ─────────────────────────────────────────────────────────── -->
-<style>
-/* ── Botón cubo 3D UST ── */
-#bot-btn{
-  position:fixed;bottom:28px;right:32px;z-index:9000;
-  width:56px;height:56px;border-radius:8px 8px 2px 8px;
-  background:#4a8c6a;border:none;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  /* Caras del cubo con box-shadow escalonado */
-  box-shadow:
-    1px 1px 0 #428060,2px 2px 0 #3c7357,3px 3px 0 #35674d,
-    4px 4px 0 #2e5a43,5px 5px 0 #274e3a,6px 6px 0 #204131,
-    8px 8px 18px rgba(0,0,0,.4);
-  transition:transform .1s,box-shadow .1s;
-  color:#fff;font-family:inherit}
-#bot-btn:hover{
-  transform:translate(-2px,-2px);
-  box-shadow:
-    1px 1px 0 #428060,2px 2px 0 #3c7357,3px 3px 0 #35674d,
-    4px 4px 0 #2e5a43,5px 5px 0 #274e3a,6px 6px 0 #204131,
-    7px 7px 0 #193428,8px 8px 0 #12281f,10px 10px 22px rgba(0,0,0,.5)}
-#bot-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #204131,4px 4px 10px rgba(0,0,0,.3)}
-#bot-btn svg{pointer-events:none}
-#bot-btn-label{font-size:8px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.65);text-transform:uppercase;line-height:1}
-#bot-badge{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:var(--ro);
-  border-radius:50%;border:2px solid #4a8c6a;display:none;
-  align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff}
-
-/* ── Ventana chat estilo UST Chat Online ── */
-#bot-window{
-  position:fixed;bottom:94px;right:28px;z-index:9001;width:340px;
-  background:#fff !important;color:#111 !important;
-  border:1px solid rgba(0,0,0,.1);border-radius:14px;
-  box-shadow:0 8px 40px rgba(0,0,0,.3);display:none;flex-direction:column;overflow:hidden;
-  max-height:510px}
-#bot-window.open{display:flex}
-
-/* Header verde UST */
-#bot-header{
-  display:flex;align-items:center;gap:10px;padding:12px 14px;
-  background:#3a7a5c;border-bottom:none;flex-shrink:0}
-#bot-header-icon{
-  width:34px;height:34px;border-radius:50%;
-  background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
-#bot-title{flex:1}
-#bot-title strong{font-size:13px;color:#fff !important;display:block;font-weight:700}
-#bot-title span{font-size:10px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:4px}
-#bot-title span::before{content:'';width:6px;height:6px;border-radius:50%;background:#4cde8c;display:inline-block}
-#bot-close,#bot-clear{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);padding:4px;
-  border-radius:6px;display:flex;align-items:center;transition:color .15s;font-size:20px;line-height:1}
-#bot-close:hover,#bot-clear:hover{color:#fff}
-#bot-clear{font-size:16px}
-
-/* Área mensajes — fondo gris claro */
-#bot-msgs{
-  flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;
-  scroll-behavior:smooth;background:#f0f2f4 !important;color:#111 !important}
-#bot-msgs::-webkit-scrollbar{width:4px}
-#bot-msgs::-webkit-scrollbar-track{background:transparent}
-#bot-msgs::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
-
-/* Burbujas con colores explícitos */
-.bot-msg{max-width:88%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.55;white-space:pre-wrap}
-.bot-msg.bot{
-  background:#ffffff !important;color:#111111 !important;
-  align-self:flex-start;border-radius:2px 14px 14px 14px;
-  box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e5e7eb}
-.bot-msg.user{
-  background:#3a7a5c !important;color:#ffffff !important;
-  align-self:flex-end;border-radius:14px 2px 14px 14px}
-.bot-msg strong{color:#1c6b4a !important;font-weight:700}
-.bot-msg.user strong{color:#a8e6c0 !important}
-.bot-msg.typing{opacity:.6}
-
-/* Chips */
-.bot-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;align-self:flex-start}
-.bot-chip{
-  background:#fff;border:1px solid #d1d5db;
-  border-radius:20px;padding:5px 11px;font-size:11px;color:#3a7a5c;cursor:pointer;
-  transition:all .12s;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.bot-chip:hover{background:#4a8c6a;color:#fff;border-color:#4a8c6a}
-
-/* Input */
-#bot-input-row{
-  display:flex;gap:8px;padding:10px 12px;
-  border-top:1px solid #e5e7eb;background:#fff !important;flex-shrink:0}
-#bot-input{
-  flex:1;background:#f5f6f7;border:1px solid #e0e3e8;
-  border-radius:20px;padding:8px 14px;color:#111 !important;font-size:12.5px;outline:none;
-  font-family:inherit;transition:border-color .15s}
-#bot-input::placeholder{color:#aab0ba}
-#bot-input:focus{border-color:#4a8c6a;background:#fff}
-#bot-send{
-  background:#4a8c6a;border:none;
-  border-radius:50%;width:34px;height:34px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:background .15s}
-#bot-send:hover{background:#1a4530}
-.bot-link{cursor:pointer;color:#2d6e4e;text-decoration:underline;text-underline-offset:2px;font-weight:500}
-.bot-link:hover{color:#1a4530}
-.bot-a{color:#2d6e4e;text-underline-offset:2px}
-.bot-a:hover{color:#1a4530}
-</style>
-
-<button id="bot-btn" title="Chat Online — Vio" onclick="botToggle()">
-  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<button id="bot-btn" title="Preguntale a Pauli" onclick="botToggle()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
   </svg>
-  <div id="bot-btn-label">Chat</div>
-  <div id="bot-badge"></div>
 </button>
 
-<div id="bot-window">
-  <div id="bot-header">
-    <div id="bot-header-icon">🤖</div>
-    <div id="bot-title">
-      <strong>Vio</strong>
-      <span>Asistente UST 2026-1</span>
+<!-- Panel lateral — mismo patrón que #panel (filtros), garantiza visibilidad -->
+<div id="bot-panel">
+  <div id="bot-panel-header">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:#d4943a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.02em">Pauli</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7);font-weight:400">Asistente del proyecto UST 2026-1</div>
+      </div>
     </div>
-    <button id="bot-clear" onclick="botClear()" title="Limpiar chat">↺</button>
-    <button id="bot-close" onclick="botToggle()">−</button>
+    <button onclick="botToggle()" style="background:none;border:none;cursor:pointer;color:#4ade80;padding:6px;display:flex;align-items:center;border-radius:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
   <div id="bot-msgs"></div>
   <div id="bot-input-row">
-    <input id="bot-input" type="text" placeholder="Escribe aquí..." autocomplete="off"
+    <input id="bot-input" type="text" placeholder="Escribí tu pregunta…" autocomplete="off"
       onkeydown="if(event.key==='Enter')botSend()">
     <button id="bot-send" onclick="botSend()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
+  <div style="padding:5px 16px 10px;font-size:10.5px;color:#6ee7b7;text-align:center;font-style:italic;background:#0f2018">Pauli es IA y puede cometer errores.</div>
 </div>
 
 <script>
@@ -5992,7 +5939,7 @@ window.addEventListener('load', function(){
       return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
-      return {txt:'Podés preguntarme sobre:\n• <strong>Avance / docente / DI / JP / DG / reunión</strong> de una asignatura\n• <strong>Aula Moodle</strong> o <strong>seguimiento</strong> de una asignatura\n• <strong>Plazos DEL</strong> por facultad\n• <strong>Tipos de recursos</strong> (T1-T4, cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Plantillas y manuales</strong> del proyecto\n• <strong>Equipo, roles, fases</strong> del proyecto\n• <strong>Reportes semanales</strong> por facultad\n• <strong>Estadísticas</strong> de avance general, alertas, rendimiento', chips:['Rendimiento','Docentes en riesgo','Reportes']};
+      return {txt:'Podés preguntarme sobre:\n• <strong>Avance por facultad / asignatura</strong> (% promedio por área)\n• <strong>Docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Tipos de recursos</strong> T1–T4 (cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Manual DG, Manual Implementador</strong> (nomenclatura, checklist QA)\n• <strong>Fases del proceso</strong> y <strong>roles del equipo</strong>\n• <strong>Co-diseño, Escala de Apreciación, QA planificación</strong>\n• <strong>Colores por facultad</strong>, herramientas, duplas de trabajo\n• <strong>Estadísticas:</strong> promedio, top 5, menor avance, formatos', chips:['Avance por facultad','Tipos de recursos','Fases del proceso']};
 
     // Proyecto general
     if(nq.match(/que es el proyecto|de que trata|en que consiste|proyecto ust|virtualiz/))
@@ -6010,28 +5957,32 @@ window.addEventListener('load', function(){
     // ── RECURSOS ──────────────────────────────────────────────────────────────
 
     // Tipos de recursos general
-    if(nq.match(/tipos de recurso|que recursos|cuantos tipos|t1|t2|t3|t4/) && !nq.match(/capsula|videoclase|genially|podcast|infografia|guia|presentacion|foro|tarea/))
-      return {txt:'<strong>Tipos de recursos didácticos:</strong>\n\n<strong>T1 — Audiovisuales e interactivos</strong> (20% horas asincrónicas)\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Video bienvenida/cierre\n\n<strong>T2 — Prácticos y evaluativos</strong> (80% horas asincrónicas)\nTareas, Foros, Evaluaciones, Glosarios, Lecturas, Infografías\n\n<strong>T3 — Materiales sesiones sincrónicas</strong>\nPresentaciones, Guías de facilitación, Dinámicas en vivo, Plantillas ejercicios\n\n<strong>T4 — TPE guiado</strong>\nGuías de análisis, actividades preparatorias previas a clases\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1TRWpMvkzGTSKErbPQObipGHd5Ov8cAuQ/view" target="_blank">Guía completa de los 26 recursos (PDF)</a>', chips:['¿Qué es una cápsula?','¿Qué es un Genially?','Los 3 momentos']};
+    if(nq.match(/tipos de recurso|que recursos|cuantos tipos|t1|t2|t3|t4/) && !nq.match(/capsula|videoclase|genially|podcast|infografia|guia|presentacion|foro|tarea/) && !findAsig(q))
+      return {txt:'<strong>Tipos de recursos didácticos:</strong>\n\n<strong>T1 — Audiovisuales e interactivos</strong> (20% horas asincrónicas)\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Video bienvenida/cierre\n\n<strong>T2 — Prácticos y evaluativos</strong> (80% horas asincrónicas)\nTareas, Foros, Evaluaciones, Glosarios, Lecturas, Infografías\n\n<strong>T3 — Materiales sesiones sincrónicas</strong>\nPresentaciones, Guías de facilitación, Dinámicas en vivo, Plantillas ejercicios\n\n<strong>T4 — TPE guiado</strong>\nGuías de análisis, actividades preparatorias previas a clases', chips:['¿Qué es una cápsula?','¿Qué es un Genially?','Los 3 momentos']};
 
     // Cápsula
     if(nq.match(/capsula|capsulas/))
-      return {txt:'<strong>Cápsula (T1)</strong>\nVideo corto que desarrolla un único concepto clave. <strong>Máx. 2 minutos / 280 palabras.</strong>\n\n• DI crea el guion literario y técnico\n• DG produce el video\n• Ideal para: Preparación o reforzar un contenido específico\n• Plantilla: <em>T1_Plantilla_video.docx</em>', chips:['¿Qué es una videoclase?','Tipos de recursos']};
+      return {txt:'<strong>Cápsula (T1)</strong>\nVideo corto que desarrolla un único concepto clave. <strong>Máx. 2 minutos / 280 palabras.</strong>\n\n• DI crea el guion literario y técnico\n• DG produce el video\n• Ideal para: Preparación o reforzar un contenido específico\n• Plantilla: <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a>', chips:['¿Qué es una videoclase?','Pasame plantilla video','Tipos de recursos']};
 
     // Videoclase
     if(nq.match(/videoclase|video clase/))
-      return {txt:'<strong>Videoclase (T1)</strong>\nVideo con desarrollo profundo del tema. <strong>Máx. 10 minutos / 1.400 palabras.</strong>\n\n• 2-3 bloques temáticos con ejemplos y transiciones\n• DI hace el guion, DG produce el video\n• Ideal para: Preparación o Desarrollo cuando el tema necesita más tiempo\n• Plantilla: <em>T1_Plantilla_video.docx</em>', chips:['¿Qué es una cápsula?','Tipos de recursos']};
+      return {txt:'<strong>Videoclase (T1)</strong>\nVideo con desarrollo profundo del tema. <strong>Máx. 10 minutos / 1.400 palabras.</strong>\n\n• 2-3 bloques temáticos con ejemplos y transiciones\n• DI hace el guion, DG produce el video\n• Ideal para: Preparación o Desarrollo cuando el tema necesita más tiempo\n• Plantilla: <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a>', chips:['¿Qué es una cápsula?','Pasame plantilla video','Tipos de recursos']};
 
     // Genially
     if(nq.match(/genially/))
-      return {txt:'<strong>Genially interactivo (T1)</strong>\nRecurso navegable con menú de temas, hotspots, autoevaluación y actividad reflexiva.\n\n• 3 a 5 actividades interactivas — 15 a 20 min para el estudiante\n• DI hace el guion técnico por slide, DG crea las piezas gráficas\n• Ideal para: Preparación o Trabajo independiente con varios conceptos relacionados\n• Plantilla: <em>T1_Plantilla_Genially_Interactivo.pptx</em>', chips:['Tipos de recursos','Los 3 momentos']};
+      return {txt:'<strong>Genially interactivo (T1)</strong>\nRecurso navegable con menú de temas, hotspots, autoevaluación y actividad reflexiva.\n\n• 3 a 5 actividades interactivas — 15 a 20 min para el estudiante\n• DI hace el guion técnico por slide, DG crea las piezas gráficas\n• Ideal para: Preparación o Trabajo independiente con varios conceptos relacionados\n• Plantilla: <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank">T1_Plantilla_Genially_Interactivo.pptx ↗</a>', chips:['Tipos de recursos','Pasame plantilla Genially','Los 3 momentos']};
 
     // Podcast
     if(nq.match(/podcast/))
-      return {txt:'<strong>Podcast educativo (T1)</strong>\nAudio con 2 personajes diferenciados. <strong>Máx. 5 minutos.</strong>\n\n• Estructura: Introducción (30 seg) → Desarrollo (3:30 min) → Cierre (1 min)\n• DI hace el guion literario completo, DG produce el audio\n• Ideal para: Preparación o Trabajo independiente\n• Plantilla: <em>T1_Plantilla_podcast.docx</em>', chips:['Tipos de recursos']};
+      return {txt:'<strong>Podcast educativo (T1)</strong>\nAudio con 2 personajes diferenciados (A y B). <strong>Máx. 5 minutos.</strong>\n\n<strong>Estructura del guión:</strong>\n🎙 <strong>Introducción</strong> (30 seg) — Personaje A presenta el tema, B hace una pregunta gancho\n🎧 <strong>Desarrollo</strong> (3 min 30 seg) — 3 bloques conversacionales:\n  · Bloque 1: Concepto clave + ejemplo concreto\n  · Bloque 2: Profundización o contraste\n  · Bloque 3: Aplicación práctica o caso\n🔔 <strong>Cierre</strong> (1 min) — Síntesis, mensaje final y referencia bibliográfica\n\n<strong>Reglas:</strong>\n• 5–7 oraciones por bloque · tono conversacional, NO leer slides\n• Sin siglas sin explicar · evitar párrafos de más de 3 líneas\n• DI escribe el guión literario completo · DG produce el MP3 en Canva\n\n📄 Plantilla: <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank">T1_Plantilla_podcast.docx ↗</a>', chips:['Tipos de recursos','Pasame plantilla podcast','Prompts IA']};
 
     // Infografía
     if(nq.match(/infografia|infografía/))
-      return {txt:'<strong>Infografía (T1)</strong>\nRecurso estático con texto en bloques cortos, imágenes y bibliografía APA 7. <strong>1 página — 10 a 15 min</strong> para el estudiante.\n\n• DI crea el guion completo (texto, imágenes sugeridas, referencias)\n• DG hace la creación gráfica\n• Ideal para: Sintetizar visualmente un concepto, proceso o comparación\n• Plantilla: <em>T1_Plantilla_infografia.docx</em>\n\n<strong>Infografía interactiva:</strong> con capas navegables tipo pop-up (3-5 elementos). Plantilla: <em>T1_Plantilla_infografia_interactiva.pptx</em>', chips:['Tipos de recursos']};
+      return {txt:'<strong>Infografía (T1)</strong>\n1 página visual. <strong>10 a 15 min</strong> para el estudiante.\n\n<strong>Estructura del guión:</strong>\n📌 <strong>Título</strong> — claro e impactante (máx. 8 palabras)\n📋 <strong>Introducción</strong> — 1–2 oraciones que contextualizan el tema\n📊 <strong>4–5 bloques de contenido</strong> — subtítulo + 3–4 líneas + ícono/imagen sugerida\n📚 <strong>Bibliografía APA 7</strong> al pie de página\n\n<strong>Reglas DI/DG:</strong>\n• Máx. 200 palabras en total\n• Imágenes libres de derechos (Freepik o Unsplash)\n• Colores corporativos UST + color de facultad\n• Fondo blanco o color plano — sin fondos complejos\n• DI entrega guión completo con sugerencias visuales · DG produce la pieza\n\n<strong>Infografía interactiva:</strong> 3–5 elementos pop-up navegables, exporta como SCORM desde Genially.\n\n📄 Plantilla: <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank">T1_Plantilla_infografia.docx ↗</a>', chips:['Tipos de recursos','Pasame plantilla infografia','Colores por facultad']};
+
+    // Presentación sincrónica
+    if(nq.match(/presentacion|presentación|ppt\b|powerpoint/) && !findAsig(q))
+      return {txt:'<strong>Presentación sincrónica (T3)</strong>\nMaterial de apoyo para sesiones con el docente.\n\n<strong>Estructura:</strong>\n📎 <strong>Portada</strong> — nombre asignatura, logo UST, nombre sesión, semana\n📌 <strong>Agenda</strong> — 3–5 puntos de la clase\n📋 <strong>Desarrollo</strong> — 1 slide = 1 idea · máx. 6 líneas / 24 palabras por slide\n💬 <strong>Actividad o reflexión</strong> — instrucción clara para el estudiante\n✅ <strong>Cierre</strong> — síntesis de los puntos clave de la sesión\n\n<strong>Reglas:</strong>\n• T3 <strong>no pasa por DG</strong> — el DI completa la plantilla directamente\n• Sin animaciones complejas · fuente Arial · colores UST + color de facultad\n• Fotos e íconos libres de derechos (Freepik)\n• Plantilla: <em>T3_Plantilla_Actividad_Sincrónica.docx</em>', chips:['Tipos de recursos','Plantillas T3','Los 3 momentos']};
 
     // Guía de facilitación
     if(nq.match(/guia de facilitacion|guia facilitacion|guías de facilitación/))
@@ -6042,8 +5993,33 @@ window.addEventListener('load', function(){
       return {txt:'<strong>Los 3 momentos de aprendizaje UST:</strong>\n\n<strong>1. Preparación</strong>\nEstudiante autónomo se prepara para la clase. Usa TPE (tiempo personal). Sin docente.\n\n<strong>2. Desarrollo</strong>\nContacto directo con el docente. Horas sincrónicas o asincrónicas. Evaluaciones formativas y sumativas.\n\n<strong>3. Trabajo Independiente</strong>\nEstudiante profundiza lo aprendido de manera personal. Practica habilidades y conocimientos. Usa TPE.\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1TNmRJnOrZP-rsauFZSz-HiQEZyTMfpZP/view" target="_blank">Ver documento completo (PDF)</a>', chips:['Tipos de recursos','¿Qué es T1?']};
 
     // Plantillas
+    if(nq.match(/plantilla.*t1|t1.*plantilla/))
+      return {txt:'<strong>Plantillas T1 — Audiovisuales e interactivos</strong>\n\n📄 <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a> → Cápsula y Videoclase\n📄 <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank">T1_Plantilla_podcast.docx ↗</a> → Podcast educativo\n📄 <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank">T1_Plantilla_infografia.docx ↗</a> → Infografía estática\n📄 <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank">T1_Plantilla_Genially_Interactivo.pptx ↗</a> → Genially navegable\n\nTodos los T1 pasan por el DG para producción.', chips:['Plantillas T2','Plantillas T3','Plantillas T4']};
+
+    if(nq.match(/plantilla.*t2|t2.*plantilla/))
+      return {txt:'<strong>Plantillas T2 — Actividades prácticas y evaluativas</strong>\n\n<strong>Documentos académicos (variantes por facultad):</strong>\n• <em>T2_Plantilla_guia_de_estudio.docx</em> (Ing. y Negocios, Salud, Recursos, Formación, Sociales)\n• <em>T2_Plantilla Apunte.docx</em> (Ing. y Negocios, Salud, Recursos, Formación, Sociales)\n\n<strong>Actividades y evaluaciones:</strong>\n• <em>T2_Plantilla_Actividad_de_clase.docx</em>\n• <em>T2_Plantilla_Tarea.docx</em>\n• <em>T2_Plantilla_prueba_desarrollo.docx</em>\n• <em>T2_Plantilla_Lista_Cotejo.docx</em>\n• <em>T2_Plantilla_Pauta_Corrección.docx</em>', chips:['Plantillas T1','Plantillas T3','Plantillas T4']};
+
+    if(nq.match(/plantilla.*t3|t3.*plantilla/))
+      return {txt:'<strong>Plantillas T3 — Materiales sesiones sincrónicas</strong>\n\n• <em>T3_Plantilla_Actividad_Sincrónica.docx</em>\n\nEl DI no interviene el DG en los T3. El DI completa la plantilla y va directo a revisión.', chips:['Plantillas T2','Plantillas T4','Los 3 momentos']};
+
+    if(nq.match(/plantilla.*t4|t4.*plantilla/))
+      return {txt:'<strong>Plantillas T4 — TPE guiado</strong>\n\n• <em>T4_Plantilla_Actividad_TPE.docx</em> (variantes: Formación, Sociales, Recursos Naturales, Ing. y Negocios)\n• <em>T4_Plantilla_Guía_preparación.docx</em>\n• <em>T4_Plantilla_Encuesta_de_interés.docx</em>\n\nRecursos para que el estudiante trabaje de forma autónoma (Trabajo Personal del Estudiante).', chips:['Plantillas T2','Plantillas T3','Los 3 momentos']};
+
+    // Pasame plantilla (links directos de Drive)
+    if(nq.match(/pasame|dame.*plantilla|quiero.*plantilla|necesito.*plantilla|link.*plantilla|enlace.*plantilla|descargar.*plantilla/)){
+      if(nq.match(/video|capsula|videoclase/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank"><strong>T1_Plantilla_video.docx ↗</strong></a>\nÚsala para guiones de cápsula y videoclase.', chips:['¿Qué es una cápsula?','Tipos de recursos']};
+      if(nq.match(/podcast/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank"><strong>T1_Plantilla_podcast.docx ↗</strong></a>\nÚsala para el guión literario del podcast educativo.', chips:['¿Cómo debe ser un podcast?','Tipos de recursos']};
+      if(nq.match(/infografia|infografía/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank"><strong>T1_Plantilla_infografia.docx ↗</strong></a>\nÚsala para el guión de infografía estática.', chips:['¿Cómo debe ser una infografía?','Tipos de recursos']};
+      if(nq.match(/genially/))
+        return {txt:'📄 <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank"><strong>T1_Plantilla_Genially_Interactivo.pptx ↗</strong></a>\nÚsala para el guión técnico por slide del Genially.', chips:['¿Qué es un Genially?','Tipos de recursos']};
+      return {txt:'📂 <strong>Plantillas T1 disponibles:</strong>\n\n📄 <a href="https://drive.google.com/file/d/1Qeospr5s2qnFmtNB1ASJo9QER4c1eobN/view" target="_blank">T1_Plantilla_video.docx ↗</a> (cápsula / videoclase)\n📄 <a href="https://drive.google.com/file/d/1G5duGdbSH8a-uFqR4aOGlKCjNyiaRHS-/view" target="_blank">T1_Plantilla_podcast.docx ↗</a>\n📄 <a href="https://drive.google.com/file/d/1WVTQVtwVHY2AMnT8onC2nuo_LsicBpgA/view" target="_blank">T1_Plantilla_infografia.docx ↗</a>\n📄 <a href="https://drive.google.com/file/d/1NKKHyZPcvdtiGJHmOKMDu4hoGUUVDosJ/view" target="_blank">T1_Plantilla_Genially_Interactivo.pptx ↗</a>\n\nPara T2/T3/T4 escribí <strong>Plantillas T2</strong>, <strong>Plantillas T3</strong> o <strong>Plantillas T4</strong>.', chips:['Plantillas T2','Plantillas T3','Plantillas T4']};
+    }
+
     if(nq.match(/plantilla|plantillas/) && !findAsig(q))
-      return {txt:'<strong>Plantillas disponibles por área:</strong>\n• 1. Ingeniería y negocios\n• 2. Recursos naturales\n• 3. Sociales\n• 4. Formación general\n• 5. Salud\n\nAdemás hay plantillas para Planificación Didáctica.\n\n📁 <a class="bot-a" href="https://drive.google.com/drive/folders/1h51hcMZMYwodkZWHubZW0opsVI82CXyK" target="_blank">Abrir carpeta de Plantillas en Drive</a>', chips:['Tipos de recursos','Prompts IA']};
+      return {txt:'<strong>Plantillas del proyecto — organizadas por tipo de recurso</strong>\n\n<strong>T1 — Audiovisuales e interactivos:</strong>\nVideo, Podcast, Infografía, Infografía interactiva, Genially\n\n<strong>T2 — Actividades prácticas y evaluativas:</strong>\nGuía de estudio, Apunte (x5 facultades), Actividad de clase, Tarea, Prueba de desarrollo, Lista Cotejo, Pauta Corrección\n\n<strong>T3 — Materiales sincrónicas:</strong>\nActividad Sincrónica\n\n<strong>T4 — TPE guiado:</strong>\nActividad TPE (x4 facultades), Guía de preparación, Encuesta de interés\n\nAccedé desde: <em>Carpeta 2. Plantillas</em> en el Drive del proyecto.', chips:['Plantillas T1','Plantillas T2','Plantillas T4']};
 
     // Prompts IA
     if(nq.match(/prompt|prompts|ia para recursos|claude para/))
@@ -6059,11 +6035,19 @@ window.addEventListener('load', function(){
 
     // Manual DG
     if(nq.match(/manual.*dg|dg.*manual|manual.*grafico|manual.*diseño grafico/))
-      return {txt:'<strong>Manual del Diseñador Gráfico e-Learning UST</strong>\n\nContenido:\n• Identidad visual UST — Brandbook\n• Color por facultad\n• Herramientas institucionales (Freepik, Canva, Genially, Adobe)\n• Flujo de trabajo y plazos\n• Dupla DG–DI: cómo trabajar juntos\n• Lineamientos por tipo de recurso\n• Accesibilidad (criterio obligatorio)\n• QA antes de entregar\n• Errores frecuentes y causales de rechazo\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1TlS4gC9m85KQ4F2KlHxK6OV7dVNg_6Bm/view" target="_blank">Abrir Manual DG (DOCX)</a>\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1gqHc1zU8eOO9OkBsaSVD8Z7x7IvuXR6p/view" target="_blank">Ver resumen del rol DG (PDF)</a>', chips:['Dupla DI-DG','Brandbook UST','Tipos de recursos']};
+      return {txt:'<strong>Manual del Diseñador Gráfico — e-Learning UST v2</strong>\n\nEl DG transforma contenido pedagógico en experiencias visuales. Principios: Claridad · Jerarquía · Reducción de carga cognitiva · Coherencia.\n\n<strong>Identidad visual:</strong>\n• Color corporativo: <strong>#284639</strong> (verde UST) — 70–80% de la composición\n• Complementario: <strong>#B7BF10</strong> — 20–30%\n• Tipografía obligatoria: <strong>Arial</strong> en todos los recursos digitales\n• Logo UST: nunca modificar proporciones ni colores\n\n<strong>Herramientas institucionales (licencias vía JP):</strong>\nFreepik (imágenes/íconos) · Canva (video/podcast MP4/MP3) · Genially (SCORM) · Word/PPT · Adobe\n\n<strong>Flujo:</strong> DI deja en Borrador → DG toma, diseña y mueve a Producción → DI aprueba → DG mueve a Validado → Implementador sube al LMS\n\n<strong>Plazos:</strong> 3–5 días hábiles por semana de recursos asignada', chips:['Colores por facultad','Dupla DI-DG','QA del DG']};
 
     // Dupla DI-DG
     if(nq.match(/dupla|di.*dg|dg.*di|trabajan juntos|trabajo con.*dg|trabajo con.*di/))
-      return {txt:'<strong>Dupla DG–DI</strong>\n\n<strong>Recursos donde DG interviene (T1):</strong>\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Videos bienvenida/cierre → DI hace el guion, DG produce la pieza.\n\n<strong>Recursos donde DG NO interviene:</strong>\nGuías de facilitación, Lecturas, Glosarios → DI completa la plantilla y va directo a revisión.\n\n<strong>Flujo:</strong> DI entrega guion completo → DG produce → Revisión → Implementación', chips:['Manual DG','Tipos de recursos']};
+      return {txt:'<strong>Dupla DG–DI</strong>\n\n<strong>Recursos donde DG interviene (T1):</strong>\nInfografía, Infografía interactiva, Podcast, Cápsula, Videoclase, Genially, Videos bienvenida/cierre → DI hace el guion, DG produce la pieza.\n\n<strong>Recursos donde DG NO interviene:</strong>\nGuías de facilitación, Lecturas, Glosarios → DI completa la plantilla y va directo a revisión.\n\n<strong>Flujo:</strong> DI entrega guion completo → DG produce → DI revisa y comenta en Producción → DG aplica ajustes → DI aprueba → DG mueve a Validado\n\n<strong>Rondas de corrección:</strong> máximo 1 por recurso. Si los cambios son muy extensos = nuevo brief.', chips:['Manual DG','Tipos de recursos']};
+
+    // Colores por facultad (DG)
+    if(nq.match(/color.*facultad|colores.*facultad|que color|hex.*facultad|facultad.*color|brandbook.*color/))
+      return {txt:'<strong>Colores por facultad — Brandbook UST</strong>\nEl color de facultad complementa el verde corporativo (#284639). Uso en íconos, líneas y destacados (20–30% max).\n\n• Ciencias: <strong>#4E0B76</strong>\n• Ingeniería y Negocios: <strong>#6F7A73</strong>\n• Ciencias Sociales y Comunicaciones: <strong>#9F83B3</strong>\n• Derecho: <strong>#852746</strong>\n• Educación: <strong>#5B7AAB</strong>\n• Economía y Negocios: <strong>#97BB5B</strong>\n• Recursos Naturales / Veterinaria: <strong>#A4CCBF</strong>\n• Salud: <strong>#C02B22</strong>\n\nRegla: el color de facultad <em>complementa</em>, nunca reemplaza el verde institucional.', chips:['Manual DG']};
+
+    // QA del DG
+    if(nq.match(/qa.*dg|dg.*qa|checklist.*dg|dg.*checklist|errores.*dg|rechazo.*dg|causal.*rechazo.*dg/))
+      return {txt:'<strong>QA del DG — Causales de rechazo en DI o QA institucional:</strong>\n\n<strong>Identidad visual:</strong>\n• Logo modificado, estirado o recoloreado\n• Color de facultad incorrecto o no aplicado\n• Tipografía no institucional (no Arial en docs digitales)\n\n<strong>Diseño y accesibilidad:</strong>\n• Más de 7 líneas de texto en PPT\n• Contraste texto/fondo menor a 4.5:1 (WCAG AA)\n• Texto incrustado en imagen\n• Íconos sin etiqueta de texto\n• Recursos visualmente inconsistentes entre sí\n\n<strong>Archivos:</strong>\n• Formato incorrecto (SCORM para Genially, MP4 video, MP3 podcast)\n• Archivo en carpeta equivocada del Drive\n• Errores ortográficos o puntuación incorrecta', chips:['Manual DG','Dupla DI-DG']};
 
     // Equipo completo
     if(nq.match(/equipo|integrantes|quienes son|miembros/)){
@@ -6124,45 +6108,58 @@ window.addEventListener('load', function(){
     }
 
     if(nq.match(/manual.*implementador|implementador.*manual|moodle.*manual/))
-      return {txt:'<strong>Manual del Implementador — Moodle UST</strong>\n\nCubre:\n• Estructura del aula virtual (sección bienvenida + sesiones)\n• Nomenclatura de archivos (estándar obligatorio)\n• Tres momentos de publicación (estructura → recursos → mini QA)\n• Criterios por tipo de recurso (PDF, SCORM, URLs, Moodle nativo)\n• Errores críticos — causales de rechazo en QA\n• Checklist interno mini QA\n\nDirigido a: Elías Castillo y Antonio Cabrera\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1Hk7e89RY_u_cMlbKdgwl6jvfHLYF_G4-/view" target="_blank">Abrir Manual del Implementador (DOCX)</a>', chips:['¿Quiénes son los implementadores?','Flujo de producción','Dupla DI-DG']};
+      return {txt:'<strong>Manual del Implementador — Moodle UST v1.0</strong>\n\nPrincipio: <em>"La planificación es la fuente de verdad. Si no lo indica, no se agrega."</em>\n\n<strong>3 Momentos de publicación:</strong>\n1. <strong>Estructura del aula</strong> — Sección Bienvenida (6 elementos fijos) + todas las sesiones + etiquetas de modalidad + encabezados de los 3 momentos\n2. <strong>Recursos e instrucciones</strong> — PDFs, URLs (nueva pestaña + APA), SCORMs, actividades Moodle configuradas\n3. <strong>Mini QA interno</strong> — Navegar en modo estudiante con checklist A–F antes de notificar a QA DEL\n\n<strong>Nomenclatura:</strong> <code>S[N]_[Tipo][N]_[Título].[ext]</code>\nEj: S1_Apunte1_Introduccion_al_Derecho_Penal.pdf\n\n<strong>Rúbricas: publicación DOBLE obligatoria</strong>\n→ Rúbrica nativa en Moodle + PDF descargable en las instrucciones\n\nDirigido a: Elías Castillo y Antonio Cabrera', chips:['Nomenclatura archivos','Errores críticos Moodle','Checklist QA Moodle']};
 
-    if(nq.match(/guia.*docente|docente.*guia|entregables.*docente|que entrega.*docente/))
-      return {txt:'<strong>Guías para el docente:</strong>\n\n<strong>1. Guía de Revisión de Planificación</strong>\nCómo el docente revisa y aprueba la planificación didáctica elaborada por el DI.\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1f044cV8SEObEWxl39HjLCEqHHkdaFws2/view" target="_blank">Abrir guía (DOCX)</a>\n\n<strong>2. Guía de Producción de Contenidos</strong>\nCómo el docente produce y entrega sus materiales (PPT, guiones, lecturas, etc.).\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1pyvodKcKxbKyRGCGeYckj6-pRRoTgkaR/view" target="_blank">Abrir guía (DOCX)</a>\n\n<strong>3. Entregables del docente</strong>\nLista detallada de compromisos y fechas en el proceso.\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1nMYvwWkrzczlu43tyIOCqqbhrNlqZOa5/view" target="_blank">Abrir documento (DOCX)</a>', chips:['Reunión de inicio','Fases del proyecto']};
+    if(nq.match(/nomenclatura|nombre.*archivo|archivo.*nombre|como.*nombrar.*archivo/))
+      return {txt:'<strong>Nomenclatura de archivos — Manual Implementador</strong>\n\nEstructura: <strong>S[N]_[Tipo][N]_[Título].[ext]</strong>\n\n• <strong>S[N]</strong> = Sesión (S1, S2, S12…)\n• <strong>[Tipo]</strong> = Tipo de recurso con mayúscula inicial\n• <strong>[N]</strong> = Correlativo si hay más de uno del mismo tipo\n• <strong>[Título]</strong> = Nombre descriptivo (guion bajo en lugar de espacios, sin tildes ni caracteres especiales)\n\n<strong>Tipos de archivo válidos:</strong> Apunte, Presentacion, Infografia, Resumen, Facilitacion, Ejercicio, Rubrica, Podcast\n\n<strong>URLs</strong> en Moodle → nombre visible: <em>[Tipo]. [Título]</em> + bajada APA en descripción\n<strong>SCORMs</strong> (Genially, Infografía interactiva) → subir sin descomprimir\n\n<strong>Ejemplos correctos:</strong>\n✓ S1_Apunte1_Introduccion_al_Derecho_Penal.pdf\n✓ S3_Rubrica1_Tarea_de_aplicacion.pdf\n✗ apunte semana 1.pdf / presentacion v2 final OK.pdf', chips:['Manual del Implementador']};
+
+    if(nq.match(/errores.*moodle|moodle.*errores|errores.*implementador|rechazo.*qa|causas.*rechazo|criticos.*moodle|criticos.*implementador/))
+      return {txt:'<strong>Errores críticos — Rechazo automático en QA (Implementador)</strong>\n\n<strong>Textos de plantilla visibles al estudiante:</strong>\n• "primera actividad", "segunda actividad", "tercer actividad"\n• "XX horas pedagógicas" / "XX horas cronológicas" sin completar\n• "SESIÓN X SINCRÓNICA" con X sin reemplazar\n\n<strong>Evaluaciones incompletas:</strong>\n• Tarea evaluada sin rúbrica nativa + sin PDF descargable\n• Tarea sin fecha de entrega o puntaje 0\n• Quiz con preguntas incompletas o sin respuestas marcadas\n\n<strong>Recursos y estructura:</strong>\n• URL que no funciona o abre en misma ventana (debe ser NUEVA PESTAÑA siempre)\n• Nombre de archivo interno: borrador, temp, v2, final OK\n• Sesiones fuera del orden de la planificación\n• SCORM que no carga o muestra error', chips:['Manual del Implementador','Checklist QA Moodle']};
+
+    if(nq.match(/checklist.*moodle|checklist.*implementador|checklist.*qa|mini.*qa|qa.*aula/))
+      return {txt:'<strong>Checklist Mini QA — Implementador (Bloques A–F)</strong>\n\n<strong>A — Bienvenida:</strong> 6 elementos publicados y visibles · PDF Planificación aprobada (no Excel) · Foro Avisos tipo "Noticias"\n\n<strong>B — Sesiones:</strong> N° sesiones coincide con planificación · Etiquetas de modalidad con número correcto · 3 momentos con horas completas (sin "XX") · TPE con "horas cronológicas"\n\n<strong>C — Recursos y archivos:</strong> Todos los recursos de la planificación publicados · Nomenclatura correcta · PDFs abren correctamente · SCORMs cargan sin error\n\n<strong>D — URLs:</strong> Todas abren en nueva pestaña · Nombre visible en formato [Tipo]. [Título] · Bajada APA en descripción\n\n<strong>E — Actividades evaluadas:</strong> Todas las tareas con rúbrica nativa + PDF · Fechas y puntajes correctos · Foros con calificación configurada\n\n<strong>F — Modo estudiante:</strong> Recorrí el aula completa · Sin instrucciones internas visibles · Sin texto de plantilla', chips:['Manual del Implementador','Errores críticos Moodle']};
+
+    if(nq.match(/guia.*docente|docente.*guia|entregables.*docente|que entrega.*docente|rol.*docente|docente.*que hace/))
+      return {txt:'<strong>Guías para el docente — UST 2026-1</strong>\n\n<strong>1. Guía de Revisión de Planificación</strong>\nEl DI envía la planificación didáctica y el docente tiene <strong>máx. 5 días hábiles</strong> para revisarla. Debe verificar: datos del programa, RA transcritos textualmente, evaluaciones (suman 100%), secuencia pedagógica y carga de horas. Devuelve observaciones al JP por correo o en comentarios en el Excel.\n\n<strong>2. Guía de Producción de Contenidos (Fase III)</strong>\nEl docente entrega el contenido disciplinar semanal: guión de <strong>3–8 páginas en Word</strong>, mínimo <strong>5 días hábiles antes</strong> de la co-construcción. Incluye: introducción, desarrollo, caso/ejemplo, síntesis, bibliografía completa con URL.\n\n<strong>3. Entregables del docente por fase:</strong>\n• Fase 0: confirmar disponibilidad y leer guía\n• Fase I: entregar programa oficial al JP\n• Fase II: co-diseño con DI (1–3 sesiones 60–90 min)\n• Fase III: guión semanal en Word\n• Fase V: validar el aula completa y enviar observaciones al JP\n\n⚠ El docente consulta dudas de proceso al JP, no al DI. El DI es su colaborador de contenido.', chips:['Co-diseño planificación','Fases del proceso']};
+
+    if(nq.match(/co.?dise[nñ]o|codise[nñ]o|planificacion.*didactica|didactica.*planificacion|planificacion.*aprobada/))
+      return {txt:'<strong>Co-diseño y Planificación Didáctica (Fase II)</strong>\n\nEl DI lidera sesiones con el docente para completar la planificación. Antes de enviarla al equipo QA, aplica el <strong>checklist pre-QA de 14 criterios mínimos</strong>.\n\n<strong>Sin planificación aprobada por QA DEL no puede iniciarse la producción.</strong>\n\n<strong>La planificación tiene dos partes:</strong>\n• Parte 1 — Síntesis: datos del programa, créditos, competencias, RA, evaluaciones\n• Parte 2 — Detalle por unidad: sesión a sesión con 3 momentos, recursos, actividades, horas\n\n<strong>El docente debe completar:</strong>\n• C1: Nombre específico de cada recurso y actividad (no "Recurso 1")\n• C2: Bibliografía con autor, título, año y URL de acceso\n• C3: URLs de imágenes disciplinares específicas\n• C4: Propósito de cada lectura (qué logrará el estudiante)\n\n<strong>QA DEL evalúa con Escala de Apreciación (41 criterios, 5 dimensiones). Máx. 2 rondas.</strong>', chips:['Escala de Apreciación','Guía docente']};
+
+    if(nq.match(/escala.*apreciacion|41.*criterios|instrumento.*qa.*planif|qa.*planif.*instrumento/))
+      return {txt:'<strong>Escala de Apreciación — QA de Planificación</strong>\n\n41 criterios en 5 dimensiones. La planificación debe alcanzar el umbral institucional de aprobación.\n\n<strong>Criterios mínimos de aprobación:</strong>\n• Datos generales completos, coinciden exactamente con el programa oficial\n• RA formulados con verbo de acción, condición y criterio (no paráfrasis genéricas)\n• Porcentajes de evaluación suman 100%\n• Cada RA tiene procedimiento e instrumento de evaluación declarado\n• Carga académica cuadra con el SCT (celda verificación = "Correcto")\n• Cada sesión tiene los 3 momentos completos con actividades específicas\n• Actividades redactadas en imperativo dirigido al estudiante\n• Alineación RA → Actividad → Evaluación verificada\n• Recursos con 5 campos: título, autor/a, tipo, acceso, extensión', chips:['Co-diseño planificación','Fases del proceso']};
 
     // Reportes semanales
     if(nq.match(/reporte|informe.*semanal|semanal.*informe/) && !findAsig(q)){
-      const links=PROYECTO.reportes.map(r=>`• <a class="bot-a" href="${r.url}" target="_blank">${r.facultad}</a>`).join('\n');
+      const links=PROYECTO.reportes?.map(r=>`• <a class="bot-a" href="${r.url}" target="_blank">${r.facultad}</a>`).join('\n')||'No hay reportes configurados.';
       return {txt:`<strong>Reportes semanales por facultad:</strong>\n${links}\n\nSe actualizan automáticamente con datos del sistema de seguimiento.`};
     }
 
     // Contactos DEL
     if(nq.match(/contacto.*del|del.*contacto|coordinador.*del|del.*quien|quien.*del|encargado.*del|del de/) && !findAsig(q)){
-      const lista=PROYECTO.contactosDEL.map(c=>`• <strong>${c.facultad}</strong>\n  ${c.nombre} — <a class="bot-a" href="mailto:${c.mail}">${c.mail}</a>`).join('\n');
+      const lista=PROYECTO.contactosDEL?.map(c=>`• <strong>${c.facultad}</strong>\n  ${c.nombre} — <a class="bot-a" href="mailto:${c.mail}">${c.mail}</a>`).join('\n')||'No hay contactos DEL configurados.';
       return {txt:`<strong>Contactos DEL por facultad:</strong>\n\n${lista}`};
     }
 
-    // Brandbook / identidad visual UST
     if(nq.match(/brandbook|identidad visual|marca ust|logo ust|color.*facultad|facultad.*color/))
-      return {txt:'<strong>Brandbook UST — Identidad Visual</strong>\n\nDefine los criterios gráficos institucionales:\n• Logo e imagotipo (nunca modificar proporciones ni colores)\n• Tipografía: Arial / Calibri obligatorias en recursos digitales\n• Verde corporativo: <strong>#284639</strong> (70-80% de cada pieza)\n• Color complementario por facultad:\n  - Ingeniería: #6F7A73\n  - Ciencias Sociales: #9F83B3\n  - Economía y Negocios: #97BB5B\n  - Recursos Naturales: #A4CCBF\n  - Salud: #C02B22\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1hHtjdHmz7b6U_vq5Q_wIN5bznSjT5D6h/view" target="_blank">Abrir Brandbook completo (PDF)</a>', chips:['Manual del DG','Dupla DI-DG']};
+      return {txt:'<strong>Brandbook UST — Identidad Visual</strong>\n\nDefine los criterios gráficos institucionales:\n• Logo e imagotipo (nunca modificar proporciones ni colores)\n• Tipografía: Arial / Calibri obligatorias en recursos digitales\n• Verde corporativo: <strong>#284639</strong> (70-80% de cada pieza)\n• Color complementario por facultad:\n  - Ingeniería: #6F7A73\n  - Ciencias Sociales: #9F83B3\n  - Economía y Negocios: #97BB5B\n  - Recursos Naturales: #A4CCBF\n  - Salud: #C02B22', chips:['Manual del DG','Dupla DI-DG']};
 
-    // Flujo de producción / proceso completo
     if(nq.match(/flujo.*produccion|produccion.*flujo|flujo.*proceso|proceso.*completo|fases.*produccion|diagrama.*roles/))
-      return {txt:'<strong>Flujo de Producción e-Learning 2026-1</strong>\n\nEl proceso tiene 6 fases:\n• <strong>Fase 0</strong> — Incorporación del docente (JP)\n• <strong>Fase I</strong> — Planificación con IA (DI)\n• <strong>Fase II</strong> — Co-diseño y validación QA (DI + QA)\n• <strong>Fase III</strong> — Producción semanal iterativa (DI + DG)\n• <strong>Fase IV</strong> — Publicación en plataforma (JP + IP + DI)\n• <strong>Fase V</strong> — Validación final del aula (JP + QA DEL)\n\n⭐ Regla de oro: ningún recurso entra a Fase III sin planificación aprobada por QA DEL.\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1l72xK7SMVoAbYirkUu2jX3Gq7jNQoQnE/view" target="_blank">Ver diagrama de carriles (PDF)</a>\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1A13rJPawrZ83tNUoDOcQY620fGFN9Lua/view" target="_blank">Manual de Procedimiento completo (DOCX)</a>', chips:['Fases del proyecto','Manual del DI','Reunión de inicio']};
+      return {txt:'<strong>Flujo de Producción e-Learning 2026-1</strong>\n\nEl proceso tiene 6 fases:\n• <strong>Fase 0</strong> — Incorporación del docente (JP)\n• <strong>Fase I</strong> — Planificación con IA (DI)\n• <strong>Fase II</strong> — Co-diseño y validación QA (DI + QA)\n• <strong>Fase III</strong> — Producción semanal iterativa (DI + DG)\n• <strong>Fase IV</strong> — Publicación en plataforma (JP + IP + DI)\n• <strong>Fase V</strong> — Validación final del aula (JP + QA DEL)\n\n⭐ Regla de oro: ningún recurso entra a Fase III sin planificación aprobada por QA DEL.', chips:['Fases del proyecto','Manual del DI','Reunión de inicio']};
 
-    // Reunión de inicio / kick-off
     if(nq.match(/reunion.*inicio|inicio.*reunion|kick.*off|kickoff|bienvenida.*docente|reunion.*docente/))
-      return {txt:'<strong>Reunión de Inicio — Kick-off con el docente</strong>\n\nAgenda en 4 bloques:\n1. Bienvenida y contexto (presentación del equipo)\n2. El proceso de diseño (fases, flujo, rol del docente)\n3. Levantamiento de información (materiales disponibles, disponibilidad)\n4. Acuerdos y compromisos (fechas, entregables, canal de comunicación)\n\n<em>Premisa fundamental: el docente aporta el conocimiento disciplinar; el equipo pone la tecnología.</em>\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1Ie2-9UwmtRvxLO0EdEZSdfpvB5SoKmFg/view" target="_blank">Ver presentación de Kick-off (PDF)</a>\n📄 <a class="bot-a" href="https://drive.google.com/file/d/13AgIP3QONVbHrXTrVQhWJCUk8Nwf-uac/view" target="_blank">Paso a paso del DI (PDF)</a>', chips:['Guía del docente','Fases del proyecto','Flujo de producción']};
+      return {txt:'<strong>Reunión de Inicio — Kick-off con el docente</strong>\n\nAgenda en 4 bloques:\n1. Bienvenida y contexto (presentación del equipo)\n2. El proceso de diseño (fases, flujo, rol del docente)\n3. Levantamiento de información (materiales disponibles, disponibilidad)\n4. Acuerdos y compromisos (fechas, entregables, canal de comunicación)\n\n<em>Premisa fundamental: el docente aporta el conocimiento disciplinar; el equipo pone la tecnología.</em>', chips:['Guía del docente','Fases del proyecto','Flujo de producción']};
 
-    // Estándar de recursos e-learning
     if(nq.match(/estandar.*recurso|recurso.*estandar|estandar.*elearning|estandar.*virtual|estandarizacion/))
-      return {txt:'<strong>Estándar de Recursos e-Learning UST</strong>\n\nEstablece cuántos recursos de cada tipo debe tener un curso según sus créditos y horas.\n\nDistribución por tipo:\n• T1 (audiovisuales): 20% de las horas asincrónicas\n• T2 (prácticos/evaluativos): 80% de las horas asincrónicas\n• T3 (sincrónicas): 40% horas presenciales + 40% sincrónicas\n• T4 (TPE guiado): 20% horas TPE\n\nBeneficio: homogeneidad, eficiencia en producción, mejor experiencia del estudiante.\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1ESM6HkPLEvEQP0SZMXrptCuMG-unYji4/view" target="_blank">Abrir Estándar de Recursos (PDF)</a>', chips:['Tipos de recursos','Los 3 momentos','Manual del DI']};
+      return {txt:'<strong>Estándar de Recursos e-Learning UST</strong>\n\nEstablece cuántos recursos de cada tipo debe tener un curso según sus créditos y horas.\n\nDistribución por tipo:\n• T1 (audiovisuales): 20% de las horas asincrónicas\n• T2 (prácticos/evaluativos): 80% de las horas asincrónicas\n• T3 (sincrónicas): 40% horas presenciales + 40% sincrónicas\n• T4 (TPE guiado): 20% horas TPE\n\nBeneficio: homogeneidad, eficiencia en producción, mejor experiencia del estudiante.', chips:['Tipos de recursos','Los 3 momentos','Manual del DI']};
 
-    // Lineamientos A+S
     if(nq.match(/aprendizaje.*servicio|a\+s|as.*elearning|lineamiento.*as|lineamiento.*a\+s/))
-      return {txt:'<strong>Lineamientos A+S e-Learning (Aprendizaje + Servicio)</strong>\n\nOrientaciones para diseñar asignaturas con metodología A+S en modalidad virtual.\n\nEjes principales:\n• Protagonismo estudiantil y autonomía progresiva\n• El entorno digital como espacio legítimo de aprendizaje\n• Vinculación del saber disciplinar con la realidad comunitaria\n• Criterios de calidad del A+S e-Learning UST\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1sKPbUHg_7_hA8ueyhW-acCuKRnOv6Nro/view" target="_blank">Abrir Lineamientos A+S (DOCX)</a>', chips:['Manual del DI','Los 3 momentos']};
+      return {txt:'<strong>Lineamientos A+S e-Learning (Aprendizaje + Servicio)</strong>\n\nOrientaciones para diseñar asignaturas con metodología A+S en modalidad virtual.\n\nEjes principales:\n• Protagonismo estudiantil y autonomía progresiva\n• El entorno digital como espacio legítimo de aprendizaje\n• Vinculación del saber disciplinar con la realidad comunitaria\n• Criterios de calidad del A+S e-Learning UST', chips:['Manual del DI','Los 3 momentos']};
 
     if(nq.match(/capacitacion|onboarding|entrenamiento|formacion.*equipo/))
-      return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1SVcTMJvAaZ1P6iegLXyuIAf0kOdJ0Dl7/view" target="_blank">Presentación de Capacitación del Equipo (PDF)</a>\n📄 <a class="bot-a" href="https://drive.google.com/file/d/13AgIP3QONVbHrXTrVQhWJCUk8Nwf-uac/view" target="_blank">Paso a paso del Diseñador Instruccional (PDF)</a>\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1A13rJPawrZ83tNUoDOcQY620fGFN9Lua/view" target="_blank">Manual de Procedimiento (DOCX)</a>\n📄 <a class="bot-a" href="https://drive.google.com/file/d/1l72xK7SMVoAbYirkUu2jX3Gq7jNQoQnE/view" target="_blank">Flujo de producción — diagrama de carriles (PDF)</a>\n\n<strong>Manuales por rol:</strong>\n• <span class="bot-link" onclick="botAsk(\'Manual del DI\')">Manual DI</span> · <span class="bot-link" onclick="botAsk(\'Manual del DG\')">Manual DG</span> · <span class="bot-link" onclick="botAsk(\'Manual del Implementador\')">Manual Implementador</span>', chips:['Flujo de producción','Reunión de inicio','Guía del docente']};
+      return {txt:'<strong>Capacitación del Equipo UST 2026-1</strong>\n\nDocumentos oficiales por rol:\n• <strong>Manual DI</strong> — Diseño instruccional e-learning UST\n• <strong>Manual DG</strong> — Lineamientos gráficos + Brandbook\n• <strong>Manual Implementador</strong> — Moodle, nomenclatura, QA checklist\n• <strong>Manual de Procedimiento</strong> — Flujo completo 6 fases del proceso 2026-1\n• <strong>Flujo de Producción</strong> — Diagrama de carriles por rol (7 roles, 6 fases)\n• <strong>Paso a paso DI</strong> — Guía visual del flujo de trabajo semestral del DI\n• <strong>Guía Docente Revisión</strong> — Cómo revisar la planificación didáctica\n• <strong>Guía Docente Producción</strong> — Cómo entregar el contenido semanal\n• <strong>Capacitación de Equipo</strong> — Visión general, roles, fases y duplas\n\n<strong>Duplas JP–DI 2026-1:</strong>\n• Dupla 1: JP María José + DI Andreina\n• Dupla 2: JP Noelia + DI Cristián\n• Dupla 3: JP José Luis + DI Natalie\n• Dupla 5: JP José Luis + DI Karen\n• DI adicional flexible: José Luis', chips:['Fases del proceso','Duplas de trabajo','Manual DG']};
+
+    if(nq.match(/duplas.*trabajo|duplas.*jp|jp.*dupla|asignacion.*equipo|quien.*trabaja.*con|como.*asignados/))
+      return {txt:'<strong>Duplas JP–DI del proyecto 2026-1</strong>\n\nCada dupla tiene asignados 5–6 cursos (diseños nuevos y rediseños):\n\n• <strong>Dupla 1:</strong> JP María José Suazo + DI Andreina Rodríguez\n• <strong>Dupla 2:</strong> JP Noelia Escalona + DI Cristián Domínguez\n• <strong>Dupla 3:</strong> JP José Luis Salazar + DI Natalie Baeza\n• <strong>Dupla 5:</strong> JP José Luis Salazar + DI Karen Chávez\n• <strong>DI adicional:</strong> José Luis Salazar — apoyo flexible en cursos y rediseños\n\nDG asignados: Francisco Tapia, Giovanni Perini, Jenny García\nImplementadores: Elías Castillo, Antonio Cabrera', chips:['¿Quién es el equipo?','Fases del proceso']};
 
     // Guard: si DATA aún no cargó, intentar cargar y avisar
     if(!DATA.length){
@@ -6264,8 +6261,36 @@ window.addEventListener('load', function(){
     }
 
     // Stats generales
-    if(nq.match(/cuantas|total.*asig|asig.*total/))
-      return {txt:`Hay <strong>${(DATA||[]).length} asignaturas</strong> en el proyecto.`};
+    // Directoras/directores de escuela (DNE)
+    if(nq.match(/director|directora|dne|encargad|director.*facultad|director.*escuela|director.*programa/)){
+      const dne = (typeof DNE_DATA!=='undefined'?DNE_DATA:[]);
+      if(!dne.length) return {txt:'No hay datos de directores cargados.'};
+      const byFac={};
+      dne.forEach(d=>{
+        if(!byFac[d.facultad]) byFac[d.facultad]=[];
+        byFac[d.facultad].push(`  · ${d.nombre} — ${d.escuela} (${d.programa})`);
+      });
+      const txt='<strong>Directores/as de Escuela por facultad:</strong>\n'+
+        Object.entries(byFac).map(([f,ps])=>`\n<strong>${f}:</strong>\n${ps.join('\n')}`).join('\n');
+      return {txt, chips:['Avance por facultad','¿Quién es el equipo?']};
+    }
+
+    // Docentes del proyecto (listado o por facultad)
+    if(nq.match(/docentes.*proyecto|listado.*docente|todos.*docente|docente.*facultad|docentes.*facultad|docentes.*area/) && !findAsig(q)){
+      const data=window.DATA||[];
+      if(!data.length) return {txt:'Los datos aún no cargaron.'};
+      const facMatch=Object.keys((()=>{const f={};data.forEach(d=>{if(d.facultad)f[d.facultad]=1;});return f;})())
+        .find(f=>nq.includes(nrm(f).split(' ')[0]));
+      const lista=facMatch?data.filter(d=>d.facultad===facMatch):data;
+      const header=facMatch?`<strong>Docentes — ${facMatch}:</strong>`:`<strong>Todos los docentes (${lista.length} asignaturas):</strong>`;
+      return {txt:header+'\n'+lista.map(d=>`• ${d.docente||'—'} — <em>${d.asignatura}</em>`).join('\n')};
+    }
+
+    if(nq.match(/cuantas|cantidad.*asig|cuanto.*asig|total.*asig|asig.*total|numero.*asig|asig.*numero|hay.*asig|asig.*hay/)){
+      const n=(window.DATA||[]).length;
+      if(!n) return {txt:'Los datos aún no cargaron. Intentá en un momento.'};
+      return {txt:`El proyecto tiene <strong>${n} asignaturas</strong> en total.`, chips:['Avance por facultad','Top 5']};
+    }
 
     // ── DETALLE DE FACULTAD — handler independiente para chips de facultad ───
     if(!nq.match(/avance por|ver promedio|avance general|avance total|\bdi\b|\bjp\b|planif|cuantas|total.*asig|reunion|manual|equipo|tipo/)){
@@ -6372,7 +6397,7 @@ window.addEventListener('load', function(){
               chips:['Docentes en riesgo','Avance por DI','Avance por facultad','Mejor docente']};
     }
 
-    // Planificaciones validadas (s0 = Validada)
+    // Planificaciones validadas
     if(nq.match(/planificaci[oó]n.*valid|valid.*planificaci[oó]n|planif.*valid|valid.*planif|planificaciones/) && !findAsig(q)){
       const arr=DATA||[];
       const validadas=arr.filter(d=>(AVANCE||{})[d.asignatura]?.hitos?.s0==='Validada'||/^validada$/i.test((d.planif||'').trim()));
@@ -6393,6 +6418,22 @@ window.addEventListener('load', function(){
       }
       return {txt:`<strong>Planificaciones:</strong>\n✅ Validadas: <strong>${validadas.length}</strong>\n📤 Enviadas a DEL: <strong>${enviadas.length}</strong>\n🔨 En construcción: <strong>${enConst.length}</strong>\n\nTotal asignaturas: ${arr.length}`,
               chips:['Planificaciones validadas por facultad','Ver promedio']};
+    }
+
+    // Asignaturas de una persona (DI, DG, JP, docente)
+    const personaQ = PROYECTO.equipo.find(p=>nrm(p.nombre).split(' ').some(w=>w.length>3&&nq.includes(w)));
+    if(personaQ && (nq.match(/cuantas|cuanto|asig|cargo|tiene|asignatura|lista/))) {
+      const nombre = personaQ.nombre;
+      const nNom = nrm(nombre);
+      const primerNombre = nNom.split(' ')[0];
+      const apellido = nNom.split(' ').slice(-1)[0];
+      const asigs = (window.DATA||[]).filter(d=>{
+        const campos=[d.di,d.dg,d.jp,d.implementador,d.docente];
+        return campos.some(c=>c && (nrm(c).includes(primerNombre)||nrm(c).includes(apellido)));
+      });
+      if(!asigs.length) return {txt:`No encontré asignaturas asignadas a <strong>${nombre}</strong>.`};
+      const avg = Math.round(asigs.reduce((s,d)=>s+pct(d),0)/asigs.length);
+      return {txt:`<strong>${nombre}</strong> (${personaQ.rol})\n<strong>${asigs.length} asignaturas</strong> · Avance promedio: <strong>${avg}%</strong>\n\n`+asigs.map(d=>`• ${d.asignatura}: ${pct(d)}%`).join('\n')};
     }
 
     if(nq.match(/mayor avance|mas avanzada|mejor avance|top.*avance|mas adelantada|mejor docente/) && !nq.match(/alerta/)){
@@ -6421,10 +6462,96 @@ window.addEventListener('load', function(){
       return {txt:`⚠️ <strong>Alertas (${conRiesgo.length} asignaturas):</strong>\nCriterios: avance < 25% o reunión sin respuesta\n\n${filas}`, chips:['Top 5 avance','Reuniones realizadas']};
     }
 
+    if(nq.match(/avance.*facultad|avance.*area|facultad.*avance|area.*avance|por facultad|cada facultad|porcent.*facultad/) && !findAsig(q)){
+      const facs={};
+      (window.DATA||[]).forEach(d=>{
+        if(d.facultad){
+          if(!facs[d.facultad]) facs[d.facultad]={total:0,sum:0};
+          facs[d.facultad].total++;
+          facs[d.facultad].sum+=pct(d);
+        }
+      });
+      if(!Object.keys(facs).length) return {txt:'Los datos aún no cargaron, intentá en un momento.'};
+      const lines=Object.entries(facs).sort((a,b)=>(b[1].sum/b[1].total)-(a[1].sum/a[1].total))
+        .map(([f,v])=>`• ${f}: <strong>${Math.round(v.sum/v.total)}%</strong> (${v.total} asig.)`);
+      return {txt:'<strong>Avance promedio por facultad:</strong>\n'+lines.join('\n'), chips:['Top 5','Ver promedio']};
+    }
+
     if(nq.match(/facultad|area|escuela/) && !findAsig(q)){
       const facs={};
-      (DATA||[]).forEach(d=>{if(d.facultad){facs[d.facultad]=(facs[d.facultad]||0)+1;}});
-      return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
+      (window.DATA||[]).forEach(d=>{
+        if(d.facultad){
+          if(!facs[d.facultad]) facs[d.facultad]={total:0,sum:0};
+          facs[d.facultad].total++;
+          facs[d.facultad].sum+=pct(d);
+        }
+      });
+      return {txt:'<strong>Asignaturas por área:</strong>\n'+Object.entries(facs).map(([f,v])=>`• ${f}: ${v.total} asig. · prom. ${Math.round(v.sum/v.total)}%`).join('\n'), chips:['Avance por facultad','Top 5']};
+    }
+
+    // ── RANKING POR ROL ──────────────────────────────────────────────────────
+
+    function rankPorRol(campo, label){
+      const map={};
+      (window.DATA||[]).forEach(d=>{
+        const k=(d[campo]||'').trim();
+        if(!k) return;
+        if(!map[k]) map[k]={total:0,sum:0,asigs:[]};
+        map[k].total++;
+        map[k].sum+=pct(d);
+        map[k].asigs.push(d.asignatura);
+      });
+      if(!Object.keys(map).length) return {txt:'Los datos aún no cargaron.'};
+      const sorted=Object.entries(map).sort((a,b)=>(b[1].sum/b[1].total)-(a[1].sum/a[1].total));
+      return {txt:`<strong>Avance promedio por ${label}:</strong>\n`+sorted.map(([n,v],i)=>`${i===0?'🥇':i===1?'🥈':i===2?'🥉':'•'} ${n}: <strong>${Math.round(v.sum/v.total)}%</strong> (${v.total} asig.)`).join('\n')};
+    }
+
+    if(nq.match(/mejor.*di|di.*mejor|avance.*di|di.*avance|ranking.*di|di.*ranking|por.*di\b/) && !findAsig(q))
+      return rankPorRol('di','DI');
+
+    if(nq.match(/mejor.*jp|jp.*mejor|avance.*jp|jp.*avance|ranking.*jp|jp.*ranking|por.*jp\b/) && !findAsig(q))
+      return rankPorRol('jp','JP');
+
+    if(nq.match(/mejor.*dg|dg.*mejor|avance.*dg|dg.*avance|ranking.*dg|dg.*ranking|por.*dg\b/) && !findAsig(q))
+      return rankPorRol('dg','DG');
+
+    if(nq.match(/mejor.*implementador|implementador.*mejor|avance.*implementador|ranking.*implementador/) && !findAsig(q))
+      return rankPorRol('implementador','Implementador');
+
+    // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
+
+    function listarFmt(label, fn){
+      const lista=(window.DATA||[]).filter(fn);
+      if(!lista.length) return {txt:`No encontré asignaturas de tipo <strong>${label}</strong>.`};
+      return {txt:`<strong>${label}</strong> (${lista.length}):\n`+lista.map(d=>`• ${d.asignatura}${d.jp?' · JP: '+d.jp:''}`).join('\n')};
+    }
+
+    if(nq.match(/a\+s|aprendizaje.?servicio|servicio.?aprendizaje/))
+      return listarFmt('A+S (Aprendizaje + Servicio)', d=>nrm(d.asignatura).includes('a s')||String(d.fmt).toLowerCase().includes('a+s')||(d.asignatura||'').includes('A+S'));
+
+    if(nq.match(/redise[nñ]o|redisenos/))
+      return listarFmt('Rediseños', d=>nrm(d.fmt).includes('rediseno')||nrm(d.fmt).includes('antiguo'));
+
+    if(nq.match(/nuevo|dise[nñ]o nuevo|asig.*nueva/))
+      return listarFmt('Diseños nuevos', d=>nrm(d.fmt)==='nuevo'||nrm(d.fmt).includes('nuevo'));
+
+    if(nq.match(/adecuaci[oó]n|adecuaciones/))
+      return listarFmt('Adecuaciones', d=>nrm(d.fmt).includes('adecuacion'));
+
+    if(nq.match(/ajuste.*aula|aula.*ajuste/))
+      return listarFmt('Ajustes de aula', d=>nrm(d.fmt).includes('ajuste'));
+
+    if(nq.match(/tipos.*formato|formatos.*asig|que formatos|cuantos.*formato/) && !findAsig(q)){
+      const fmts={};
+      (window.DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      return {txt:'<strong>Asignaturas por tipo de trabajo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n'), chips:['Diseños nuevos','Rediseños','Adecuaciones']};
+    }
+
+    if(nq.match(/\bformato\b|tipo.*trabajo/) && findAsig(q)){/* handled below */}
+    else if(nq.match(/\bformato\b|tipo.*trabajo/) && !findAsig(q)){
+      const fmts={};
+      (window.DATA||[]).forEach(d=>{const f=d.fmt||'Sin formato';fmts[f]=(fmts[f]||0)+1;});
+      return {txt:'<strong>Asignaturas por tipo:</strong>\n'+Object.entries(fmts).sort((a,b)=>b[1]-a[1]).map(([f,c])=>`• ${f}: ${c}`).join('\n')};
     }
 
     // ── FORMATOS / TIPOS DE TRABAJO ──────────────────────────────────────────
@@ -6511,44 +6638,69 @@ window.addEventListener('load', function(){
       return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${asig.fmt||'—'}</strong>\nÁrea: <strong>${asig.facultad||'—'}</strong>${pdfLink}`};
     }
 
-    // Rendimiento completo (respuesta por defecto)
-    const _av=(AVANCE||{})[asig.asignatura];
-    const _h=_av?.hitos||{};
-    function _hi(v){if(!v||v==='—')return '⚪';if(v==='Validada'||v==='Cargada en aula')return '✅';if(v==='Enviada')return '📤';if(v==='En construcción')return '🔨';if(v==='No aplica')return '—';return '⚪';}
-    const hitos=[
-      `S0: ${_hi(_h.s0)} ${_h.s0||'—'}`,
-      `S1-S2: ${_hi(_h.s1s2)} ${_h.s1s2||'—'}`,
-      `S3-S4: ${_hi(_h.s3s4)} ${_h.s3s4||'—'}`,
-      `S5-S6: ${_hi(_h.s5s6)} ${_h.s5s6||'—'}`,
-      `S7-S8: ${_hi(_h.s7s8)} ${_h.s7s8||'—'}`,
-    ].join('\n');
-    const reunIcon=asig.reunion==='Realizada'?'✅':asig.reunion==='Agendada'?'📅':'❓';
-    const moodleUrl=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
-    const moodleLink=moodleUrl?`\n🔗 <a class="bot-a" href="${moodleUrl}" target="_blank">Aula Moodle</a>`:'';
-    const pdfUrl=typeof getProgramaUrl==='function'?getProgramaUrl(asig.asignatura,asig.facultad):null;
-    const pdfLink=pdfUrl?`\n📋 <a class="bot-a" href="${pdfUrl}" target="_blank">Ver programa PDF</a>`:'';
-    const prod=typeof getProd==='function'?getProd(asig.asignatura,asig.docente):null;
-    const horasLine=prod?`\n⏱ Sincrónica: <strong>${prod.pres}h</strong> · Asincrónica: <strong>${prod.asin}h</strong>`:'';
-    const teamLnk=n=>{if(!n||n==='—')return n||'—';return `<span class="bot-link" onclick="botAsk('Asignaturas de ${n.split(' ')[0]}')">` + n + '</span>';};
-    const docLnk=d=>{if(!d||/ajuste|sin asignar|^\s*del\s*$/i.test(d))return d||'—';return `<span class="bot-link" onclick="botAsk('${d.replace(/'/g,"\\'")}')">` + d + '</span>';};
-    const facLnk=f=>{if(!f)return '—';return `<span class="bot-link" onclick="botAsk('${f.replace(/'/g,"\\'")}')">` + f + '</span>';};
-    return {txt:`<strong>${asig.asignatura}</strong>\n📊 Avance: <strong>${av}%</strong> · ${facLnk(asig.facultad)}\n👤 Docente: ${docLnk(asig.docente||'—')}\n👥 JP: ${teamLnk(asig.jp||'—')} · DI: ${teamLnk(asig.di||'—')} · DG: ${teamLnk(asig.dg||'—')}${horasLine}\n${reunIcon} Reunión: <strong>${asig.reunion||'—'}</strong> · Planif: <strong>${asig.planif||'—'}</strong>\n\n<strong>Hitos:</strong>\n${hitos}${moodleLink}${pdfLink}`,
-            chips:[`Seguimiento ${asig.asignatura.split(' ')[0]}`]};
+    if(nq.match(/t1|t2|t3|t4|tipos.*recurso|recursos.*tipo/)){
+      const fmt=asig.fmt||'—';
+      return {txt:`<strong>${asig.asignatura}</strong>\nFormato: <strong>${fmt}</strong> · Avance: <strong>${av}%</strong>\n\nLos recursos T1/T2/T3/T4 producidos están detallados en la planificación didáctica de esta asignatura.\n\n<strong>T1:</strong> Audiovisuales (cápsula, videoclase, podcast, infografía, Genially)\n<strong>T2:</strong> Actividades y evaluaciones (tareas, foros, pruebas, guías)\n<strong>T3:</strong> Materiales sincrónicas (presentaciones, guías de facilitación)\n<strong>T4:</strong> TPE guiado (actividades autónomas previas a clase)\n\n💡 Consultá la planificación con <strong>${asig.di||'el DI'}</strong> o <strong>${asig.jp||'el JP'}</strong>.`, chips:['Tipos de recursos','Plantillas T1']};
+    }
+
+    // Ficha completa de la asignatura
+    {
+      const avObj=(window.AVANCE||{})[asig.asignatura]||{};
+      const hitos=avObj.hitos||{};
+      const hitoMeta=(typeof HITO_META!=='undefined'?HITO_META:[]);
+      const hitoStr=hitoMeta.map(h=>{
+        const v=hitos[h.key]||'—';
+        const icon=v==='Validada'?'✅':v==='Enviada'?'📤':v==='En construcción'?'🔨':v==='No aplica'?'➖':v==='No inicia'?'⏸':'▫';
+        return `${icon} ${h.label}: ${v}`;
+      }).join('\n');
+      const obs=avObj.obs||asig.obs||'';
+      const moodleUrl=typeof getMoodleUrl==='function'?getMoodleUrl(asig.asignatura,asig.facultad):null;
+      const moodleLink=moodleUrl?`\n🔗 <a class="bot-a" href="${moodleUrl}" target="_blank">Aula Moodle</a>`:'';
+      let txt=`<strong>${asig.asignatura}</strong>\n`;
+      txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
+      txt+=`📊 Avance: <strong>${av}%</strong>\n`;
+      txt+=`🏫 Facultad: ${asig.facultad||'—'}\n`;
+      txt+=`📋 Formato: ${asig.fmt||'—'}\n`;
+      txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
+      txt+=`👤 Docente: <strong>${asig.docente||'—'}</strong>\n`;
+      txt+=`🗂 JP: ${asig.jp||'—'}\n`;
+      txt+=`🎓 DI: ${asig.di||'—'}\n`;
+      txt+=`🎨 DG: ${asig.dg||'—'}\n`;
+      txt+=`💻 Implementador: ${asig.implementador||'—'}\n`;
+      txt+=`━━━━━━━━━━━━━━━━━━━━━\n`;
+      txt+=`📅 Reunión inicio: ${asig.reunion||'—'}\n`;
+      txt+=`📅 Planificación: ${asig.planif||'—'}\n`;
+      if(hitoStr){txt+=`━━━━━━━━━━━━━━━━━━━━━\n<strong>Hitos de producción:</strong>\n${hitoStr}\n`;}
+      if(obs){txt+=`━━━━━━━━━━━━━━━━━━━━━\n📝 Obs: ${obs}\n`;}
+      if(moodleLink){txt+=moodleLink+'\n';}
+      return {txt, chips:['Avance por facultad','Top 5']};
+    }
   }
 
   function addMsg(txt, who, chips){
     const msgs=document.getElementById('bot-msgs');
     const d=document.createElement('div');
     d.className='bot-msg '+who;
+    if(who==='bot'){
+      d.style.cssText='background:#243d2e;color:#d1fae5;padding:12px 15px;border-radius:18px;border-bottom-left-radius:4px;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-width:90%;align-self:flex-start;box-shadow:0 2px 10px rgba(0,0,0,.5);border:1px solid #4ade80';
+    } else {
+      d.style.cssText='background:#4ade80;color:#0f2018;padding:12px 15px;border-radius:18px;border-bottom-right-radius:4px;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-width:90%;align-self:flex-end;box-shadow:0 2px 10px rgba(0,0,0,.4);font-weight:600';
+    }
     d.innerHTML=txt.replace(/\n/g,'<br>');
+    if(who==='bot'){
+      d.querySelectorAll('strong').forEach(s=>{s.style.color='#bbf7d0';s.style.fontWeight='700';});
+      d.querySelectorAll('a').forEach(a=>{a.style.color='#bbf7d0';a.style.fontWeight='700';a.style.textDecoration='underline';});
+    }
     msgs.appendChild(d);
     if(chips?.length){
       const cc=document.createElement('div');
-      cc.className='bot-chips';
+      cc.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-self:flex-start';
       chips.forEach(c=>{
         const btn=document.createElement('button');
-        btn.className='bot-chip';
+        btn.style.cssText='background:#0f2018;color:#4ade80;border:2px solid #4ade80;border-radius:20px;padding:5px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit';
         btn.textContent=c;
+        btn.onmouseenter=()=>{btn.style.background='#4ade80';btn.style.color='#0f2018';};
+        btn.onmouseleave=()=>{btn.style.background='#0f2018';btn.style.color='#4ade80';};
         btn.onclick=()=>{ botProcess(c); };
         cc.appendChild(btn);
       });
@@ -6591,11 +6743,9 @@ window.addEventListener('load', function(){
 
   window.botToggle=function(){
     botOpen=!botOpen;
-    const w=document.getElementById('bot-window');
-    const b=document.getElementById('bot-badge');
+    const w=document.getElementById('bot-panel');
     if(botOpen){
       w.classList.add('open');
-      b.style.display='none';
       if(!botGreeted){
         botGreeted=true;
         setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-1. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']),300);
