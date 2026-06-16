@@ -2520,7 +2520,9 @@ function buildDataFromCSV(rows){
     if(CSV_HEADER_R4.includes(r4l) || CSV_HEADER_R1.includes(r1l)) return;
     const asig = r[1].trim();
     const rawPct = r[20] ? parseFloat(String(r[20]).replace('%','').replace(',','.')) : 0;
-    const pct = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
+    const isRecNatC = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const basePctC = isNaN(rawPct) ? 0 : (rawPct <= 1 ? Math.round(rawPct*100) : Math.round(rawPct));
+    const pct = isRecNatC ? Math.min(100,Math.round(basePctC*18/12)) : basePctC;
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
@@ -2528,8 +2530,10 @@ function buildDataFromCSV(rows){
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
       s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
-      s11s12:mapHito(r[16]),s13s14:mapHito(r[17]),s15s16:mapHito(r[18]),
-      s17s18:mapHito(r[19])}};
+      s11s12:mapHito(r[16]),
+      s13s14:isRecNatC ? 'No aplica' : mapHito(r[17]),
+      s15s16:isRecNatC ? 'No aplica' : mapHito(r[18]),
+      s17s18:isRecNatC ? 'No aplica' : mapHito(r[19])}};
   });
   return {data,avance};
 }
@@ -2543,7 +2547,9 @@ function buildDataFromGviz(rows){
     if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))return;
     const asig=r[1];
     const rawPct=row.c?.[20]?.v;
-    const pct=typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
+    const isRecNatG = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const basePctG = typeof rawPct==='number'?Math.round(rawPct<=1?rawPct*100:rawPct):(parseInt(String(rawPct||'0').replace('%',''))||0);
+    const pct = isRecNatG ? Math.min(100,Math.round(basePctG*18/12)) : basePctG;
     data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
       jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
       reunion:r[8]||'',planif:r[9]||'',obs:r[22]||'',correo:r[24]||'',
@@ -2551,8 +2557,10 @@ function buildDataFromGviz(rows){
     avance[asig]={avance:pct,obs:r[22]||'',hitos:{
       s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
       s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
-      s11s12:mapHito(r[16]),s13s14:mapHito(r[17]),s15s16:mapHito(r[18]),
-      s17s18:mapHito(r[19])}};
+      s11s12:mapHito(r[16]),
+      s13s14:isRecNatG ? 'No aplica' : mapHito(r[17]),
+      s15s16:isRecNatG ? 'No aplica' : mapHito(r[18]),
+      s17s18:isRecNatG ? 'No aplica' : mapHito(r[19])}};
   });
   return {data,avance};
 }
@@ -2601,7 +2609,8 @@ function buildData(rows){
     if(CSV_HEADER_R4.includes(r4l)||CSV_HEADER_R1.includes(r1l))continue;
     const asig   = r[1]||'';
     const pctRaw = (r[20]||'0%').replace('%','').trim();
-    const pct    = parseInt(pctRaw)||0;
+    const isRecNat = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const pct    = isRecNat ? Math.min(100,Math.round((parseInt(pctRaw)||0)*18/12)) : (parseInt(pctRaw)||0);
     data.push({
       facultad:      r[0]||'',
       asignatura:    asig,
@@ -2630,9 +2639,9 @@ function buildData(rows){
         s7s8:  mapHito(r[14]),
         s9s10: mapHito(r[15]),
         s11s12:mapHito(r[16]),
-        s13s14:mapHito(r[17]),
-        s15s16:mapHito(r[18]),
-        s17s18:mapHito(r[19]),
+        s13s14:isRecNat ? 'No aplica' : mapHito(r[17]),
+        s15s16:isRecNat ? 'No aplica' : mapHito(r[18]),
+        s17s18:isRecNat ? 'No aplica' : mapHito(r[19]),
       }
     };
   }
