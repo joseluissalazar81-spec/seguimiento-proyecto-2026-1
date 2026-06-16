@@ -535,6 +535,9 @@
     @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(200,160,144,.4)}50%{opacity:.6;box-shadow:0 0 0 4px rgba(200,160,144,.0)}}
     .urg-row{background:rgba(200,160,144,.04)!important}
     .urg-row:hover{background:rgba(200,160,144,.08)!important}
+    .row-completa td{background:linear-gradient(90deg,rgba(212,175,55,.08) 0%,transparent 55%)!important}
+    .row-completa:hover td{background:linear-gradient(90deg,rgba(212,175,55,.16) 0%,transparent 55%)!important}
+    .badge-completa{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,#d4af37,#f5d060);color:#3a2800;font-size:9.5px;font-weight:800;padding:2px 8px 2px 5px;border-radius:20px;margin-left:6px;letter-spacing:.03em;vertical-align:middle;box-shadow:0 1px 6px rgba(212,175,55,.45);white-space:nowrap}
 
     /* ── EXPORT BTN ── */
     .export-btn{
@@ -3060,12 +3063,12 @@ function renderTable(){
     const isVenc=isHitoVencido(d);
     const avColor=rPct>=50?'hi':rPct>0?'mid':'lo';
     return `
-    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''}">
+    <tr data-idx="${i}" class="${selectedIdx===i?'selected':''} ${isUrg||isVenc?'urg-row':''} ${rPct>=100?'row-completa':''}">
       <td><span class="chip chip-fac">${d.facultad}</span></td>
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${planifLabel(d.planif,d)}</span></td>
-      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%"></div></div><span class="av-pct ${avColor}">${rPct}%</span></div></td>
+      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}</div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
   }).join('');
@@ -4840,8 +4843,8 @@ function renderFacView(){
         </td>
         <td style="min-width:110px">
           <div class="ftk-av-wrap">
-            <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${avFill}"></div></div>
-            <span class="ftk-av-pct">${av}%</span>
+            <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${av>=100?'linear-gradient(90deg,#d4af37,#f5d060)':avFill}"></div></div>
+            <span class="ftk-av-pct">${av}%${av>=100?' <span class="badge-completa">🏅</span>':''}</span>
           </div>
         </td>
       </tr>`;
