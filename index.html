@@ -4043,10 +4043,10 @@ function renderProjectCharts(){
 // ── Plazos de entrega de planificación a DEL por grupo de facultades ──────────
 // Fuente: CartaGantt_2026-1 + ajuste comunicado por el equipo
 const PLANIF_DEADLINES = {
-  default:            new Date(2026,6,4),  // 4 julio — (+3 días, CartaGantt actualizado)
-  "Salud":            new Date(2026,6,4),  // 4 julio
-  "Formación General":new Date(2026,6,4),  // 4 julio
-  "Recursos Naturales y Medicina Veterinaria": new Date(2026,5,10), // 10 junio (+3 días)
+  default:            new Date(2026,6,1),  // 1 julio
+  "Salud":            new Date(2026,6,1),  // 1 julio
+  "Formación General":new Date(2026,6,1),  // 1 julio
+  "Recursos Naturales y Medicina Veterinaria": new Date(2026,5,7), // 7 junio
 };
 function planifDeadline(facultad){
   return PLANIF_DEADLINES[facultad] || PLANIF_DEADLINES.default;
@@ -4316,7 +4316,7 @@ const GANTT_HITOS = [
   {label:'S11–S12',key:'s11s12',fecha: new Date(2026,5,3),  weeksDone:14, hito:'Producción'},
   {label:'S13–S14',key:'s13s14',fecha: new Date(2026,5,14), weeksDone:16, hito:'Producción'},
   {label:'S15–S16',key:'s15s16',fecha: new Date(2026,5,24), weeksDone:17, hito:'Producción'},
-  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,6,4),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
+  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,6,1),  weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
 ];
 
 let ovBarInstance = null, ovDonutInstance = null;
