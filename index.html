@@ -3094,7 +3094,7 @@ function renderKPIs(){
     </div>
     <div class="kpi k-ci">
       <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div class="kpi-info"><div class="kpi-val" style="color:#38bdf8">${rows.filter(d=>EN_AULA.has(d.asignatura)).length}</div><div class="kpi-name" style="color:#38bdf8">En el aula</div><div class="kpi-sub">de ${EN_AULA_TOTAL} prog. · cargadas en Moodle</div></div>
+      <div class="kpi-info"><div class="kpi-val" style="color:#38bdf8">${rows.filter(d=>isEnAula(d.asignatura)).length}</div><div class="kpi-name" style="color:#38bdf8">En el aula</div><div class="kpi-sub">de ${EN_AULA_TOTAL} prog. · cargadas en Moodle</div></div>
     </div>`;
   document.getElementById('header-count').textContent=t;
 }
@@ -3120,7 +3120,7 @@ function renderTable(){
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let pill='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}pill=`<div class="row-escal-pill">⚠ ${ds}d — Informar a ${lv}</div>`;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${o.length>65?o.slice(0,63)+'…':o}</div>${pill}`;})()}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${isAtrasada(d)?'⚠ Atrasada':(d.estadoGlobal||planifLabel(d.planif,d))}</span></td>
-      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}${EN_AULA.has(d.asignatura)?'<span class="badge-aula">🏫 En el aula</span>':''}</div></td>
+      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}${isEnAula(d.asignatura)?'<span class="badge-aula">🏫 En el aula</span>':''}</div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
   }).join('');
@@ -3399,6 +3399,7 @@ document.getElementById('search').addEventListener('input',e=>{
   await cargarAvanceDashboard();
   await loadReunionData();
   cargarSegAPI();
+  cargarEnAulaSheet(); // carga dinámica desde planilla de implementación (no bloquea)
   // Los gráficos Gantt y progreso son estáticos — se renderizan siempre, con o sin datos
   requestAnimationFrame(()=>{ setTimeout(renderProjectCharts, 0); });
 
@@ -4063,23 +4064,47 @@ const PLANIF_DEADLINES_ASIG = {
   "Calidad e Inocuidad Alimentaria": new Date(2026, 8, 2),
 };
 
-// ── Asignaturas cargadas en Moodle ("En el aula") — actualizado 08/jul/2026 ──
-// Fuente: https://docs.google.com/spreadsheets/d/1Lc-cL24fITef-M9rdTLe2ekZLcvqO_dRWHRZNfVwhVI
-const EN_AULA = new Set([
-  "Sist. Prod. Cultivos Sostenibles",
-  "Sist. Prod. Frutales Sostenibles",
-  "Evaluación de Proyectos",
-  "Electivo FP: Mercado I+D+i I",
-  "FP: Mercado I+D+i I",
-  "Narrativa Digital",
-  "Electivo FP: Bioinformática",
-  "FP: Bioinformática",
-  "Electivo I: Op. Humanitarias",
-  "Gestión de Operaciones Mineras",
-  "Electivo III: Op. Humanitarias",
-  "Derecho Comercial y Laboral",
-]);
+// ── Asignaturas cargadas en Moodle ("En el aula") ────────────────────────────
+// Cargado dinámicamente desde la planilla de implementación (col L = ESTADO).
+// Fallback hardcoded si la planilla no es pública.
+// Planilla: https://docs.google.com/spreadsheets/d/1Lc-cL24fITef-M9rdTLe2ekZLcvqO_dRWHRZNfVwhVI
+const EN_AULA_SHEET_ID = '1Lc-cL24fITef-M9rdTLe2ekZLcvqO_dRWHRZNfVwhVI';
 const EN_AULA_TOTAL = 43;
+let EN_AULA_NORM = new Set([
+  "sist. prod. cultivos sostenibles",
+  "sist. prod. frutales sostenibles",
+  "evaluación de proyectos",
+  "electivo fp: mercado i+d+i i",
+  "fp: mercado i+d+i i",
+  "narrativa digital",
+  "electivo fp: bioinformática",
+  "fp: bioinformática",
+  "electivo i: op. humanitarias",
+  "gestión de operaciones mineras",
+  "electivo iii: op. humanitarias",
+  "derecho comercial y laboral",
+]);
+function isEnAula(nombre){ return EN_AULA_NORM.has((nombre||'').toLowerCase().trim()); }
+
+// Intenta cargar el estado "En el aula" desde la planilla de implementación.
+// Requiere que la planilla sea "Cualquier persona con el enlace puede ver".
+function cargarEnAulaSheet(){
+  const url=`https://docs.google.com/spreadsheets/d/${EN_AULA_SHEET_ID}/gviz/tq?tqx=out:csv`;
+  fetch(url).then(r=>r.ok?r.text():Promise.reject(r.status)).then(csv=>{
+    const rows=csv.split('\n').map(l=>l.split(',').map(c=>c.replace(/^"|"$/g,'').trim()));
+    const listos=new Set();
+    rows.forEach(r=>{
+      const asig=(r[4]||'').trim();
+      const estado=(r[11]||'').toLowerCase();
+      if(asig && estado.includes('listo')) listos.add(asig.toLowerCase());
+    });
+    if(listos.size>0){
+      EN_AULA_NORM=listos;
+      if(typeof renderKPIs==='function') renderKPIs();
+      if(typeof renderTable==='function') renderTable();
+    }
+  }).catch(()=>{/* planilla privada — se usa el fallback hardcoded */});
+}
 
 function asigDeadline(d){
   return PLANIF_DEADLINES_ASIG[d.asignatura] || planifDeadline(d.facultad);
@@ -5170,7 +5195,7 @@ function renderFacView(){
         <td style="min-width:110px">
           <div class="ftk-av-wrap">
             <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${av>=100?'linear-gradient(90deg,#d4af37,#f5d060)':avFill}"></div></div>
-            <span class="ftk-av-pct">${av}%${av>=100?' <span class="badge-completa">🏅</span>':''}${EN_AULA.has(d.asignatura)?' <span class="badge-aula">🏫</span>':''}</span>
+            <span class="ftk-av-pct">${av}%${av>=100?' <span class="badge-completa">🏅</span>':''}${isEnAula(d.asignatura)?' <span class="badge-aula">🏫</span>':''}</span>
           </div>
         </td>
       </tr>`;
@@ -6167,8 +6192,9 @@ window.addEventListener('load', function(){
 
     // En el aula (Moodle)
     if(nq.match(/en el aula|cuantas.*aula|aula.*cuantas|moodle.*cuantas|implementad|cargad.*moodle|aulas cargadas|aulas implementadas|cargadas en moodle/) && !findAsig(q)){
-      const listado=[...EN_AULA].filter(n=>!n.startsWith('FP:')).map(n=>`• ${n}`).join('\n');
-      return {txt:`<strong>🏫 Aulas cargadas en Moodle — ${new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long'})}</strong>\n\n<strong>10 de ${EN_AULA_TOTAL} programadas</strong> ya están en el aula virtual:\n\n${listado}\n\n<em>Responsables: Antonio Cabrera y Elías Castillo.</em>`, chips:['Manual del Implementador','¿Cuántas están completas?']};
+      const nAula=DATA.filter(d=>isEnAula(d.asignatura));
+      const listado=nAula.map(d=>`• ${d.asignatura}`).join('\n')||'(sin datos aún)';
+      return {txt:`<strong>🏫 Aulas cargadas en Moodle — ${new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long'})}</strong>\n\n<strong>${nAula.length} de ${EN_AULA_TOTAL} programadas</strong> ya están en el aula virtual:\n\n${listado}\n\n<em>Responsables: Antonio Cabrera y Elías Castillo.</em>`, chips:['Manual del Implementador','¿Cuántas están completas?']};
     }
 
     if(nq.match(/brandbook|identidad visual|marca ust|logo ust|color.*facultad|facultad.*color/))
