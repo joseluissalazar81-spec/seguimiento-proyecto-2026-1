@@ -552,6 +552,8 @@
     .row-completa td{background:linear-gradient(90deg,rgba(212,175,55,.08) 0%,transparent 55%)!important}
     .row-completa:hover td{background:linear-gradient(90deg,rgba(212,175,55,.16) 0%,transparent 55%)!important}
     .badge-completa{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,#d4af37,#f5d060);color:#3a2800;font-size:9.5px;font-weight:800;padding:2px 8px 2px 5px;border-radius:20px;margin-left:6px;letter-spacing:.03em;vertical-align:middle;box-shadow:0 1px 6px rgba(212,175,55,.45);white-space:nowrap}
+    .badge-aula{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#0c1a27;font-size:9.5px;font-weight:800;padding:2px 8px 2px 5px;border-radius:20px;margin-left:6px;letter-spacing:.03em;vertical-align:middle;box-shadow:0 1px 6px rgba(14,165,233,.4);white-space:nowrap}
+    .k-ci .kpi-icon{background:rgba(14,165,233,.15);box-shadow:0 0 12px rgba(14,165,233,.2)} .k-ci .kpi-icon svg{stroke:#38bdf8}
 
     /* ── EXPORT BTN ── */
     .export-btn{
@@ -3089,6 +3091,10 @@ function renderKPIs(){
     <div class="kpi" style="border-color:rgba(59,110,140,.25)">
       <div class="kpi-icon" style="color:var(--az)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
       <div class="kpi-info"><div class="kpi-val" style="color:var(--az)">${escala}</div><div class="kpi-name" style="color:var(--az)">Ajustes según Escala</div><div class="kpi-sub">en proceso de ajuste DEL</div></div>
+    </div>
+    <div class="kpi k-ci">
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="kpi-info"><div class="kpi-val" style="color:#38bdf8">${rows.filter(d=>EN_AULA.has(d.asignatura)).length}</div><div class="kpi-name" style="color:#38bdf8">En el aula</div><div class="kpi-sub">de ${EN_AULA_TOTAL} prog. · cargadas en Moodle</div></div>
     </div>`;
   document.getElementById('header-count').textContent=t;
 }
@@ -3114,7 +3120,7 @@ function renderTable(){
       <td class="asig-col">${isUrg||isVenc?'<span class="urg-dot" style="background:var(--ro)"></span>':''} ${d.asignatura}${isVenc&&!isUrg?' <span style="font-size:9px;color:var(--ro);font-weight:700;vertical-align:middle">VENCIDO</span>':''}${(getOverrides()[d.asignatura]||{}).bloqueante?'<span class="row-bloq-dot" title="Bloqueada: '+((getOverrides()[d.asignatura]||{}).bloqueante||'').replace(/'/g,"&apos;")+'"></span>':''}${(()=>{const o=(rav.obs||d.obs||'').trim();if(!o)return '';let pill='';if(d.fechaSR){const ds=diasDesde(d.fechaSR);if(ds!==null&&ds>=3){let lv='Equipo';for(let i=ESCAL_NIVELES.length-1;i>=0;i--){if(ds>=ESCAL_NIVELES[i].dias){lv=ESCAL_NIVELES[i].label;break;}}pill=`<div class="row-escal-pill">⚠ ${ds}d — Informar a ${lv}</div>`;}}return `<div class="row-obs" title="${o.replace(/"/g,'&quot;')}">💬 ${o.length>65?o.slice(0,63)+'…':o}</div>${pill}`;})()}</td>
       <td style="color:var(--text-muted)">${d.docente}${d.correo?` <a href="mailto:${d.correo}" title="${d.correo}" onclick="event.stopPropagation()" style="color:var(--az2);vertical-align:middle;display:inline-flex;margin-left:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></a>`:''}</td>
       <td><span class="pl-dot"><span class="dot dot-${dotClass(d.planif,d)}"></span>${isAtrasada(d)?'⚠ Atrasada':(d.estadoGlobal||planifLabel(d.planif,d))}</span></td>
-      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}</div></td>
+      <td><div class="av-cell"><div class="av-bar-wrap"><div class="av-bar" style="width:${rPct}%;${rPct>=100?'background:linear-gradient(90deg,#d4af37,#f5d060)':''}"></div></div><span class="av-pct ${avColor}">${rPct}%</span>${rPct>=100?'<span class="badge-completa">🏅 ¡Completa!</span>':''}${EN_AULA.has(d.asignatura)?'<span class="badge-aula">🏫 En el aula</span>':''}</div></td>
       <td class="col-hitos">${miniHitosDot(rav.hitos||{})}</td>
     </tr>`;
   }).join('');
@@ -4056,6 +4062,25 @@ const PLANIF_DEADLINES_ASIG = {
   "Trabajo de Título":               new Date(2026, 8, 2),
   "Calidad e Inocuidad Alimentaria": new Date(2026, 8, 2),
 };
+
+// ── Asignaturas cargadas en Moodle ("En el aula") — actualizado 08/jul/2026 ──
+// Fuente: https://docs.google.com/spreadsheets/d/1Lc-cL24fITef-M9rdTLe2ekZLcvqO_dRWHRZNfVwhVI
+const EN_AULA = new Set([
+  "Sist. Prod. Cultivos Sostenibles",
+  "Sist. Prod. Frutales Sostenibles",
+  "Evaluación de Proyectos",
+  "Electivo FP: Mercado I+D+i I",
+  "FP: Mercado I+D+i I",
+  "Narrativa Digital",
+  "Electivo FP: Bioinformática",
+  "FP: Bioinformática",
+  "Electivo I: Op. Humanitarias",
+  "Gestión de Operaciones Mineras",
+  "Electivo III: Op. Humanitarias",
+  "Derecho Comercial y Laboral",
+]);
+const EN_AULA_TOTAL = 43;
+
 function asigDeadline(d){
   return PLANIF_DEADLINES_ASIG[d.asignatura] || planifDeadline(d.facultad);
 }
@@ -5145,7 +5170,7 @@ function renderFacView(){
         <td style="min-width:110px">
           <div class="ftk-av-wrap">
             <div class="ftk-av-bar"><div class="ftk-av-fill" style="width:${av}%;background:${av>=100?'linear-gradient(90deg,#d4af37,#f5d060)':avFill}"></div></div>
-            <span class="ftk-av-pct">${av}%${av>=100?' <span class="badge-completa">🏅</span>':''}</span>
+            <span class="ftk-av-pct">${av}%${av>=100?' <span class="badge-completa">🏅</span>':''}${EN_AULA.has(d.asignatura)?' <span class="badge-aula">🏫</span>':''}</span>
           </div>
         </td>
       </tr>`;
@@ -6138,6 +6163,12 @@ window.addEventListener('load', function(){
     if(nq.match(/contacto.*del|del.*contacto|coordinador.*del|del.*quien|quien.*del|encargado.*del|del de/) && !findAsig(q)){
       const lista=PROYECTO.contactosDEL?.map(c=>`• <strong>${c.facultad}</strong>\n  ${c.nombre} — <a class="bot-a" href="mailto:${c.mail}">${c.mail}</a>`).join('\n')||'No hay contactos DEL configurados.';
       return {txt:`<strong>Contactos DEL por facultad:</strong>\n\n${lista}`};
+    }
+
+    // En el aula (Moodle)
+    if(nq.match(/en el aula|cuantas.*aula|aula.*cuantas|moodle.*cuantas|implementad|cargad.*moodle|aulas cargadas|aulas implementadas|cargadas en moodle/) && !findAsig(q)){
+      const listado=[...EN_AULA].filter(n=>!n.startsWith('FP:')).map(n=>`• ${n}`).join('\n');
+      return {txt:`<strong>🏫 Aulas cargadas en Moodle — ${new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long'})}</strong>\n\n<strong>10 de ${EN_AULA_TOTAL} programadas</strong> ya están en el aula virtual:\n\n${listado}\n\n<em>Responsables: Antonio Cabrera y Elías Castillo.</em>`, chips:['Manual del Implementador','¿Cuántas están completas?']};
     }
 
     if(nq.match(/brandbook|identidad visual|marca ust|logo ust|color.*facultad|facultad.*color/))
