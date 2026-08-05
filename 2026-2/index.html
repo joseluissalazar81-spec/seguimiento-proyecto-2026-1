@@ -2515,29 +2515,31 @@ const CSV_HEADER_R4 = ['jp','jefe de proyecto','jefe proyecto'];
 const CSV_HEADER_R1 = ['asignatura','nombre asignatura','nombre de asignatura'];
 
 function buildDataFromCSV(rows){
-  // 2026-2: columna "Nivel" (Pregrado/Postgrado) en índice 1 — todo desplazado +1
-  // 0:Facultad 1:Nivel 2:Asignatura 3:Docente 4:TipoVirt 5:JP 6:DI 7:DG 8:Impl
-  // 9:Reunión 10:Planif 11:S0 12:S1-S2 ... 20:S17-S18 21:%Avance 22:Estado 23:Obs
-  // 24:Escal 25:Correo 26:FechaSR 27:EnvDEL 28:DEL2
+  // CSV generado por Power Automate: 0=@odata.etag 1=ItemInternalId 2=Facultad 3=Nivel
+  // 4:Asignatura 5:Docente 6:TipoVirt 7:JP 8:DI 9:DG 10:Impl 11:Reunión 12:Planif
+  // 13:S0 14:S1-S2 15:S3-S4 16:S5-S6 17:S7-S8 18:S9-S10 19:S11-S12
+  // 20:S13-S14 21:S15-S16 22:S17-S18 23:%Avance 24:Estado 25:Obs
+  // 26:Escal 27:Correo 28:FechaSR 29:EnvDEL 30:DEL2 31:ID
   const data=[], avance={};
   (rows||[]).forEach(r=>{
-    if(!r[2] || !r[2].trim()) return;
-    const asig = r[2].trim();
-    const isRecNatC = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
-    const HITO_COLS_C = [r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19],r[20]];
+    if(!r[4] || !r[4].trim()) return;
+    if(r[4].trim()==='Asignatura') return;
+    const asig = r[4].trim();
+    const isRecNatC = (r[2]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const HITO_COLS_C = [r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19],r[20],r[21],r[22]];
     const nValC = HITO_COLS_C.filter(v=>(v||'').trim()==='Validada').length;
     const pct = isRecNatC ? Math.min(100,Math.round(nValC/8*100)) : Math.round(nValC/11*100);
-    data.push({facultad:(r[0]||'').trim(),nivel:r[1]||'',asignatura:asig,docente:r[3]||'',fmt:r[4]||'',
-      jp:r[5]||'',di:r[6]||'',dg:r[7]||'—',implementador:r[8]||'',
-      reunion:r[9]||'',planif:r[10]||'',estadoGlobal:r[22]||'',obs:r[23]||'',correo:r[25]||'',
-      fechaSR:r[26]||'',envDELfecha:r[27]||'',del2fecha:r[28]||''});
-    avance[asig]={avance:pct,obs:r[23]||'',hitos:{
-      s0:mapHito(r[11]),s1s2:mapHito(r[12]),s3s4:mapHito(r[13]),
-      s5s6:mapHito(r[14]),s7s8:mapHito(r[15]),s9s10:mapHito(r[16]),
-      s11s12:mapHito(r[17]),
-      s13s14:isRecNatC ? 'No aplica' : mapHito(r[18]),
-      s15s16:isRecNatC ? 'No aplica' : mapHito(r[19]),
-      s17s18:isRecNatC ? 'No aplica' : mapHito(r[20])}};
+    data.push({facultad:(r[2]||'').trim(),nivel:r[3]||'',asignatura:asig,docente:r[5]||'',fmt:r[6]||'',
+      jp:r[7]||'',di:r[8]||'',dg:r[9]||'—',implementador:r[10]||'',
+      reunion:r[11]||'',planif:r[12]||'',estadoGlobal:r[24]||'',obs:r[25]||'',correo:r[27]||'',
+      fechaSR:r[28]||'',envDELfecha:r[29]||'',del2fecha:r[30]||''});
+    avance[asig]={avance:pct,obs:r[25]||'',hitos:{
+      s0:mapHito(r[13]),s1s2:mapHito(r[14]),s3s4:mapHito(r[15]),
+      s5s6:mapHito(r[16]),s7s8:mapHito(r[17]),s9s10:mapHito(r[18]),
+      s11s12:mapHito(r[19]),
+      s13s14:isRecNatC ? 'No aplica' : mapHito(r[20]),
+      s15s16:isRecNatC ? 'No aplica' : mapHito(r[21]),
+      s17s18:isRecNatC ? 'No aplica' : mapHito(r[22])}};
   });
   return {data,avance};
 }
