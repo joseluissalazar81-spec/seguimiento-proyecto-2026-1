@@ -2515,30 +2515,29 @@ const CSV_HEADER_R4 = ['jp','jefe de proyecto','jefe proyecto'];
 const CSV_HEADER_R1 = ['asignatura','nombre asignatura','nombre de asignatura'];
 
 function buildDataFromCSV(rows){
+  // 2026-2: columna "Nivel" (Pregrado/Postgrado) en índice 1 — todo desplazado +1
+  // 0:Facultad 1:Nivel 2:Asignatura 3:Docente 4:TipoVirt 5:JP 6:DI 7:DG 8:Impl
+  // 9:Reunión 10:Planif 11:S0 12:S1-S2 ... 20:S17-S18 21:%Avance 22:Estado 23:Obs
+  // 24:Escal 25:Correo 26:FechaSR 27:EnvDEL 28:DEL2
   const data=[], avance={};
   (rows||[]).forEach(r=>{
-    if(!r[1] || !r[1].trim()) return; // fila vacía
-    // Saltar filas de encabezado detectando por contenido
-    const r1l = r[1].toLowerCase().trim();
-    const r4l = (r[4]||'').toLowerCase().trim();
-    if(CSV_HEADER_R4.includes(r4l) || CSV_HEADER_R1.includes(r1l)) return;
-    const asig = r[1].trim();
-    // Columna U = COUNTIF(J:T,"Validada")/11 — recomputar desde hitos para evitar overrides
+    if(!r[2] || !r[2].trim()) return;
+    const asig = r[2].trim();
     const isRecNatC = (r[0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
-    const HITO_COLS_C = [r[9],r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19]];
+    const HITO_COLS_C = [r[10],r[11],r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19],r[20]];
     const nValC = HITO_COLS_C.filter(v=>(v||'').trim()==='Validada').length;
     const pct = isRecNatC ? Math.min(100,Math.round(nValC/8*100)) : Math.round(nValC/11*100);
-    data.push({facultad:(r[0]||'').trim(),asignatura:asig,docente:r[2]||'',fmt:r[3]||'',
-      jp:r[4]||'',di:r[5]||'',dg:r[6]||'—',implementador:r[7]||'',
-      reunion:r[8]||'',planif:r[9]||'',estadoGlobal:r[21]||'',obs:r[22]||'',correo:r[24]||'',
-      fechaSR:r[25]||'',envDELfecha:r[26]||'',del2fecha:r[27]||''});
-    avance[asig]={avance:pct,obs:r[22]||'',hitos:{
-      s0:mapHito(r[10]),s1s2:mapHito(r[11]),s3s4:mapHito(r[12]),
-      s5s6:mapHito(r[13]),s7s8:mapHito(r[14]),s9s10:mapHito(r[15]),
-      s11s12:mapHito(r[16]),
-      s13s14:isRecNatC ? 'No aplica' : mapHito(r[17]),
-      s15s16:isRecNatC ? 'No aplica' : mapHito(r[18]),
-      s17s18:isRecNatC ? 'No aplica' : mapHito(r[19])}};
+    data.push({facultad:(r[0]||'').trim(),nivel:r[1]||'',asignatura:asig,docente:r[3]||'',fmt:r[4]||'',
+      jp:r[5]||'',di:r[6]||'',dg:r[7]||'—',implementador:r[8]||'',
+      reunion:r[9]||'',planif:r[10]||'',estadoGlobal:r[22]||'',obs:r[23]||'',correo:r[25]||'',
+      fechaSR:r[26]||'',envDELfecha:r[27]||'',del2fecha:r[28]||''});
+    avance[asig]={avance:pct,obs:r[23]||'',hitos:{
+      s0:mapHito(r[11]),s1s2:mapHito(r[12]),s3s4:mapHito(r[13]),
+      s5s6:mapHito(r[14]),s7s8:mapHito(r[15]),s9s10:mapHito(r[16]),
+      s11s12:mapHito(r[17]),
+      s13s14:isRecNatC ? 'No aplica' : mapHito(r[18]),
+      s15s16:isRecNatC ? 'No aplica' : mapHito(r[19]),
+      s17s18:isRecNatC ? 'No aplica' : mapHito(r[20])}};
   });
   return {data,avance};
 }
@@ -4208,22 +4207,22 @@ function renderExecutiveHero(){
 
 // Fechas del proyecto (CartaGantt real: Mar 2 → Jul 17)
 const GANTT_START = new Date(2026,8,1);   // 1 sep 2026 — inicio CartaGantt
-const GANTT_END   = new Date(2027,0,20);  // 20 ene 2027 — fin CartaGantt
+const GANTT_END   = new Date(2026,11,31); // 31 dic 2026 — fin CartaGantt
 
 // Bloques de producción: 9 bloques × 2 semanas = 18 semanas
 // (S0 = bloque 0 especial; S1-S2 a S17-S18 = bloques 1-9)
 // weeksDone: cuántas semanas académicas se habrán completado al llegar a la fecha límite
 const GANTT_HITOS = [
-  {label:'S0',     key:'s0',    fecha: new Date(2026,8,12), weeksDone:2,  hito:'Videos B y C'},
-  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,8,26), weeksDone:4,  hito:'Primeros recursos'},
-  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,9,10), weeksDone:6,  hito:'Entrega planif. DEL ◆'},
-  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,9,24), weeksDone:8,  hito:'Producción'},
-  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,10,7), weeksDone:10, hito:'Producción'},
-  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,10,21),weeksDone:12, hito:'Producción'},
-  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,11,5), weeksDone:14, hito:'Producción'},
-  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,11,19),weeksDone:16, hito:'Producción'},
-  {label:'S15–S16',key:'s15s16',fecha: new Date(2027,0,2),  weeksDone:17, hito:'Producción'},
-  {label:'S17–S18',key:'s17s18',fecha: new Date(2027,0,16), weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
+  {label:'S0',     key:'s0',    fecha: new Date(2026,8,15), weeksDone:2,  hito:'Videos B y C'},
+  {label:'S1–S2',  key:'s1s2',  fecha: new Date(2026,8,25), weeksDone:4,  hito:'Primeros recursos'},
+  {label:'S3–S4',  key:'s3s4',  fecha: new Date(2026,9,5),  weeksDone:6,  hito:'Entrega planif. DEL ◆'},
+  {label:'S5–S6',  key:'s5s6',  fecha: new Date(2026,9,15), weeksDone:8,  hito:'Producción'},
+  {label:'S7–S8',  key:'s7s8',  fecha: new Date(2026,9,25), weeksDone:10, hito:'Producción'},
+  {label:'S9–S10', key:'s9s10', fecha: new Date(2026,10,5), weeksDone:12, hito:'Producción'},
+  {label:'S11–S12',key:'s11s12',fecha: new Date(2026,10,15),weeksDone:14, hito:'Producción'},
+  {label:'S13–S14',key:'s13s14',fecha: new Date(2026,10,25),weeksDone:16, hito:'Producción'},
+  {label:'S15–S16',key:'s15s16',fecha: new Date(2026,11,5), weeksDone:17, hito:'Producción'},
+  {label:'S17–S18',key:'s17s18',fecha: new Date(2026,11,15),weeksDone:18, hito:'Entrega PPRD a DEL ◆'},
 ];
 
 let ovBarInstance = null, ovDonutInstance = null;
