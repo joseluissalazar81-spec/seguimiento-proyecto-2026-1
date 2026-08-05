@@ -1,59 +1,73 @@
-Facultad,Nivel,Asignatura,Docente,Tipo de  Virtualización,JP,DI,DG,Implementador,Reunión docente,Planificación didáctica,S0 Videos B y C 15/9,S1S2 25/9,S3S4 5/10,S5S6 15/10,S7S8 25/10,S9S10 5/11,S11S12 15/11,S13S14 25/11,S15S16 5/12,S17S18 15/12,% Avance,Estado global,Observaciones,Escalamiento correo,Correo docente,Fecha Sin Respuesta,Fecha envío DEL,Fecha DEL 2° Inst.
-Ingeniería y Negocios,Pregrado,Nivelación Ciencias Básicas,Edgardo Palma Waldron,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Ingeniería en Termofluído,Jorge Rojo Camcho,Actualización,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Gestión de Capital humano,Isabel Flores Cáceres,Actualización,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Ingeniería para el medioambiente,Marcelo Hernandez,Actualización,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Modelos de optimización,Wayib Emilio Kahil Delgado,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Estadística para Ingeniería,Gino Chávez Pinto,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Administración para alta dirección,Yohanna Abarzúa Calfuquir,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Machine Learning,Danilo Alberto Gomez Correa,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Electivo de Formación Profesional II: Aplicación de aprendizaje de máquinas,Danilo Alberto Gomez Correa,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Formulación y gestión de proyectos,Edgardo Palma Waldron,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,"Ética, ciudadanía y sociedad",Francisco Javier Labbé de Stefano,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Operación Remota y Robótica en Minería,Miguel Solis,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,9%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Electivo de Formación Profesional II: Análisis de Voladuras en Minería,Cristóbal de la Guarda,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Econometría,Germán Rojas,Ajuste pasar presencial a sincrónico,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Inglés Avanzado II,Claudia Jeria,Ajuste pasar presencial a sincrónico,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Marketing Estratégico,Renato Bustamante,Ajuste Evaluaciones,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Introducción al Análisis de Datos,Rodrigo Ramírez,Ajuste Evaluaciones,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Economía para las Organizaciones,Sergio Álvarez,Ajuste Evaluaciones,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Macroeconomía,Felipe Rifo,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Electivo: Gestión de Marketing Digital,Renato Bustamante,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Pregrado,Estrategia Competitiva,Camilo Araya,Ajuste de Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ciencias Sociales y Comunicaciones,Pregrado,Enfoques Contemporaneos,Luis Donoso Estay,Ajuste evaluaciones,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ciencias Sociales y Comunicaciones,Pregrado,Epistemologia y Trabajo Social,Daniel Valenzuela Galarce,Ajuste evaluaciones,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ciencias Sociales y Comunicaciones,Pregrado,Metodología de la Investigación,Daniel Valenzuela Galarce,Ajuste evaluaciones,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Componentes Contaminantes y Tóxicos en Alimentos,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Mercado I+D+i -2,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Herramientas y atributos de gestión II,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Gestión de Proyectos y Administración,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Terapia Visual,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Análisis neuromuscular del movimiento humano,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Emprendimiento en Salud II,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Fundamentos del Envejecimiento y Atención Integral,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Valoración Integral de la Persona Mayor,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Pregrado,Liderazgo y coaching para el cambio organizacional,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Pregrado,Viticultura y Enología,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Pregrado,"Antrozoología, Bienestar y Sociedad",Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Pregrado,Tecnologías de Producción Acuícola,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Pregrado,Manejo de Rumiantes en Pastoreo,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Pregrado,Manejo y Conservación en Fauna Silvestre,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Educación,Postgrado,Modelo teórico y trabajo interdisciplinario y transdisciplinario,Sandra María Rodríguez,Diseño (40%),,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Postgrado,Fundamentos de Ecología,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Postgrado,Conservación Biológica en un Contexto Cambio Global,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Postgrado,Estrategias para la Conservación y Restauración de la Biodiversidad,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Recursos Naturales y Medicina Veterinaria,Postgrado,Sistemas de Información Geográfica para la Conservación Biológica Aplicada,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Estrategias organizacionales para la creación de valor,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Analítica de negocios para la gestión directiva,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Innovación Empresarial,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Metodologías ágiles para la gestión de proyectos,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Liderazgo para la transformación organizacional,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Dirección de Organizaciones y Equipos,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Economía para la Dirección,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Análisis de Datos para la Gestión,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Dirección de Marketing,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Ingeniería y Negocios,Postgrado,Innovación y Emprendimiento,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Postgrado,Evaluación integral del comportamiento alimentario y nutrición,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Postgrado,Diseño de proyectos de intervención,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Postgrado,Planificación educativa,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
-Salud,Postgrado,Taller integrado interdisciplinario II,Sin docente,Diseño,,,,,,,,,,,,,,,,,0%,?? Pendiente,,,,,,
+@odata.etag,ItemInternalId,Facultad,Nivel,Asignatura,Docente,"Tipo de 
+Virtualización",JP,DI,DG,Implementador,"Reunión
+docente","Planificación
+didáctica","S0 Videos B y C
+15/9","S1–S2
+25/9","S3–S4
+5/10","S5–S6
+15/10","S7–S8
+25/10","S9–S10
+5/11","S11–S12
+15/11","S13–S14
+25/11","S15–S16
+5/12","S17–S18
+15/12",% Avance,Estado global,Observaciones,"Escalamiento
+correo",Correo docente,Fecha Sin Respuesta,Fecha envío DEL  ,Fecha DEL 2° Inst_x002e_ ,ID
+,ccdb9626-994c-4ce4-aabf-32511a9bdbc0,Ingeniería y Negocios,Pregrado,Nivelación Ciencias Básicas,Edgardo Palma Waldron,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,1
+,baade8da-22f4-464b-945c-40e315c1cb4e,Ingeniería y Negocios,Pregrado,Ingeniería en Termofluído,Jorge Rojo Camcho,Actualización,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,2
+,77ae90b5-77ae-4b1d-910d-506913c0e1da,Ingeniería y Negocios,Pregrado,Gestión de Capital humano,Isabel Flores Cáceres,Actualización,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,3
+,535144f6-f09c-4755-9f1c-691597ce4e05,Ingeniería y Negocios,Pregrado,Ingeniería para el medioambiente,Marcelo Hernandez,Actualización,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,4
+,fdd4f9ec-8417-4c7d-bd9e-58c18fc3fda9,Ingeniería y Negocios,Pregrado,Modelos de optimización,Wayib Emilio Kahil Delgado,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,5
+,285817e4-942a-4542-ae03-34a2106e7c0e,Ingeniería y Negocios,Pregrado,Estadística para Ingeniería,Gino Chávez Pinto,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,6
+,812fbbfd-8a7c-4749-a548-1a7302c6561e,Ingeniería y Negocios,Pregrado,Administración para alta dirección,Yohanna Abarzúa Calfuquir,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,7
+,d69ee2db-8de8-4625-a592-95fcc172823c,Ingeniería y Negocios,Pregrado,Machine Learning,Danilo Alberto Gomez Correa,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,8
+,9ea28421-d49e-4413-892d-0114b6f6b18c,Ingeniería y Negocios,Pregrado,Electivo de Formación Profesional II: Aplicación de aprendizaje de máquinas,Danilo Alberto Gomez Correa,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,9
+,af4f3012-771e-4a52-a240-2bf3a99d88a3,Ingeniería y Negocios,Pregrado,Formulación y gestión de proyectos,Edgardo Palma Waldron,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,10
+,651c9eb1-c6f9-44c5-983f-821b6c8bccb8,Ingeniería y Negocios,Pregrado,"Ética, ciudadanía y sociedad",Francisco Javier Labbé de Stefano,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,11
+,62b01e46-5b9c-4fd6-9b68-b1b1c54f3a12,Ingeniería y Negocios,Pregrado,Operación Remota y Robótica en Minería,Miguel Solis,Virtualización de recursos - Planificación validada,,,,,,Validada,,,,,,,,,,,0.0909090909090909,🟡 Pendiente,,,,,,,12
+,3fb1ec68-9582-4cc3-80f5-d4c53ca026cc,Ingeniería y Negocios,Pregrado,Electivo de Formación Profesional II: Análisis de Voladuras en Minería,Cristóbal de la Guarda,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,13
+,a58bc270-4a05-4216-b227-9639034d7935,Ingeniería y Negocios,Pregrado,Econometría,Germán Rojas,Ajuste pasar presencial a sincrónico,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,14
+,fb174af2-022b-4848-a820-b33c244c2522,Ingeniería y Negocios,Pregrado,Inglés Avanzado II,Claudia Jeria,Ajuste pasar presencial a sincrónico,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,15
+,3604efaa-90f7-4121-8bb9-5aaf2c2efe0a,Ingeniería y Negocios,Pregrado,Marketing Estratégico,Renato Bustamante,Ajuste Evaluaciones,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,16
+,9dd78d5f-3f1a-4f51-ab85-60c0affbfb6a,Ingeniería y Negocios,Pregrado,Introducción al Análisis de Datos,Rodrigo Ramírez,Ajuste Evaluaciones,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,17
+,28ab72ff-f74b-421a-8464-45029dc6fe0f,Ingeniería y Negocios,Pregrado,Economía para las Organizaciones,Sergio Álvarez,Ajuste Evaluaciones,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,18
+,2b0c4b1a-846d-4247-b9a2-a07cc39b0780,Ingeniería y Negocios,Pregrado,Macroeconomía,Felipe Rifo,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,19
+,88e73377-b484-476e-a0d0-8793cd96eed4,Ingeniería y Negocios,Pregrado,Electivo: Gestión de Marketing Digital,Renato Bustamante,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,20
+,a4376af9-7408-46cb-b926-4bd2a37cba20,Ingeniería y Negocios,Pregrado,Estrategia Competitiva,Camilo Araya,Ajuste de Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,21
+,037a6630-0140-4216-a733-59688ee7b336,Ciencias Sociales y Comunicaciones,Pregrado,Enfoques Contemporaneos,Luis Donoso Estay,Ajuste evaluaciones,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,22
+,36d65a12-0161-4edf-b745-d05846c31d0d,Ciencias Sociales y Comunicaciones,Pregrado,Epistemologia y Trabajo Social,Daniel Valenzuela Galarce,Ajuste evaluaciones,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,23
+,cf12f036-18c5-4333-968c-afb900ad9960,Ciencias Sociales y Comunicaciones,Pregrado,Metodología de la Investigación,Daniel Valenzuela Galarce,Ajuste evaluaciones,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,24
+,33b6fdf6-97a5-4c9a-90da-c73da5a33a48,Salud,Pregrado,Componentes Contaminantes y Tóxicos en Alimentos,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,25
+,78ce1ffb-ca78-4b08-8a2b-783e237aeb0c,Salud,Pregrado,Mercado I+D+i -2,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,26
+,19e0529d-1259-472b-a3d5-08561feda1be,Salud,Pregrado,Herramientas y atributos de gestión II,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,27
+,8690907e-0d32-4251-aac6-b3857260198e,Salud,Pregrado,Gestión de Proyectos y Administración,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,28
+,b7d465a7-6f70-488c-a11f-bab95306028e,Salud,Pregrado,Terapia Visual,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,29
+,d26fc292-479e-4389-b216-57b14e6d30ee,Salud,Pregrado,Análisis neuromuscular del movimiento humano,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,30
+,a9c276dd-03e3-4005-bac0-921c28ffed33,Salud,Pregrado,Emprendimiento en Salud II,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,31
+,246ff1b3-66db-4e44-8785-e88e11f454f0,Salud,Pregrado,Fundamentos del Envejecimiento y Atención Integral,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,32
+,cd3bc0d8-6963-43b1-b68a-bc5fae34af8d,Salud,Pregrado,Valoración Integral de la Persona Mayor,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,33
+,ecd58e22-7a32-4294-bbc2-9b064593a6da,Salud,Pregrado,Liderazgo y coaching para el cambio organizacional,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,34
+,40d085ce-35da-42f6-be09-c3847b615c88,Recursos Naturales y Medicina Veterinaria,Pregrado,Viticultura y Enología,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,35
+,a14caa41-e917-4cc6-99ce-385f242289a6,Recursos Naturales y Medicina Veterinaria,Pregrado,"Antrozoología, Bienestar y Sociedad",Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,36
+,b52601d4-778a-46b4-87c5-d67794589f0d,Recursos Naturales y Medicina Veterinaria,Pregrado,Tecnologías de Producción Acuícola,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,37
+,732cd058-7c53-44fc-af1e-5ba5589780e7,Recursos Naturales y Medicina Veterinaria,Pregrado,Manejo de Rumiantes en Pastoreo,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,38
+,742a55c1-80c9-44a3-be46-a86dbe41601f,Recursos Naturales y Medicina Veterinaria,Pregrado,Manejo y Conservación en Fauna Silvestre,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,39
+,25a5e50e-a23e-4ee9-aa62-36f1ea3a483d,Educación,Postgrado,Modelo teórico y trabajo interdisciplinario y transdisciplinario,Sandra María Rodríguez,Diseño (40%),,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,40
+,b8ad3549-1195-4fc8-abec-91e29c05bcba,Recursos Naturales y Medicina Veterinaria,Postgrado,Fundamentos de Ecología,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,41
+,e60a036b-e78c-487d-9c07-3d5f3d3552ec,Recursos Naturales y Medicina Veterinaria,Postgrado,Conservación Biológica en un Contexto Cambio Global,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,42
+,f0c49345-9b45-4126-9ef2-08c2078ea2fe,Recursos Naturales y Medicina Veterinaria,Postgrado,Estrategias para la Conservación y Restauración de la Biodiversidad,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,43
+,dbca32ea-92cb-4c7b-a67f-48dbf171d6da,Recursos Naturales y Medicina Veterinaria,Postgrado,Sistemas de Información Geográfica para la Conservación Biológica Aplicada,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,44
+,9b74b414-70aa-4dcb-acef-73e32ced7d45,Ingeniería y Negocios,Postgrado,Estrategias organizacionales para la creación de valor,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,45
+,08e749b6-c02e-4865-8ad9-2275c9a3167c,Ingeniería y Negocios,Postgrado,Analítica de negocios para la gestión directiva,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,46
+,49cd353d-9202-4c18-b919-e6a15f52c6c3,Ingeniería y Negocios,Postgrado,Innovación Empresarial,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,47
+,c60fa77a-0afd-4307-ab29-90a64d2e7525,Ingeniería y Negocios,Postgrado,Metodologías ágiles para la gestión de proyectos,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,48
+,5368ec3d-40e1-4db1-9778-713c1feccba1,Ingeniería y Negocios,Postgrado,Liderazgo para la transformación organizacional,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,49
+,b5c3efff-b2a1-43a3-b7da-c24f2c315b32,Ingeniería y Negocios,Postgrado,Dirección de Organizaciones y Equipos,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,50
+,9eddca47-0ce2-4d35-bc79-2088ea53b0e8,Ingeniería y Negocios,Postgrado,Economía para la Dirección,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,51
+,02d2644e-ccaf-471d-ad5d-6ca198cbb230,Ingeniería y Negocios,Postgrado,Análisis de Datos para la Gestión,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,52
+,065b945b-8924-4c57-9838-856a55778b6c,Ingeniería y Negocios,Postgrado,Dirección de Marketing,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,53
+,b8b92c8a-15c8-4758-ba66-c2ec509cf298,Ingeniería y Negocios,Postgrado,Innovación y Emprendimiento,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,54
+,4d48eced-5151-4c13-838e-e787c50ebd14,Salud,Postgrado,Evaluación integral del comportamiento alimentario y nutrición,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,55
+,63df9c44-9681-4fbd-b83e-9e1b7e04d6ef,Salud,Postgrado,Diseño de proyectos de intervención,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,56
+,930ac005-ef3a-42ed-9aa1-3300b66295c6,Salud,Postgrado,Planificación educativa,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,57
+,c89f9355-8e44-4256-b7e5-7b42103f48a1,Salud,Postgrado,Taller integrado interdisciplinario II,Sin docente,Diseño,,,,,,,,,,,,,,,,,0,🟡 Pendiente,,,,,,,58
