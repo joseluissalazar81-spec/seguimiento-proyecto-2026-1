@@ -5770,8 +5770,8 @@ window.addEventListener('load', function(){
   // Conocimiento del proyecto UST 2026-2
   const PROYECTO = {
     nombre: 'Proyecto de Virtualización de Cursos UST 2026-2',
-    botNombre: 'Vio',
-    botOrigen: 'Me llamo Vio, abreviación de Violetta — la asistente virtual del proyecto UST 2026-2.',
+    botNombre: 'Pauli',
+    botOrigen: 'Me llamo Pauli, la asistente virtual del proyecto UST 2026-2.',
     descripcion: 'Diseño y producción de recursos educativos digitales para cursos universitarios de la Universidad Santo Tomás, semestre 2026-2.',
     directora: {nombre:'Paulina Vera Benavente', rol:'Directora del proyecto', mail:'pverab@santotomas.cl'},
     fases: [
@@ -5834,13 +5834,13 @@ window.addEventListener('load', function(){
     const nq = nrm(q);
 
     if(nq.match(/como te llamas|quien eres|tu nombre|eres vio|por que vio|de donde.*nombre|violetta/))
-      return {txt:'Soy <strong>Vio</strong>, la asistente virtual del proyecto UST 2026-2.\n\n'+PROYECTO.botOrigen+'\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.', chips:['Ver promedio','Reuniones realizadas','Ayuda']};
+      return {txt:'Soy <strong>Pauli</strong>, la asistente virtual del proyecto UST 2026-2.\n\n'+PROYECTO.botOrigen+'\n\nPuedo responder sobre avance de asignaturas, equipo, recursos, plantillas, manuales, horas, programas y todo lo relacionado al proyecto.', chips:['Ver promedio','Reuniones realizadas','Ayuda']};
 
     if(nq.match(/paulina|directora/))
       return {txt:`<strong>${PROYECTO.directora.nombre}</strong>\nRol: ${PROYECTO.directora.rol}\nContacto: ${PROYECTO.directora.mail}`, chips:['¿Quién es el equipo?']};
 
     if(/^(hola|buenas|hey|buen|saludos)/.test(nq))
-      return {txt:'¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-2. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']};
+      return {txt:'¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-2. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.', chips:['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']};
 
     if(nq.includes('ayuda') || nq==='?' || nq.includes('que puedo'))
       return {txt:'Podés preguntarme sobre:\n• <strong>Avance por facultad / asignatura</strong> (% promedio por área)\n• <strong>Docente / DI / JP / DG / implementador</strong> de una asignatura\n• <strong>Tipos de recursos</strong> T1–T4 (cápsula, videoclase, Genially…)\n• <strong>Los 3 momentos</strong> de aprendizaje\n• <strong>Manual DG, Manual Implementador</strong> (nomenclatura, checklist QA)\n• <strong>Fases del proceso</strong> y <strong>roles del equipo</strong>\n• <strong>Co-diseño, Escala de Apreciación, QA planificación</strong>\n• <strong>Colores por facultad</strong>, herramientas, duplas de trabajo\n• <strong>Estadísticas:</strong> promedio, top 5, menor avance, formatos', chips:['Avance por facultad','Tipos de recursos','Fases del proceso']};
@@ -6659,7 +6659,7 @@ window.addEventListener('load', function(){
       w.classList.add('open');
       if(!botGreeted){
         botGreeted=true;
-        setTimeout(()=>addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-2. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']),300);
+        setTimeout(()=>addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-2. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']),300);
       }
       setTimeout(()=>document.getElementById('bot-input')?.focus(),100);
     } else {
@@ -6674,7 +6674,7 @@ window.addEventListener('load', function(){
     ctxPersona=null;
     setTimeout(()=>{
       botGreeted=true;
-      addMsg('¡Hola! Soy <strong>Vio</strong>, tu asistente del proyecto UST 2026-2. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']);
+      addMsg('¡Hola! Soy <strong>Pauli</strong>, tu asistente del proyecto UST 2026-2. Podés preguntarme sobre avance de asignaturas, estado de reuniones, equipo o cualquier recurso del proyecto.','bot',['Rendimiento','Docentes en riesgo','Mejor docente','¿Quién es el equipo?','Manuales']);
     },200);
   };
 })();
