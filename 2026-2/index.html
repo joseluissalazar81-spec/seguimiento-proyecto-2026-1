@@ -2515,31 +2515,39 @@ const CSV_HEADER_R4 = ['jp','jefe de proyecto','jefe proyecto'];
 const CSV_HEADER_R1 = ['asignatura','nombre asignatura','nombre de asignatura'];
 
 function buildDataFromCSV(rows){
-  // CSV generado por Power Automate: 0=@odata.etag 1=ItemInternalId 2=Facultad 3=Nivel
-  // 4:Asignatura 5:Docente 6:TipoVirt 7:JP 8:DI 9:DG 10:Impl 11:Reunión 12:Planif
-  // 13:S0 14:S1-S2 15:S3-S4 16:S5-S6 17:S7-S8 18:S9-S10 19:S11-S12
-  // 20:S13-S14 21:S15-S16 22:S17-S18 23:%Avance 24:Estado 25:Obs
-  // 26:Escal 27:Correo 28:FechaSR 29:EnvDEL 30:DEL2 31:ID
+  if(!rows||!rows.length)return{data:[],avance:{}};
+  // Auto-detect Power Automate format: PA adds @odata.etag + ItemInternalId at start,
+  // shifting all columns +2. Detect by checking if first data row starts with a known faculty.
+  const KNOWN_FAC=['Ingeniería','Ciencias','Salud','Recursos','Educación','Formación'];
+  const isPAFmt = !KNOWN_FAC.some(f=>(rows[0][0]||'').startsWith(f));
+  const OFF = isPAFmt ? 2 : 0;
+  // Column layout (OFF=0 for plain CSV, OFF=2 for Power Automate CSV):
+  // OFF+0:Facultad OFF+1:Nivel OFF+2:Asignatura OFF+3:Docente OFF+4:TipoVirt
+  // OFF+5:JP OFF+6:DI OFF+7:DG OFF+8:Impl OFF+9:Reunión OFF+10:Planif
+  // OFF+11:S0 OFF+12:S1-S2 OFF+13:S3-S4 OFF+14:S5-S6 OFF+15:S7-S8
+  // OFF+16:S9-S10 OFF+17:S11-S12 OFF+18:S13-S14 OFF+19:S15-S16 OFF+20:S17-S18
+  // OFF+21:%Avance OFF+22:Estado OFF+23:Obs OFF+24:Escal OFF+25:Correo
+  // OFF+26:FechaSR OFF+27:EnvDEL OFF+28:DEL2
   const data=[], avance={};
   (rows||[]).forEach(r=>{
-    if(!r[4] || !r[4].trim()) return;
-    if(r[4].trim()==='Asignatura') return;
-    const asig = r[4].trim();
-    const isRecNatC = (r[2]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
-    const HITO_COLS_C = [r[12],r[13],r[14],r[15],r[16],r[17],r[18],r[19],r[20],r[21],r[22]];
+    if(!(r[OFF+2]||'').trim()) return;
+    if((r[OFF+2]||'').trim()==='Asignatura') return;
+    const asig = r[OFF+2].trim();
+    const isRecNatC = (r[OFF+0]||'').trim() === 'Recursos Naturales y Medicina Veterinaria';
+    const HITO_COLS_C = [r[OFF+10],r[OFF+11],r[OFF+12],r[OFF+13],r[OFF+14],r[OFF+15],r[OFF+16],r[OFF+17],r[OFF+18],r[OFF+19],r[OFF+20]];
     const nValC = HITO_COLS_C.filter(v=>(v||'').trim()==='Validada').length;
     const pct = isRecNatC ? Math.min(100,Math.round(nValC/8*100)) : Math.round(nValC/11*100);
-    data.push({facultad:(r[2]||'').trim(),nivel:r[3]||'',asignatura:asig,docente:r[5]||'',fmt:r[6]||'',
-      jp:r[7]||'',di:r[8]||'',dg:r[9]||'—',implementador:r[10]||'',
-      reunion:r[11]||'',planif:r[12]||'',estadoGlobal:r[24]||'',obs:r[25]||'',correo:r[27]||'',
-      fechaSR:r[28]||'',envDELfecha:r[29]||'',del2fecha:r[30]||''});
-    avance[asig]={avance:pct,obs:r[25]||'',hitos:{
-      s0:mapHito(r[13]),s1s2:mapHito(r[14]),s3s4:mapHito(r[15]),
-      s5s6:mapHito(r[16]),s7s8:mapHito(r[17]),s9s10:mapHito(r[18]),
-      s11s12:mapHito(r[19]),
-      s13s14:isRecNatC ? 'No aplica' : mapHito(r[20]),
-      s15s16:isRecNatC ? 'No aplica' : mapHito(r[21]),
-      s17s18:isRecNatC ? 'No aplica' : mapHito(r[22])}};
+    data.push({facultad:(r[OFF+0]||'').trim(),nivel:r[OFF+1]||'',asignatura:asig,docente:r[OFF+3]||'',fmt:r[OFF+4]||'',
+      jp:r[OFF+5]||'',di:r[OFF+6]||'',dg:r[OFF+7]||'—',implementador:r[OFF+8]||'',
+      reunion:r[OFF+9]||'',planif:r[OFF+10]||'',estadoGlobal:r[OFF+22]||'',obs:r[OFF+23]||'',correo:r[OFF+25]||'',
+      fechaSR:r[OFF+26]||'',envDELfecha:r[OFF+27]||'',del2fecha:r[OFF+28]||''});
+    avance[asig]={avance:pct,obs:r[OFF+23]||'',hitos:{
+      s0:mapHito(r[OFF+11]),s1s2:mapHito(r[OFF+12]),s3s4:mapHito(r[OFF+13]),
+      s5s6:mapHito(r[OFF+14]),s7s8:mapHito(r[OFF+15]),s9s10:mapHito(r[OFF+16]),
+      s11s12:mapHito(r[OFF+17]),
+      s13s14:isRecNatC ? 'No aplica' : mapHito(r[OFF+18]),
+      s15s16:isRecNatC ? 'No aplica' : mapHito(r[OFF+19]),
+      s17s18:isRecNatC ? 'No aplica' : mapHito(r[OFF+20])}};
   });
   return {data,avance};
 }
